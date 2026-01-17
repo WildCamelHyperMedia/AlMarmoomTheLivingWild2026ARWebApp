@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Globe } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import oryxImage from "@assets/generated_images/arabian_oryx_in_desert_dunes_at_golden_hour.png";
 import { motion } from "framer-motion";
 
@@ -61,7 +61,6 @@ export default function LandingPage() {
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-white/50 tracking-widest uppercase">Arabic</span>
             </div>
-            <Globe className="absolute left-4 h-5 w-5 text-white/40 group-hover:text-primary transition-colors" />
           </button>
 
           {/* English Option */}
