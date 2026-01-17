@@ -1,110 +1,204 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, Maximize2, Info, Share2, Heart, ArrowRight } from "lucide-react";
+import { ArrowLeft, Share2 } from "lucide-react";
 import { Link } from "wouter";
-import birdImage from "@assets/generated_images/close_up_of_a_cream-colored_courser_bird_in_desert.png";
+import { useLanguage } from "@/lib/language";
+import useEmblaCarousel from "embla-carousel-react";
+import { useState, useEffect } from "react";
+
+// Data Structure for Animals
+const animals = [
+  // Page 1
+  {
+    id: "white_tailed_lapwing",
+    image: "/animals/All Animals - Pictures/25- white tailes lapwing.jpg",
+  },
+  {
+    id: "water_rail",
+    image: "/animals/All Animals - Pictures/9-Water Rail.jpg",
+  },
+  {
+    id: "blue_throated_wagtail",
+    image: "/animals/All Animals - Pictures/14-Blue-throated Wagtail.jpg",
+  },
+  {
+    id: "purple_sunbird",
+    image: "/animals/All Animals - Pictures/13-Purple Sunbird.jpg",
+  },
+  {
+    id: "eurasian_stone_curlew",
+    image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
+  },
+  {
+    id: "houbara_bustard",
+    image: "/animals/All Animals - Pictures/21 Houbara Bustard١.jpg",
+  },
+  {
+    id: "little_grebe",
+    image: "/animals/All Animals - Pictures/1-Little Grebe.jpg",
+  },
+  {
+    id: "western_great_egret",
+    image: "/animals/All Animals - Pictures/3-Western Great Egrettif.jpg",
+  },
+  {
+    id: "hoopoe",
+    image: "/animals/All Animals - Pictures/6-Hoopoe.jpg",
+  },
+  {
+    id: "yellow_wagtail",
+    image: "/animals/All Animals - Pictures/16-The Yellow Wagtails.jpg",
+  },
+  {
+    id: "grey_headed_swamphen",
+    image: "/animals/All Animals - Pictures/27-Grey-headed Swamphen.jpg",
+  },
+  {
+    id: "iraqi_sandgrouse",
+    image: "/animals/All Animals - Pictures/8-Iraqi Sandgrouse-.jpg",
+  },
+  // Page 2
+  {
+    id: "desert_eagle_owl",
+    image: "/animals/All Animals - Pictures/26- desert eagle owl .jpg",
+  },
+  {
+    id: "little_owl",
+    image: "/animals/All Animals - Pictures/19-Little Owl.jpg",
+  },
+  {
+    id: "ruppells_fox",
+    image: "/animals/All Animals - Pictures/7-Ruppell’s Fox 1.jpg",
+  },
+  {
+    id: "gerbillus_cheesmani",
+    image: "/animals/All Animals - Pictures/15-Gerbillus cheesmani.jpg",
+  },
+  {
+    id: "hedgehog",
+    image: "/animals/All Animals - Pictures/28-hedgehog.jpg",
+  },
+  {
+    id: "desert_monitor",
+    image: "/animals/All Animals - Pictures/11-Desert Monitor.jpg",
+  },
+  {
+    id: "arabian_oryx",
+    image: "/animals/All Animals - Pictures/20-Arabian Oryx.jpg",
+  },
+  {
+    id: "dorcas_gazelle",
+    image: "/animals/All Animals - Pictures/22-(Dorcas Gazelle.jpg",
+  },
+  {
+    id: "frog_headed_lizard",
+    image: "/animals/All Animals - Pictures/2-Frog-headed Lizard 1.jpg",
+  },
+  {
+    id: "sandfish_lizard",
+    image: "/animals/All Animals - Pictures/17-Sandfish Lizard.jpg",
+  },
+  {
+    id: "spiny_tailed_lizard",
+    image: "/animals/All Animals - Pictures/18-Spiny-tailed Lizard.jpg",
+  },
+];
 
 export default function GalleryPage() {
+  const { t, dir } = useLanguage();
+  const [emblaRef, emblaApi] = useEmblaCarousel({ direction: dir });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.on("select", () => {
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+      });
+    }
+  }, [emblaApi]);
+
+  // Chunk animals into groups of 12 for pagination
+  const chunkSize = 12;
+  const chunks = [];
+  for (let i = 0; i < animals.length; i += chunkSize) {
+    chunks.push(animals.slice(i, i + chunkSize));
+  }
+
   return (
-    <div className="min-h-screen bg-background text-white pb-20">
+    <div className="min-h-screen bg-background text-white pb-20 relative overflow-hidden">
       
+      {/* Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none" />
+
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-6 bg-gradient-to-b from-black/80 to-transparent">
-        <Link href="/">
-          <button className="rounded-full bg-black/20 p-2 backdrop-blur-md hover:bg-black/40 transition-colors">
+      <div className="flex items-center justify-between p-6 z-10 relative">
+        <Link href="/intro">
+          <button className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}>
             <ArrowLeft className="h-6 w-6 text-white" />
           </button>
         </Link>
-        <div className="flex gap-4">
-          <button className="rounded-full bg-black/20 p-2 backdrop-blur-md hover:bg-black/40 transition-colors">
+        {/* <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
             <Share2 className="h-5 w-5 text-white" />
-          </button>
+        </button> */}
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="px-6 mb-8 z-10 relative"
+      >
+        <h1 className="font-serif text-2xl font-bold uppercase tracking-wider text-white">
+          {t("gallery.title")}
+        </h1>
+      </motion.div>
+
+      {/* Carousel */}
+      <div className="overflow-hidden" ref={emblaRef} dir={dir}>
+        <div className="flex touch-pan-y">
+          {chunks.map((chunk, pageIndex) => (
+            <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative" key={pageIndex}>
+              <div className="grid grid-cols-3 gap-y-8 gap-x-4">
+                {chunk.map((animal) => (
+                  <motion.div 
+                    key={animal.id}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="flex flex-col items-center gap-3 text-center"
+                  >
+                    <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg">
+                      <img 
+                        src={animal.image} 
+                        alt={t(`animals.${animal.id}`)}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        loading="lazy"
+                      />
+                    </div>
+                    <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center">
+                      {t(`animals.${animal.id}`)}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-col gap-6">
-        
-        {/* Featured VR Experience Card */}
-        <div className="relative h-[85vh] w-full overflow-hidden rounded-b-[3rem] shadow-2xl">
-          <div className="absolute inset-0 bg-black/20 z-10" />
-          <img 
-            src={birdImage} 
-            alt="Cream-colored Courser" 
-            className="h-full w-full object-cover"
+      {/* Pagination Dots */}
+      <div className="flex justify-center gap-3 mt-12">
+        {chunks.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => emblaApi && emblaApi.scrollTo(index)}
+            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+              index === selectedIndex ? "bg-white scale-110" : "bg-white/20"
+            }`}
+            aria-label={`Go to page ${index + 1}`}
           />
-          
-          {/* Video Player UI Overlay */}
-          <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 bg-gradient-to-t from-black/90 via-transparent to-transparent">
-            
-            {/* Play Button - Centered */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="pointer-events-auto flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-lg border border-white/30 text-white shadow-lg hover:bg-white/30 transition-all"
-              >
-                <Play className="h-8 w-8 ml-1 fill-white" />
-              </motion.button>
-            </div>
-
-            {/* Info Section */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mb-8"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-xs font-medium tracking-wider uppercase backdrop-blur-sm">
-                  Featured
-                </span>
-                <span className="text-white/60 text-xs tracking-wider uppercase">Rare Sighting</span>
-              </div>
-              <h2 className="font-serif text-4xl mb-2">The Cream-colored Courser</h2>
-              <p className="text-white/70 font-sans text-sm max-w-xs leading-relaxed">
-                A native resident of the Arabian desert, perfectly camouflaged against the dunes. Experience its habitat in VR.
-              </p>
-            </motion.div>
-
-            {/* VR CTA */}
-            <button className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl bg-primary/90 hover:bg-primary text-background font-semibold py-4 transition-all active:scale-[0.98]">
-              <Maximize2 className="h-5 w-5" />
-              <span className="tracking-widest text-sm">ENTER VR EXPERIENCE</span>
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </button>
-
-            {/* Progress Bar (Mock) */}
-            <div className="mt-6 flex items-center gap-3 text-xs font-mono text-white/50">
-              <span>0:57</span>
-              <div className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/10">
-                <div className="absolute left-0 top-0 h-full w-1/3 bg-primary rounded-full" />
-              </div>
-              <span>3:21</span>
-            </div>
-
-          </div>
-        </div>
-
-        {/* Secondary Content - "Unified Gallery" Hint */}
-        <div className="px-6 pb-12">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-serif tracking-wide text-white/90">More from the Exhibition</h3>
-            <span className="text-xs text-primary cursor-pointer hover:underline">View All</span>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer group">
-                <div className="text-center opacity-40 group-hover:opacity-100 transition-opacity">
-                  <span className="block text-2xl mb-1">Coming Soon</span>
-                  <span className="text-xs font-mono">Image {i}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        ))}
       </div>
+
     </div>
   );
 }
