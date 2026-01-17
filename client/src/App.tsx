@@ -6,11 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/LandingPage";
 import GalleryPage from "@/pages/GalleryPage";
+import SignUpPage from "@/pages/SignUpPage";
+import { LanguageProvider } from "@/lib/language";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
+      <Route path="/signup" component={SignUpPage} />
       <Route path="/gallery" component={GalleryPage} />
       <Route component={NotFound} />
     </Switch>
@@ -20,10 +23,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

@@ -1,10 +1,19 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { ArrowRight } from "lucide-react";
 import oryxImage from "@assets/generated_images/arabian_oryx_in_desert_dunes_at_golden_hour.png";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/language";
 
 export default function LandingPage() {
+  const [, setLocation] = useLocation();
+  const { setLanguage } = useLanguage();
+
+  const handleLanguageSelect = (lang: "en" | "ar") => {
+    setLanguage(lang);
+    setLocation("/signup");
+  };
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-background text-white">
       {/* Background Image with Zoom Effect */}
@@ -56,7 +65,10 @@ export default function LandingPage() {
           className="w-full max-w-sm space-y-4"
         >
           {/* Arabic Option */}
-          <button className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-right backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50">
+          <button 
+            onClick={() => handleLanguageSelect("ar")}
+            className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-right backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50"
+          >
             <span className="font-arabic text-xl">العربية</span>
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-white/50 tracking-widest uppercase">Arabic</span>
@@ -64,13 +76,16 @@ export default function LandingPage() {
           </button>
 
           {/* English Option */}
-          <Link href="/gallery" className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-left backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50">
+          <button 
+            onClick={() => handleLanguageSelect("en")}
+            className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-left backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50"
+          >
             <div className="flex flex-col items-start">
               <span className="font-serif text-xl">English</span>
               <span className="text-[10px] text-white/50 tracking-widest uppercase">Default</span>
             </div>
             <ArrowRight className="h-5 w-5 text-white/70 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-          </Link>
+          </button>
 
           <p className="mt-8 text-[10px] text-white/30 tracking-widest uppercase">
             Al Marmoom Desert Conservation Reserve
