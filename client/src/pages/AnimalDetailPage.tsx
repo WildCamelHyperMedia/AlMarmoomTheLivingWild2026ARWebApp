@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
@@ -9,6 +9,7 @@ export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const { t, dir } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isArOpen, setIsArOpen] = useState(false);
 
   const animal = animals.find((a) => a.id === params?.id);
 
@@ -40,7 +41,7 @@ export default function AnimalDetailPage() {
       </div>
 
       {/* Play Button Overlay */}
-      {!isPlaying && (
+      {!isPlaying && !isArOpen && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
           <motion.button
             initial={{ scale: 0.8, opacity: 0 }}
@@ -52,6 +53,32 @@ export default function AnimalDetailPage() {
           >
             <Play className="fill-white ml-1 w-8 h-8 group-hover:scale-110 transition-transform" />
           </motion.button>
+        </div>
+      )}
+
+      {/* Matterport AR Overlay */}
+      {isArOpen && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col">
+          <div className="relative flex-1">
+            <button 
+              onClick={() => setIsArOpen(false)}
+              className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <iframe
+              src="https://my.matterport.com/show/?m=SxQL3iGyoDo&play=1&qs=1"
+              frameBorder="0"
+              className="w-full h-full"
+              allowFullScreen
+              allow="xr-spatial-tracking"
+            ></iframe>
+          </div>
+          <div className="bg-black/90 p-6 pb-10 text-center">
+            <p className="text-white/70 text-sm">
+              {t("gallery.desc")}
+            </p>
+          </div>
         </div>
       )}
 
@@ -78,6 +105,7 @@ export default function AnimalDetailPage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
+          onClick={() => setIsArOpen(true)}
           className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
         >
           <ScanLine className="w-5 h-5 opacity-70" />
