@@ -8,6 +8,7 @@ import LandingPage from "@/pages/LandingPage";
 import GalleryPage from "@/pages/GalleryPage";
 import SignUpPage from "@/pages/SignUpPage";
 import IntroPage from "@/pages/IntroPage";
+import AnimalDetailPage from "@/pages/AnimalDetailPage";
 import { LanguageProvider } from "@/lib/language";
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/signup" component={SignUpPage} />
       <Route path="/intro" component={IntroPage} />
       <Route path="/gallery" component={GalleryPage} />
+      <Route path="/animal/:id" component={AnimalDetailPage} />
       <Route component={NotFound} />
     </Switch>
   );
