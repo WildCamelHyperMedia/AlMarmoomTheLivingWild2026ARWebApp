@@ -1,17 +1,46 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const { t, dir } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isArOpen, setIsArOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const animal = animals.find((a) => a.id === params?.id);
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+
+    if (isArOpen) {
+      // Attempt to access the back camera
+      navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: { ideal: "environment" } 
+        } 
+      })
+      .then((mediaStream) => {
+        stream = mediaStream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+      })
+      .catch((err) => {
+        console.error("Error accessing camera:", err);
+      });
+    }
+
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isArOpen]);
 
   if (!animal) {
     return <div>Animal not found</div>;
@@ -56,27 +85,60 @@ export default function AnimalDetailPage() {
         </div>
       )}
 
-      {/* Matterport AR Overlay */}
+      {/* AR Portal Experience */}
       {isArOpen && (
         <div className="fixed inset-0 z-50 bg-black flex flex-col">
-          <div className="relative flex-1">
+          {/* Camera Feed Layer */}
+          <div className="absolute inset-0 z-0">
+             <video 
+              ref={videoRef}
+              autoPlay 
+              playsInline 
+              muted
+              className="w-full h-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+               {!videoRef.current?.srcObject && (
+                 <div className="text-white/50 flex flex-col items-center gap-2">
+                   <Camera className="w-12 h-12" />
+                   <p>Waiting for camera...</p>
+                 </div>
+               )}
+            </div>
+          </div>
+
+          {/* Matterport Portal Window */}
+          <div className="relative flex-1 z-10 flex items-center justify-center p-8">
             <button 
               onClick={() => setIsArOpen(false)}
               className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
-            <iframe
-              src="https://my.matterport.com/show/?m=SxQL3iGyoDo&play=1&qs=1"
-              frameBorder="0"
-              className="w-full h-full"
-              allowFullScreen
-              allow="xr-spatial-tracking"
-            ></iframe>
+            
+            {/* The "Portal" Frame */}
+            <div className="w-full h-[70vh] max-w-lg relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm animate-in fade-in zoom-in duration-500">
+               <div className="absolute top-4 left-0 right-0 z-20 text-center pointer-events-none">
+                  <span className="bg-black/60 text-white text-xs px-3 py-1 rounded-full backdrop-blur-md">
+                    AR PORTAL VIEW
+                  </span>
+               </div>
+               <iframe
+                src="https://my.matterport.com/show/?m=SxQL3iGyoDo&play=1&qs=1&brand=0&title=0&tourcta=0&vr=0"
+                frameBorder="0"
+                className="w-full h-full"
+                allowFullScreen
+                allow="xr-spatial-tracking"
+              ></iframe>
+            </div>
           </div>
-          <div className="bg-black/90 p-6 pb-10 text-center">
-            <p className="text-white/70 text-sm">
-              {t("gallery.desc")}
+
+          <div className="relative z-10 bg-black/80 backdrop-blur-md p-6 pb-10 text-center border-t border-white/10">
+            <p className="text-white text-sm font-medium mb-1">
+              {t(`animals.${animal.id}`)} Habitat
+            </p>
+            <p className="text-white/60 text-xs">
+              Look through the portal to explore the environment
             </p>
           </div>
         </div>
