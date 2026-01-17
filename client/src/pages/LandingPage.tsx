@@ -1,0 +1,83 @@
+import { useState } from "react";
+import { Link } from "wouter";
+import { ArrowRight, Globe } from "lucide-react";
+import oryxImage from "@assets/generated_images/arabian_oryx_in_desert_dunes_at_golden_hour.png";
+import { motion } from "framer-motion";
+
+export default function LandingPage() {
+  return (
+    <div className="relative h-screen w-full overflow-hidden bg-background text-white">
+      {/* Background Image with Zoom Effect */}
+      <motion.div 
+        initial={{ scale: 1.1 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+        className="absolute inset-0 z-0"
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/30 z-10" />
+        <img 
+          src={oryxImage} 
+          alt="Al Marmoom Desert" 
+          className="h-full w-full object-cover object-center"
+        />
+      </motion.div>
+
+      {/* Content */}
+      <div className="relative z-20 flex h-full flex-col items-center justify-between px-6 py-12 text-center">
+        
+        {/* Header Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mt-12 flex flex-col items-center gap-4"
+        >
+          <div className="font-arabic text-4xl mb-2">المرموم</div>
+          <h1 className="font-serif text-5xl font-light tracking-[0.2em] uppercase text-primary/90">
+            Al Marmoom
+          </h1>
+          <div className="h-px w-24 bg-primary/60 my-4" />
+          <h2 className="font-sans text-sm tracking-widest uppercase text-white/80">
+            Drive-Through Photography Exhibition
+          </h2>
+          <p className="font-sans text-xs tracking-wider text-white/60 mt-1">
+            Al Marmoom Desert Conservation Reserve
+          </p>
+        </motion.div>
+
+        {/* Center Visual/Spacer */}
+        <div className="flex-1" />
+
+        {/* Language Selection */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="w-full max-w-sm space-y-4"
+        >
+          {/* Arabic Option */}
+          <button className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-right backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50">
+            <span className="font-arabic text-xl">العربية</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] text-white/50 tracking-widest uppercase">Arabic</span>
+            </div>
+            <Globe className="absolute left-4 h-5 w-5 text-white/40 group-hover:text-primary transition-colors" />
+          </button>
+
+          {/* English Option */}
+          <Link href="/gallery" className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-left backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50">
+            <div className="flex flex-col items-start">
+              <span className="font-serif text-xl">English</span>
+              <span className="text-[10px] text-white/50 tracking-widest uppercase">Default</span>
+            </div>
+            <ArrowRight className="h-5 w-5 text-white/70 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+          </Link>
+
+          <p className="mt-8 text-[10px] text-white/30 tracking-widest uppercase">
+            Al Marmoom Desert Conservation Reserve
+          </p>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
