@@ -10,7 +10,7 @@ export default function SignUpPage() {
   const { t, language, dir } = useLanguage();
 
   const handleContinue = () => {
-    setLocation("/gallery");
+    setLocation("/intro");
   };
 
   return (

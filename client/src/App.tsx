@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/LandingPage";
 import GalleryPage from "@/pages/GalleryPage";
 import SignUpPage from "@/pages/SignUpPage";
+import IntroPage from "@/pages/IntroPage";
 import { LanguageProvider } from "@/lib/language";
 
 function Router() {
@@ -14,6 +15,7 @@ function Router() {
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/signup" component={SignUpPage} />
+      <Route path="/intro" component={IntroPage} />
       <Route path="/gallery" component={GalleryPage} />
       <Route component={NotFound} />
     </Switch>
