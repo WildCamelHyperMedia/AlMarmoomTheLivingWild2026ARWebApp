@@ -18,7 +18,7 @@ export default function AnimalDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white relative overflow-hidden">
+    <div className="h-[100dvh] w-full bg-background text-white relative overflow-hidden">
       
       {/* Background Image (Full Screen) */}
       <div className="absolute inset-0 z-0">

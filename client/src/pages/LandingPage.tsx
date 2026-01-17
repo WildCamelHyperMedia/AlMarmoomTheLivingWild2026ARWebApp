@@ -15,7 +15,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-background text-white">
+    <div className="relative h-[100dvh] w-full overflow-hidden bg-background text-white">
       {/* Background Image with Zoom Effect */}
       <motion.div 
         initial={{ scale: 1.1 }}

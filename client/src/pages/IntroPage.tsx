@@ -29,7 +29,7 @@ export default function IntroPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-white flex flex-col items-center px-6 py-8 relative overflow-hidden">
+    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-8 relative overflow-hidden">
       
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none" />
