@@ -46,7 +46,12 @@ const translations = {
     "animals.dorcas_gazelle": "Dorcas Gazelle",
     "animals.frog_headed_lizard": "Frog Headed Lizard",
     "animals.sandfish_lizard": "Sandfish Lizard",
-    "animals.spiny_tailed_lizard": "Spiny Tailed Lizard"
+    "animals.spiny_tailed_lizard": "Spiny Tailed Lizard",
+    "notification.keepGoing.title": "Keep going!",
+    "notification.keepGoing.message": "Watch 10 videos to enter the draw for a signed photo book by Ali Bin Thalith.",
+    "notification.entered.title": "You're in!",
+    "notification.entered.message": "You've entered the draw. Watch 10 more videos for a chance to win a private photography session with Ali Bin Thalith.",
+    "notification.button": "Continue Journey"
   },
   ar: {
     "app.title": "المرموم",
@@ -89,7 +94,12 @@ const translations = {
     "animals.dorcas_gazelle": "غزال الدوركاس",
     "animals.frog_headed_lizard": "سحلية رأس الضفدع",
     "animals.sandfish_lizard": "سحلية السمكة الرملية",
-    "animals.spiny_tailed_lizard": "الضب"
+    "animals.spiny_tailed_lizard": "الضب",
+    "notification.keepGoing.title": "استمر!",
+    "notification.keepGoing.message": "شاهد 10 مقاطع فيديو للدخول في السحب على كتاب صور موقع من علي بن ثالث.",
+    "notification.entered.title": "أنت مشارك!",
+    "notification.entered.message": "لقد دخلت في السحب. شاهد 10 مقاطع فيديو إضافية لفرصة الفوز بجلسة تصوير خاصة مع علي بن ثالث.",
+    "notification.button": "أكمل الرحلة"
   }
 };
 

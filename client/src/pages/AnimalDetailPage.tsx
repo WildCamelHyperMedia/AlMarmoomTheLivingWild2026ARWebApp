@@ -4,17 +4,40 @@ import { Link, useRoute } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
 import { useState, useRef, useEffect } from "react";
+import { useProgress } from "@/lib/progress";
+import { AnimatePresence } from "framer-motion";
 
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const { t, dir } = useLanguage();
+  const { unlockNext, watchedCount } = useProgress();
   const animal = animals.find((a) => a.id === params?.id);
   // Auto-play if video exists
   const [isPlaying, setIsPlaying] = useState(!!animal?.video);
   const [isArOpen, setIsArOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
+  const [showNotification, setShowNotification] = useState<"keepGoing" | "entered" | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Handle video completion
+  const handleVideoEnded = () => {
+    if (animal) {
+      unlockNext(animal.id);
+      
+      // Check milestones (using watchedCount + 1 because the update in context might not be reflected immediately in this render cycle)
+      // Actually, relying on the prop updated value is safer in a useEffect, but for simplicity:
+      // We know we just watched one.
+      const newCount = watchedCount + 1;
+      
+      if (newCount === 1) {
+        setShowNotification("keepGoing");
+      } else if (newCount === 10) {
+        setShowNotification("entered");
+      }
+    }
+    setIsPlaying(false);
+  };
 
   useEffect(() => {
     if (videoRef.current) {
@@ -42,8 +65,9 @@ export default function AnimalDetailPage() {
             autoPlay 
             controls={false} // Hide default controls for seamless look
             playsInline
-            loop
+            loop={false}
             muted={isMuted}
+            onEnded={handleVideoEnded}
             onClick={() => setIsPlaying(false)} // Click to stop/pause
             className="w-full h-full object-cover"
           />
@@ -146,6 +170,40 @@ export default function AnimalDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Notification Modal */}
+      <AnimatePresence>
+        {showNotification && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowNotification(null)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-[#3E2D24] border border-white/10 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl"
+            >
+              <h3 className="font-serif text-2xl font-bold text-[#D4A045] mb-4">
+                {t(`notification.${showNotification}.title`)}
+              </h3>
+              <p className="text-white/80 leading-relaxed mb-8">
+                {t(`notification.${showNotification}.message`)}
+              </p>
+              <button
+                onClick={() => setShowNotification(null)}
+                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98]"
+              >
+                {t("notification.button")}
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Content */}
       <div className="absolute bottom-0 left-0 right-0 z-30 p-6 flex flex-col gap-6">
