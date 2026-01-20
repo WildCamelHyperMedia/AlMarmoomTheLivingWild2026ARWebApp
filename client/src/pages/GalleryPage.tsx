@@ -81,6 +81,13 @@ export default function GalleryPage() {
             <ArrowLeft className="h-6 w-6 text-white" />
           </button>
         </Link>
+        <button 
+          onClick={() => emblaApi && emblaApi.scrollNext()}
+          className="text-white/80 hover:text-white text-sm font-medium tracking-wide transition-colors"
+          data-testid="button-next"
+        >
+          Next
+        </button>
       </div>
 
       <motion.div 
