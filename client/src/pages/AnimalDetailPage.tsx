@@ -56,6 +56,24 @@ export default function AnimalDetailPage() {
         </div>
       )}
 
+      {/* Video Player */}
+      {isPlaying && animal.video && (
+         <div className="absolute inset-0 z-40 bg-black flex items-center justify-center">
+            <button 
+              onClick={() => setIsPlaying(false)}
+              className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <video 
+              src={animal.video} 
+              autoPlay 
+              controls 
+              className="w-full h-full object-contain"
+            />
+         </div>
+      )}
+
       {/* Mattercraft AR Overlay */}
       {isArOpen && (
         <div className="fixed inset-0 z-50 bg-black flex flex-col">

@@ -2,6 +2,7 @@ export interface Animal {
   id: string;
   image: string;
   scientificName: string;
+  video?: string;
 }
 
 export const animals: Animal[] = [
@@ -29,7 +30,8 @@ export const animals: Animal[] = [
   {
     id: "eurasian_stone_curlew",
     image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
-    scientificName: "BURHINUS OEDICNEMUS"
+    scientificName: "BURHINUS OEDICNEMUS",
+    video: "/videos/stone_curlew.webm"
   },
   {
     id: "houbara_bustard",
