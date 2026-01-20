@@ -104,19 +104,20 @@ export default function GalleryPage() {
                           </div>
                         </Link>
                       ) : (
-                        <div className="flex flex-col items-center gap-3 text-center opacity-50 grayscale">
-                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/5 bg-black/20">
+                        <div className="flex flex-col items-center gap-3 text-center">
+                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-primary/20 bg-black/40">
                             <img 
                               src={animal.image} 
                               alt={t(`animals.${animal.id}`)}
-                              className="w-full h-full object-cover blur-[2px]"
+                              className="w-full h-full object-cover blur-[2px] brightness-[0.4] sepia-[0.3]"
                               loading="lazy"
                             />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                              <Lock className="w-8 h-8 text-white/50" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-primary/10" />
+                              <Lock className="w-8 h-8 text-[#D4A045] drop-shadow-[0_0_8px_rgba(212,160,69,0.6)]" />
                             </div>
                           </div>
-                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center">
+                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-primary/40 h-8 flex items-center justify-center">
                             {t(`animals.${animal.id}`)}
                           </span>
                         </div>
