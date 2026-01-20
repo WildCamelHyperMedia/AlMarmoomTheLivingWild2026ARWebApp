@@ -65,10 +65,8 @@ export default function LandingPage() {
             onClick={() => handleLanguageSelect("ar")}
             className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-right backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50"
           >
+            <ArrowRight className="h-5 w-5 text-white/70 rotate-180 group-hover:-translate-x-1 group-hover:text-primary transition-all" />
             <span className="font-arabic text-xl">العربية</span>
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] text-white/50 tracking-widest uppercase">Arabic</span>
-            </div>
           </button>
 
           {/* English Option */}
@@ -76,10 +74,7 @@ export default function LandingPage() {
             onClick={() => handleLanguageSelect("en")}
             className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-white/10 p-4 text-left backdrop-blur-md transition-all hover:bg-white/20 active:scale-95 border border-white/10 hover:border-primary/50"
           >
-            <div className="flex flex-col items-start">
-              <span className="font-serif text-xl">English</span>
-              <span className="text-[10px] text-white/50 tracking-widest uppercase">Default</span>
-            </div>
+            <span className="font-serif text-xl">English</span>
             <ArrowRight className="h-5 w-5 text-white/70 group-hover:translate-x-1 group-hover:text-primary transition-all" />
           </button>
 
