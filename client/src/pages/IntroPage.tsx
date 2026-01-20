@@ -70,6 +70,11 @@ export default function IntroPage() {
         ) : (
             <div className="relative w-full h-full">
                 <video
+                    ref={(el) => {
+                      if (el && isPlaying) {
+                        el.play().catch(e => console.error("Autoplay failed:", e));
+                      }
+                    }}
                     src="/videos/intro_video.webm"
                     className="w-full h-full object-cover"
                     autoPlay
