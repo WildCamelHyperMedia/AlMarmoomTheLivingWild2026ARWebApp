@@ -16,6 +16,7 @@ export default function GalleryPage() {
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [watchedCount, setWatchedCount] = useState(0);
+  const [watchedIds, setWatchedIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (emblaApi) {
@@ -27,7 +28,8 @@ export default function GalleryPage() {
 
   // Load progress
   useEffect(() => {
-    const watched = JSON.parse(localStorage.getItem("watchedAnimals") || "[]");
+    const watched: string[] = JSON.parse(localStorage.getItem("watchedAnimals") || "[]");
+    setWatchedIds(watched);
     setWatchedCount(watched.length);
   }, []);
 
@@ -81,51 +83,30 @@ export default function GalleryPage() {
               <div className="grid grid-cols-3 gap-y-8 gap-x-4">
                 {chunk.map((animal, index) => {
                   const globalIndex = pageIndex * 12 + index;
-                  // First animal (index 0) is always unlocked
-                  // Subsequent animals unlock if globalIndex <= watchedCount
-                  // Example: 0 watched. Index 0 unlocked (0 <= 0). Index 1 locked (1 > 0).
-                  // Example: 1 watched. Index 0 unlocked. Index 1 unlocked (1 <= 1). Index 2 locked (2 > 1).
-                  const isLocked = globalIndex > watchedCount;
+                  const isWatched = watchedIds.includes(animal.id);
 
                   return (
-                    <div key={animal.id} className="relative">
-                      {isLocked ? (
-                        <div className="flex flex-col items-center gap-3 text-center opacity-60 pointer-events-none select-none grayscale">
-                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/5 shadow-none">
-                            <img 
-                              src={animal.image} 
-                              alt={t(`animals.${animal.id}`)}
-                              className="w-full h-full object-cover"
-                              loading={pageIndex === 0 ? "eager" : "lazy"}
-                            />
-                            {/* Lock Overlay */}
-                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-                              <Lock className="w-8 h-8 text-[#D4A045]" />
+                    <Link href={`/animal/${animal.id}`} key={animal.id}>
+                      <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
+                        <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
+                          <img 
+                            src={animal.image} 
+                            alt={t(`animals.${animal.id}`)}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
+                            loading={pageIndex === 0 ? "eager" : "lazy"}
+                            decoding="async"
+                          />
+                          {!isWatched && (
+                            <div className="absolute top-1 right-1 w-7 h-7 rounded-full bg-[#D4A045] shadow-md flex items-center justify-center z-10">
+                              <Lock className="w-4 h-4 text-black" />
                             </div>
-                          </div>
-                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/50 h-8 flex items-center justify-center">
-                            {t(`animals.${animal.id}`)}
-                          </span>
+                          )}
                         </div>
-                      ) : (
-                        <Link href={`/animal/${animal.id}`}>
-                          <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
-                            <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
-                              <img 
-                                src={animal.image} 
-                                alt={t(`animals.${animal.id}`)}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
-                                loading={pageIndex === 0 ? "eager" : "lazy"}
-                                decoding="async"
-                              />
-                            </div>
-                            <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
-                              {t(`animals.${animal.id}`)}
-                            </span>
-                          </div>
-                        </Link>
-                      )}
-                    </div>
+                        <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
+                          {t(`animals.${animal.id}`)}
+                        </span>
+                      </div>
+                    </Link>
                   );
                 })}
               </div>
