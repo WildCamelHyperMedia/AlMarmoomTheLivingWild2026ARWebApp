@@ -29,42 +29,42 @@ export default function SignUpPage() {
         </button>
       </div>
 
-      {/* Logo Area */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12 z-10"
-      >
-        <img src="/logo.png" alt="Al Marmoom" className="w-48 h-auto mx-auto" />
-      </motion.div>
-
-      {/* Main Form Content */}
+      {/* Main Content */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="w-full max-w-sm flex-1 flex flex-col justify-center z-10"
+        className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
       >
-        <h2 className="text-center font-serif text-lg md:text-xl tracking-wider leading-relaxed mb-12 whitespace-pre-line text-primary/90">
-          {t("signup.title")}
-        </h2>
+        {/* Title Section - Grouped together at the top */}
+        <div className="text-center mb-12">
+          <h1 className="font-bold text-5xl md:text-6xl tracking-tight mb-6 font-sans">
+            {t("signup.header")}
+          </h1>
+          <h2 className="text-center font-sans text-xs md:text-sm font-bold tracking-[0.15em] leading-relaxed whitespace-pre-line text-white uppercase">
+            {t("signup.title")}
+          </h2>
+        </div>
 
-        <div className="space-y-4 mb-8">
+        {/* Spacer to push form down slightly if needed, or keep it centered */}
+        <div className="flex-1"></div>
+
+        <div className="w-full space-y-4 mb-8">
           <div className="space-y-1">
             <Input 
               type="text" 
               placeholder={t("signup.fullName")}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary/50 focus:ring-primary/20 backdrop-blur-sm"
+              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
               dir={dir}
             />
           </div>
 
           <div className="space-y-1">
              <Select>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white/40 h-12 rounded-lg focus:ring-primary/20 backdrop-blur-sm w-full text-start" dir={dir}>
+              <SelectTrigger className="bg-[#3E2D24]/80 border-none text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm w-full text-start px-4" dir={dir}>
                 <SelectValue placeholder={t("signup.mobile")} />
               </SelectTrigger>
-              <SelectContent className="bg-card border-white/10 text-white">
+              <SelectContent className="bg-[#3E2D24] border-white/10 text-white">
                 <SelectItem value="ae">+971 (UAE)</SelectItem>
                 <SelectItem value="sa">+966 (KSA)</SelectItem>
                 <SelectItem value="uk">+44 (UK)</SelectItem>
@@ -76,12 +76,12 @@ export default function SignUpPage() {
 
         <button 
           onClick={handleContinue}
-          className="w-full bg-primary hover:bg-primary/90 text-background font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-6"
+          className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-6 shadow-lg"
         >
           {t("signup.continue")}
         </button>
 
-        <p className="text-center text-[10px] text-white/40 leading-relaxed whitespace-pre-line">
+        <p className="text-center text-[10px] text-white/50 leading-relaxed whitespace-pre-line mb-8">
           {t("signup.terms")}
         </p>
       </motion.div>

@@ -12,6 +12,7 @@ interface LanguageContextType {
 const translations = {
   en: {
     "app.title": "Al Marmoom",
+    "signup.header": "SIGN UP",
     "signup.title": "SIGN UP TO WIN\nA SIGNED PHOTO BOOK BY\nALI BIN THALITH.",
     "signup.fullName": "Full Name",
     "signup.mobile": "Mobile Number",
@@ -49,6 +50,7 @@ const translations = {
   },
   ar: {
     "app.title": "المرموم",
+    "signup.header": "سجل الآن",
     "signup.title": "سجل لفرصة الفوز\nبكتاب صور موقع من\nعلي بن ثالث.",
     "signup.fullName": "الاسم الكامل",
     "signup.mobile": "رقم الهاتف المتحرك",
