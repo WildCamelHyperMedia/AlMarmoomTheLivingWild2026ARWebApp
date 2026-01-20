@@ -9,7 +9,7 @@ import { useProgress } from "@/lib/progress";
 
 export default function GalleryPage() {
   const { t, dir } = useLanguage();
-  const { isUnlocked } = useProgress();
+  const { isUnlocked, watchedCount } = useProgress();
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
     duration: 20, // Faster snap
@@ -54,11 +54,25 @@ export default function GalleryPage() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="px-6 mb-8 z-10 relative"
+        className="px-6 mb-8 z-10 relative flex justify-between items-end"
       >
         <h1 className="font-serif text-2xl font-bold uppercase tracking-wider text-white">
           {t("gallery.title")}
         </h1>
+        
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] text-white/50 font-sans tracking-widest uppercase mb-1">
+            {t("gallery.watched")}
+          </span>
+          <div className="flex items-baseline gap-1">
+             <span className="font-serif text-2xl font-bold text-primary">
+               {watchedCount}
+             </span>
+             <span className="text-sm text-white/50">
+               / {animals.length}
+             </span>
+          </div>
+        </div>
       </motion.div>
 
       {/* Carousel */}
