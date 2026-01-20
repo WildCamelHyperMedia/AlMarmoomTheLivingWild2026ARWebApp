@@ -26,9 +26,9 @@ export default function GalleryPage() {
     }
   }, [emblaApi]);
 
-  // Chunk animals into groups of 6 for pagination
+  // Chunk animals into groups of 9 for pagination
   const chunks = useMemo(() => {
-    const chunkSize = 6;
+    const chunkSize = 9;
     const result = [];
     for (let i = 0; i < animals.length; i += chunkSize) {
       result.push(animals.slice(i, i + chunkSize));
