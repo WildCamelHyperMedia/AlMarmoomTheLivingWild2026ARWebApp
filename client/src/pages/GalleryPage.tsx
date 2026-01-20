@@ -8,16 +8,16 @@ import { animals } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 
 function useResponsiveChunkSize() {
-  const [chunkSize, setChunkSize] = useState(9);
+  const [chunkSize, setChunkSize] = useState(6);
 
   useEffect(() => {
     const updateChunkSize = () => {
       const height = window.innerHeight;
       const width = window.innerWidth;
       
-      if (height < 600) {
+      if (height < 700) {
         setChunkSize(6);
-      } else if (height < 750) {
+      } else if (height < 850) {
         setChunkSize(9);
       } else if (width >= 768) {
         setChunkSize(12);
@@ -108,11 +108,11 @@ export default function GalleryPage() {
       </motion.div>
 
       {/* Carousel */}
-      <div className="overflow-hidden touch-pan-y" ref={emblaRef} dir={dir}>
-        <div className="flex touch-pan-y backface-hidden will-change-transform">
+      <div className="flex-1 overflow-hidden touch-pan-y" ref={emblaRef} dir={dir}>
+        <div className="flex h-full touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
-            <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative" key={pageIndex}>
-              <div className="grid grid-cols-3 gap-y-8 gap-x-4">
+            <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative overflow-y-auto" key={pageIndex}>
+              <div className="grid grid-cols-3 gap-y-6 gap-x-4 pb-4">
                 {chunk.map((animal) => {
                   const unlocked = isUnlocked(animal.id);
                   
@@ -164,7 +164,7 @@ export default function GalleryPage() {
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center gap-3 mt-12 mb-8 relative z-20">
+      <div className="flex justify-center gap-3 py-4 relative z-20 shrink-0">
         {chunks.map((_, index) => (
           <button
             key={index}
