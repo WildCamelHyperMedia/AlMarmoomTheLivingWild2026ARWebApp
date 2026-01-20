@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function SignUpPage() {
   const [, setLocation] = useLocation();
@@ -59,12 +60,17 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-1">
-            <Input 
-              type="tel" 
-              placeholder={t("signup.mobile")}
-              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-              dir={dir}
-            />
+             <Select>
+              <SelectTrigger className="bg-[#3E2D24]/80 border-none text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm w-full text-start px-4" dir={dir}>
+                <SelectValue placeholder={t("signup.mobile")} />
+              </SelectTrigger>
+              <SelectContent className="bg-[#3E2D24] border-white/10 text-white">
+                <SelectItem value="ae">+971 (UAE)</SelectItem>
+                <SelectItem value="sa">+966 (KSA)</SelectItem>
+                <SelectItem value="uk">+44 (UK)</SelectItem>
+                <SelectItem value="us">+1 (USA)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

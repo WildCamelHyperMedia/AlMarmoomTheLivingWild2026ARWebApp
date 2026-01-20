@@ -1,16 +1,14 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX, Trophy } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
 import { useState, useRef, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
 
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const { t, dir } = useLanguage();
   const animal = animals.find((a) => a.id === params?.id);
-  
   // Auto-play if video exists
   const [isPlaying, setIsPlaying] = useState(!!animal?.video);
   const [isArOpen, setIsArOpen] = useState(false);
@@ -18,34 +16,11 @@ export default function AnimalDetailPage() {
   const [volume, setVolume] = useState(1);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Notification State
-  const [showNotification, setShowNotification] = useState<"keepGoing" | "entered" | null>(null);
-
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.volume = volume;
     }
   }, [volume]);
-
-  // Track Watched Videos logic
-  useEffect(() => {
-    if (isPlaying && animal?.id) {
-      // Get currently watched animals from local storage
-      const watched = JSON.parse(localStorage.getItem("watchedAnimals") || "[]");
-      
-      if (!watched.includes(animal.id)) {
-        const newWatched = [...watched, animal.id];
-        localStorage.setItem("watchedAnimals", JSON.stringify(newWatched));
-        
-        // Check for milestones
-        if (newWatched.length === 1) {
-          setTimeout(() => setShowNotification("keepGoing"), 2000); // Show shortly after start
-        } else if (newWatched.length === 10) {
-          setTimeout(() => setShowNotification("entered"), 2000);
-        }
-      }
-    }
-  }, [isPlaying, animal?.id]);
 
   if (!animal) {
     return <div>Animal not found</div>;
@@ -147,7 +122,7 @@ export default function AnimalDetailPage() {
           <div className="relative flex-1">
             <button 
               onClick={() => setIsArOpen(false)}
-              className="absolute top-6 left-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+              className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -206,48 +181,6 @@ export default function AnimalDetailPage() {
         </motion.button>
 
       </div>
-
-      {/* Gamification Notification */}
-      <AnimatePresence>
-        {showNotification && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="bg-[#1C1C1E]/95 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl max-w-sm w-full pointer-events-auto relative overflow-hidden"
-            >
-              {/* Gold Glow Effect */}
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
-              
-              <div className="relative z-10 flex flex-col items-center text-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-2">
-                  <Trophy className="w-8 h-8 text-primary" />
-                </div>
-                
-                <h3 className="text-xl font-bold text-white font-serif">
-                  {showNotification === "keepGoing" 
-                    ? t("notification.keepGoing.title") 
-                    : t("notification.entered.title")}
-                </h3>
-                
-                <p className="text-white/70 text-sm leading-relaxed">
-                  {showNotification === "keepGoing"
-                    ? t("notification.keepGoing.message")
-                    : t("notification.entered.message")}
-                </p>
-
-                <button
-                  onClick={() => setShowNotification(null)}
-                  className="mt-2 w-full bg-primary hover:bg-primary/90 text-background font-bold py-3 rounded-xl transition-all active:scale-[0.98]"
-                >
-                  {t("signup.continue")}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
     </div>
   );

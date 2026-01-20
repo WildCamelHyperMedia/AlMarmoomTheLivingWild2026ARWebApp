@@ -75,7 +75,7 @@ export default function IntroPage() {
                         el.play().catch(e => console.error("Autoplay failed:", e));
                       }
                     }}
-                    src="/videos/intro_video.mp4"
+                    src="/videos/intro_video.webm"
                     className="w-full h-full object-cover"
                     autoPlay
                     muted
