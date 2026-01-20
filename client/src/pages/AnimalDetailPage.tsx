@@ -95,7 +95,7 @@ export default function AnimalDetailPage() {
             
             {/* Mattercraft Iframe */}
             <iframe
-              src="https://web.zappar.com/example-project" // Replace with actual per-animal Mattercraft URL
+              src={animal.arUrl || "https://web.zappar.com/example-project"} 
               className="w-full h-full border-0"
               allow="camera; gyroscope; accelerometer; magnetometer; xr-spatial-tracking; microphone"
               allowFullScreen
