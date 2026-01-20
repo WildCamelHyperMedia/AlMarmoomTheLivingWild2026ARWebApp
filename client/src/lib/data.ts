@@ -127,4 +127,9 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/18-Spiny-tailed Lizard.jpg",
     scientificName: "UROMASTYX AEGYPTIA"
   },
+  {
+    id: "green_bee_eater",
+    image: "/animals/All Animals - Pictures/29-Green Bee-Eater.png",
+    scientificName: "MEROPS ORIENTALIS"
+  },
 ];
