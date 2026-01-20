@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
@@ -12,6 +12,7 @@ export default function AnimalDetailPage() {
   // Auto-play if video exists
   const [isPlaying, setIsPlaying] = useState(!!animal?.video);
   const [isArOpen, setIsArOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   if (!animal) {
     return <div>Animal not found</div>;
@@ -33,6 +34,7 @@ export default function AnimalDetailPage() {
             controls={false} // Hide default controls for seamless look
             playsInline
             loop
+            muted={isMuted}
             onClick={() => setIsPlaying(false)} // Click to stop/pause
             className="w-full h-full object-cover"
           />
@@ -72,7 +74,15 @@ export default function AnimalDetailPage() {
 
       {/* Stop/Close Button for Video */}
       {isPlaying && (
-        <div className="absolute top-6 right-6 z-50">
+        <div className="absolute top-6 right-6 z-50 flex gap-4">
+           {/* Mute Button */}
+           <button 
+              onClick={() => setIsMuted(!isMuted)}
+              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+            >
+              {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+            </button>
+
            <button 
               onClick={() => setIsPlaying(false)}
               className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
