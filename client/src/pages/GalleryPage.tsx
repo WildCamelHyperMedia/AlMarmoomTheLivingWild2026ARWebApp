@@ -7,12 +7,40 @@ import { useState, useEffect, useMemo } from "react";
 import { animals } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 
+function useResponsiveChunkSize() {
+  const [chunkSize, setChunkSize] = useState(9);
+
+  useEffect(() => {
+    const updateChunkSize = () => {
+      const height = window.innerHeight;
+      const width = window.innerWidth;
+      
+      if (height < 600) {
+        setChunkSize(6);
+      } else if (height < 750) {
+        setChunkSize(9);
+      } else if (width >= 768) {
+        setChunkSize(12);
+      } else {
+        setChunkSize(9);
+      }
+    };
+
+    updateChunkSize();
+    window.addEventListener("resize", updateChunkSize);
+    return () => window.removeEventListener("resize", updateChunkSize);
+  }, []);
+
+  return chunkSize;
+}
+
 export default function GalleryPage() {
   const { t, dir } = useLanguage();
   const { isUnlocked, watchedCount } = useProgress();
+  const chunkSize = useResponsiveChunkSize();
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
-    duration: 20, // Faster snap
+    duration: 20,
     skipSnaps: false,
     dragFree: false
   });
@@ -26,15 +54,19 @@ export default function GalleryPage() {
     }
   }, [emblaApi]);
 
-  // Chunk animals into groups of 9 for pagination
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.reInit();
+    }
+  }, [emblaApi, chunkSize]);
+
   const chunks = useMemo(() => {
-    const chunkSize = 9;
     const result = [];
     for (let i = 0; i < animals.length; i += chunkSize) {
       result.push(animals.slice(i, i + chunkSize));
     }
     return result;
-  }, []);
+  }, [chunkSize]);
 
   return (
     <div className="h-[100dvh] w-full bg-background text-white pb-20 relative overflow-y-auto flex flex-col">
