@@ -7,9 +7,16 @@ import { useState, useRef, useEffect } from "react";
 import { useProgress } from "@/lib/progress";
 import { AnimatePresence } from "framer-motion";
 
+const voiceoverMap: Record<string, { en: string; ar: string }> = {
+  eurasian_stone_curlew: {
+    en: "/videos/stone_curlew_en.mp3",
+    ar: "/videos/stone_curlew_ar.mp3"
+  }
+};
+
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const { unlockNext, watchedCount } = useProgress();
   const animal = animals.find((a) => a.id === params?.id);
   // Auto-play if video exists
@@ -19,6 +26,7 @@ export default function AnimalDetailPage() {
   const [volume, setVolume] = useState(1);
   const [showNotification, setShowNotification] = useState<"keepGoing" | "entered" | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const voiceoverRef = useRef<HTMLAudioElement>(null);
 
   // Handle video completion
   const handleVideoEnded = () => {
@@ -43,7 +51,33 @@ export default function AnimalDetailPage() {
     if (videoRef.current) {
       videoRef.current.volume = volume;
     }
+    if (voiceoverRef.current) {
+      voiceoverRef.current.volume = volume;
+    }
   }, [volume]);
+
+  // Play/pause voiceover with video
+  useEffect(() => {
+    const voiceover = animal?.id ? voiceoverMap[animal.id] : null;
+    if (!voiceover || !voiceoverRef.current) return;
+
+    if (isPlaying) {
+      voiceoverRef.current.src = voiceover[language];
+      voiceoverRef.current.volume = volume;
+      voiceoverRef.current.muted = isMuted;
+      voiceoverRef.current.play().catch(e => console.error("Voiceover play failed:", e));
+    } else {
+      voiceoverRef.current.pause();
+      voiceoverRef.current.currentTime = 0;
+    }
+  }, [isPlaying, animal?.id, language]);
+
+  // Sync mute state with voiceover
+  useEffect(() => {
+    if (voiceoverRef.current) {
+      voiceoverRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   if (!animal) {
     return <div>Animal not found</div>;
@@ -51,6 +85,9 @@ export default function AnimalDetailPage() {
 
   return (
     <div className="h-[100dvh] w-full bg-background text-white relative overflow-hidden">
+      
+      {/* Hidden voiceover audio element */}
+      <audio ref={voiceoverRef} />
       
       {/* Background Media (Full Screen) */}
       <div className="absolute inset-0 z-0">
