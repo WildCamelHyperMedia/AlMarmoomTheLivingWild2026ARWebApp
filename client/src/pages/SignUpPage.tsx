@@ -1,10 +1,24 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+
+const countryCodes = [
+  { code: "+971", country: "UAE", flag: "🇦🇪" },
+  { code: "+966", country: "KSA", flag: "🇸🇦" },
+  { code: "+974", country: "Qatar", flag: "🇶🇦" },
+  { code: "+973", country: "Bahrain", flag: "🇧🇭" },
+  { code: "+968", country: "Oman", flag: "🇴🇲" },
+  { code: "+965", country: "Kuwait", flag: "🇰🇼" },
+  { code: "+20", country: "Egypt", flag: "🇪🇬" },
+  { code: "+962", country: "Jordan", flag: "🇯🇴" },
+  { code: "+91", country: "India", flag: "🇮🇳" },
+  { code: "+44", country: "UK", flag: "🇬🇧" },
+  { code: "+1", country: "USA", flag: "🇺🇸" },
+];
 
 export default function SignUpPage() {
   const [, setLocation] = useLocation();
@@ -15,6 +29,7 @@ export default function SignUpPage() {
     name: "",
     phone: ""
   });
+  const [countryCode, setCountryCode] = useState("+971");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,6 +38,8 @@ export default function SignUpPage() {
       setError("Please fill in all fields");
       return;
     }
+    
+    const fullPhone = `${countryCode}${formData.phone}`;
 
     setIsLoading(true);
     setError("");
@@ -31,7 +48,7 @@ export default function SignUpPage() {
       const response = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ name: formData.name, phone: fullPhone })
       });
 
       const data = await response.json();
@@ -98,15 +115,32 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-1">
-            <Input 
-              type="tel" 
-              placeholder={t("signup.mobile")}
-              value={formData.phone}
-              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-              dir={dir}
-              data-testid="input-phone"
-            />
+            <div className="flex gap-2">
+              <div className="relative">
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="appearance-none bg-[#3E2D24]/80 border-none text-white h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm pl-4 pr-10 cursor-pointer"
+                  data-testid="select-country-code"
+                >
+                  {countryCodes.map((c) => (
+                    <option key={c.code} value={c.code} className="bg-[#3E2D24]">
+                      {c.flag} {c.code}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+              </div>
+              <Input 
+                type="tel" 
+                placeholder={t("signup.mobile")}
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                className="flex-1 bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
+                dir="ltr"
+                data-testid="input-phone"
+              />
+            </div>
           </div>
           
           {error && (
