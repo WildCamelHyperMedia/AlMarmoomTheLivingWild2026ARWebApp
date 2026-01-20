@@ -29,6 +29,28 @@ const animalHotspots: AnimalHotspot[] = [
 function DesertTerrain() {
   const meshRef = useRef<THREE.Mesh>(null);
   
+  useEffect(() => {
+    if (meshRef.current) {
+      const geometry = meshRef.current.geometry as THREE.PlaneGeometry;
+      const positions = geometry.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        
+        const wave1 = Math.sin(x * 0.15) * Math.cos(y * 0.12) * 0.8;
+        const wave2 = Math.sin(x * 0.08 + y * 0.06) * 0.5;
+        const wave3 = Math.sin(x * 0.3) * Math.sin(y * 0.25) * 0.3;
+        const ripples = Math.sin(x * 1.5) * Math.cos(y * 1.2) * 0.08;
+        
+        positions.setZ(i, wave1 + wave2 + wave3 + ripples);
+      }
+      
+      geometry.computeVertexNormals();
+      positions.needsUpdate = true;
+    }
+  }, []);
+  
   return (
     <group>
       <mesh 
@@ -37,41 +59,135 @@ function DesertTerrain() {
         position={[0, -0.5, 0]}
         receiveShadow
       >
-        <planeGeometry args={[200, 200, 128, 128]} />
+        <planeGeometry args={[200, 200, 256, 256]} />
         <meshStandardMaterial 
           color="#D4A045"
-          roughness={0.95}
-          metalness={0.05}
+          roughness={0.98}
+          metalness={0.02}
+          flatShading={false}
         />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.48, 0]}>
-        <planeGeometry args={[200, 200]} />
-        <meshStandardMaterial 
-          color="#C8983A"
-          roughness={1}
-          transparent
-          opacity={0.3}
-        />
-      </mesh>
+      
+      <SandRipples position={[0, -0.45, 0]} />
+      <SandRipples position={[-20, -0.45, -15]} />
+      <SandRipples position={[15, -0.45, 10]} />
+      <SandRipples position={[-10, -0.45, 20]} />
     </group>
   );
 }
 
+function SandRipples({ position }: { position: [number, number, number] }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useEffect(() => {
+    if (meshRef.current) {
+      const geometry = meshRef.current.geometry as THREE.PlaneGeometry;
+      const positions = geometry.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const ripple = Math.sin(x * 2 + y * 0.5) * 0.05;
+        positions.setZ(i, ripple);
+      }
+      
+      geometry.computeVertexNormals();
+      positions.needsUpdate = true;
+    }
+  }, []);
+  
+  return (
+    <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={position}>
+      <planeGeometry args={[30, 30, 64, 64]} />
+      <meshStandardMaterial 
+        color="#C8983A"
+        roughness={1}
+        transparent
+        opacity={0.4}
+      />
+    </mesh>
+  );
+}
+
 function SandDune({ position, scale = 1, rotation = 0 }: { position: [number, number, number]; scale?: number; rotation?: number }) {
+  const mainDuneRef = useRef<THREE.Mesh>(null);
+  
+  useEffect(() => {
+    if (mainDuneRef.current) {
+      const geometry = mainDuneRef.current.geometry as THREE.SphereGeometry;
+      const positions = geometry.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = positions.getZ(i);
+        
+        if (y > 0) {
+          const windward = x > 0 ? 0.85 : 1.15;
+          positions.setX(i, x * windward);
+          
+          const ripple = Math.sin(x * 3 + z * 2) * 0.05;
+          positions.setY(i, y + ripple);
+        }
+      }
+      
+      geometry.computeVertexNormals();
+      positions.needsUpdate = true;
+    }
+  }, []);
+  
   return (
     <group position={position} rotation={[0, rotation, 0]} scale={scale}>
-      <mesh position={[0, 0, 0]} castShadow receiveShadow>
-        <sphereGeometry args={[4, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshStandardMaterial color="#C4923E" roughness={0.98} />
+      <mesh ref={mainDuneRef} position={[0, 0, 0]} castShadow receiveShadow>
+        <sphereGeometry args={[5, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial 
+          color="#C4923E" 
+          roughness={0.95}
+          flatShading={false}
+        />
       </mesh>
-      <mesh position={[3, -0.3, 1]} scale={0.7} castShadow>
-        <sphereGeometry args={[3, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      
+      <mesh position={[4, -0.2, 2]} scale={[1.2, 0.6, 0.8]} castShadow>
+        <sphereGeometry args={[3, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
         <meshStandardMaterial color="#BF8E38" roughness={0.96} />
       </mesh>
-      <mesh position={[-2.5, -0.2, -1.5]} scale={0.5} castShadow>
-        <sphereGeometry args={[3.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshStandardMaterial color="#D09E42" roughness={0.97} />
+      
+      <mesh position={[-3, -0.15, -2]} scale={[0.8, 0.5, 1.1]} castShadow>
+        <sphereGeometry args={[3.5, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#D09E42" roughness={0.94} />
       </mesh>
+      
+      <mesh position={[2, -0.3, -4]} scale={[1.5, 0.4, 0.7]} castShadow>
+        <sphereGeometry args={[2.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#C8983A" roughness={0.97} />
+      </mesh>
+      
+      <DuneRidge position={[0, 0.1, 0]} length={8} />
+    </group>
+  );
+}
+
+function DuneRidge({ position, length }: { position: [number, number, number]; length: number }) {
+  const points: THREE.Vector3[] = [];
+  for (let i = 0; i <= 20; i++) {
+    const t = (i / 20) * length - length / 2;
+    const y = Math.sin((i / 20) * Math.PI) * 0.3;
+    points.push(new THREE.Vector3(t, y, 0));
+  }
+  
+  return (
+    <group position={position}>
+      <line>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={points.length}
+            array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color="#E8C068" linewidth={2} />
+      </line>
     </group>
   );
 }
