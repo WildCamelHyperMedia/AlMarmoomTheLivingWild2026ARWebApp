@@ -156,6 +156,16 @@ export default function IntroPage() {
         >
           {t("intro.win")}
         </motion.button>
+        
+        {/* Partner Logo */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="flex justify-center pt-4"
+        >
+          <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-6 w-auto opacity-60 grayscale" />
+        </motion.div>
       </div>
 
     </div>
