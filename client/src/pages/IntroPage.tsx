@@ -63,7 +63,7 @@ export default function IntroPage() {
       >
         {!isPlaying ? (
             <img 
-              src={posterImage} 
+              src="/images/ali_portrait.png" 
               alt="Ali Bin Thalith" 
               className="w-full h-full object-cover"
             />
