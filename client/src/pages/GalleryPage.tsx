@@ -76,7 +76,7 @@ export default function GalleryPage() {
       </motion.div>
 
       {/* Carousel */}
-      <div className="overflow-hidden" ref={emblaRef} dir={dir}>
+      <div className="overflow-hidden touch-pan-y" ref={emblaRef} dir={dir}>
         <div className="flex touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
             <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative" key={pageIndex}>
