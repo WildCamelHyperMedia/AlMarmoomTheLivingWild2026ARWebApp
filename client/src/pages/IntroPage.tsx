@@ -63,18 +63,25 @@ export default function IntroPage() {
       >
         {!isPlaying ? (
             <img 
-              src="/images/ali_portrait.png" 
+              src="/images/photographer_ghillie.png" 
               alt="Ali Bin Thalith" 
               className="w-full h-full object-cover"
             />
         ) : (
-            <video
-                src="/videos/intro_video.webm"
-                className="w-full h-full object-cover"
-                autoPlay
-                controls
-                playsInline
-            />
+            <div className="relative w-full h-full">
+                <video
+                    src="/videos/intro_video.webm"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    playsInline
+                    onEnded={() => setCanProceed(true)}
+                />
+                {/* Invisible layer to capture clicks to pause/stop if needed, or just let it play */}
+                <div 
+                    className="absolute inset-0 z-10" 
+                    onClick={() => setIsPlaying(false)} 
+                />
+            </div>
         )}
         
         {/* Play Button Overlay */}
