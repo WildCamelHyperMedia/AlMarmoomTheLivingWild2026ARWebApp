@@ -147,7 +147,7 @@ export default function AnimalDetailPage() {
           <div className="relative flex-1">
             <button 
               onClick={() => setIsArOpen(false)}
-              className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+              className="absolute top-6 left-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
