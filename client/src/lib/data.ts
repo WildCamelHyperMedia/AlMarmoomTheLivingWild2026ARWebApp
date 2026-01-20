@@ -9,6 +9,13 @@ export interface Animal {
 export const animals: Animal[] = [
   // Page 1
   {
+    id: "eurasian_stone_curlew",
+    image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
+    scientificName: "BURHINUS OEDICNEMUS",
+    video: "/videos/stone_curlew.webm",
+    arUrl: "https://pk6zz.zappar-us.io/7171000204019462389/"
+  },
+  {
     id: "white_tailed_lapwing",
     image: "/animals/All Animals - Pictures/25- white tailes lapwing.jpg",
     scientificName: "VANELLUS LEUCURUS",
@@ -28,13 +35,6 @@ export const animals: Animal[] = [
     id: "purple_sunbird",
     image: "/animals/All Animals - Pictures/13-Purple Sunbird.jpg",
     scientificName: "CINNYRIS ASIATICUS"
-  },
-  {
-    id: "eurasian_stone_curlew",
-    image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
-    scientificName: "BURHINUS OEDICNEMUS",
-    video: "/videos/stone_curlew.webm",
-    arUrl: "https://pk6zz.zappar-us.io/7171000204019462389/"
   },
   {
     id: "houbara_bustard",

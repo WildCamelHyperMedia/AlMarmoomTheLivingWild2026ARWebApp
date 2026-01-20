@@ -24,7 +24,7 @@ export async function registerRoutes(
       // Create initial progress for this user (first animal unlocked)
       await storage.createProgress({
         userId: user.id,
-        unlockedAnimals: ["white_tailed_lapwing"]
+        unlockedAnimals: ["eurasian_stone_curlew"]
       });
 
       res.json({ user });

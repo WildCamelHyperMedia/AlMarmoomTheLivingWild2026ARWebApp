@@ -14,7 +14,7 @@ const ProgressContext = createContext<ProgressContextType | undefined>(undefined
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: userLoading } = useUser();
-  const [unlockedAnimals, setUnlockedAnimals] = useState<string[]>([animals[0].id]);
+  const [unlockedAnimals, setUnlockedAnimals] = useState<string[]>(["eurasian_stone_curlew"]);
   const [watchedCount, setWatchedCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,14 +33,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           setIsLoading(false);
         })
         .catch(() => {
-          setUnlockedAnimals([animals[0].id]);
+          setUnlockedAnimals(["eurasian_stone_curlew"]);
           setWatchedCount(0);
           setIsLoading(false);
         });
     } else {
       const saved = localStorage.getItem("unlockedAnimals");
       const savedCount = localStorage.getItem("watchedCount");
-      setUnlockedAnimals(saved ? JSON.parse(saved) : [animals[0].id]);
+      setUnlockedAnimals(saved ? JSON.parse(saved) : ["eurasian_stone_curlew"]);
       setWatchedCount(savedCount ? parseInt(savedCount) : 0);
       setIsLoading(false);
     }
