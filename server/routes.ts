@@ -8,15 +8,15 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
-  // Create a new user
+  // Create a new user or sign in existing user
   app.post("/api/users", async (req, res) => {
     try {
       const validatedData = insertUserSchema.parse(req.body);
       
-      // Check if phone already exists
+      // Check if phone already exists - if so, sign them in
       const existingUser = await storage.getUserByPhone(validatedData.phone);
       if (existingUser) {
-        return res.status(400).json({ error: "Phone number already registered" });
+        return res.json({ user: existingUser, isExisting: true });
       }
 
       const user = await storage.createUser(validatedData);
@@ -27,7 +27,7 @@ export async function registerRoutes(
         unlockedAnimals: ["eurasian_stone_curlew"]
       });
 
-      res.json({ user });
+      res.json({ user, isExisting: false });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
