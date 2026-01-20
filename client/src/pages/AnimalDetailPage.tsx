@@ -8,10 +8,10 @@ import { useState } from "react";
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const { t, dir } = useLanguage();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isArOpen, setIsArOpen] = useState(false);
-
   const animal = animals.find((a) => a.id === params?.id);
+  // Auto-play if video exists
+  const [isPlaying, setIsPlaying] = useState(!!animal?.video);
+  const [isArOpen, setIsArOpen] = useState(false);
 
   if (!animal) {
     return <div>Animal not found</div>;
