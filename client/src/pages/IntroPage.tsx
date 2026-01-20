@@ -147,16 +147,6 @@ export default function IntroPage() {
           </AnimatePresence>
         </div>
 
-        {/* Win a Book Button */}
-        <motion.button 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="w-full py-4 rounded-xl bg-secondary/50 text-white border border-white/5 hover:bg-secondary/70 transition-colors text-sm tracking-wide"
-        >
-          {t("intro.win")}
-        </motion.button>
-        
         {/* Partner Logo */}
         <motion.div 
           initial={{ opacity: 0 }}
