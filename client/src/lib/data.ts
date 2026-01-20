@@ -11,7 +11,8 @@ export const animals: Animal[] = [
   {
     id: "white_tailed_lapwing",
     image: "/animals/All Animals - Pictures/25- white tailes lapwing.jpg",
-    scientificName: "VANELLUS LEUCURUS"
+    scientificName: "VANELLUS LEUCURUS",
+    video: "/videos/stone_curlew.webm"
   },
   {
     id: "water_rail",
