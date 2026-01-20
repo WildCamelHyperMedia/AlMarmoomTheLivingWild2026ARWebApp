@@ -1,47 +1,78 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { animals } from "./data";
+import { useUser } from "./user";
 
 interface ProgressContextType {
   unlockedAnimals: string[];
   watchedCount: number;
   unlockNext: (currentId: string) => void;
   isUnlocked: (id: string) => boolean;
+  isLoading: boolean;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
-  // Initialize from localStorage or default to first animal
-  const [unlockedAnimals, setUnlockedAnimals] = useState<string[]>(() => {
-    const saved = localStorage.getItem("unlockedAnimals");
-    return saved ? JSON.parse(saved) : [animals[0].id];
-  });
-
-  const [watchedCount, setWatchedCount] = useState<number>(() => {
-    const saved = localStorage.getItem("watchedCount");
-    return saved ? parseInt(saved) : 0;
-  });
+  const { user, isLoading: userLoading } = useUser();
+  const [unlockedAnimals, setUnlockedAnimals] = useState<string[]>([animals[0].id]);
+  const [watchedCount, setWatchedCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem("unlockedAnimals", JSON.stringify(unlockedAnimals));
-  }, [unlockedAnimals]);
+    if (userLoading) return;
+    
+    if (user) {
+      fetch(`/api/progress/${user.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Progress not found");
+          return res.json();
+        })
+        .then(data => {
+          setUnlockedAnimals(data.progress.unlockedAnimals || [animals[0].id]);
+          setWatchedCount(data.progress.unlockedAnimals?.length - 1 || 0);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setUnlockedAnimals([animals[0].id]);
+          setWatchedCount(0);
+          setIsLoading(false);
+        });
+    } else {
+      const saved = localStorage.getItem("unlockedAnimals");
+      const savedCount = localStorage.getItem("watchedCount");
+      setUnlockedAnimals(saved ? JSON.parse(saved) : [animals[0].id]);
+      setWatchedCount(savedCount ? parseInt(savedCount) : 0);
+      setIsLoading(false);
+    }
+  }, [user, userLoading]);
 
-  useEffect(() => {
-    localStorage.setItem("watchedCount", watchedCount.toString());
-  }, [watchedCount]);
-
-  const unlockNext = (currentId: string) => {
+  const unlockNext = async (currentId: string) => {
     const currentIndex = animals.findIndex(a => a.id === currentId);
     if (currentIndex === -1) return;
 
-    // Increment watch count
-    setWatchedCount(prev => prev + 1);
+    const newWatchedCount = watchedCount + 1;
+    setWatchedCount(newWatchedCount);
 
-    // Unlock next animal if it exists
     if (currentIndex < animals.length - 1) {
       const nextAnimal = animals[currentIndex + 1];
       if (!unlockedAnimals.includes(nextAnimal.id)) {
-        setUnlockedAnimals(prev => [...prev, nextAnimal.id]);
+        const newUnlocked = [...unlockedAnimals, nextAnimal.id];
+        setUnlockedAnimals(newUnlocked);
+
+        if (user) {
+          try {
+            await fetch(`/api/progress/${user.id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ unlockedAnimals: newUnlocked })
+            });
+          } catch (error) {
+            console.error("Failed to sync progress:", error);
+          }
+        } else {
+          localStorage.setItem("unlockedAnimals", JSON.stringify(newUnlocked));
+          localStorage.setItem("watchedCount", newWatchedCount.toString());
+        }
       }
     }
   };
@@ -51,7 +82,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ProgressContext.Provider value={{ unlockedAnimals, watchedCount, unlockNext, isUnlocked }}>
+    <ProgressContext.Provider value={{ unlockedAnimals, watchedCount, unlockNext, isUnlocked, isLoading }}>
       {children}
     </ProgressContext.Provider>
   );

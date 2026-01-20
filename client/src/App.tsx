@@ -10,6 +10,7 @@ import SignUpPage from "@/pages/SignUpPage";
 import IntroPage from "@/pages/IntroPage";
 import AnimalDetailPage from "@/pages/AnimalDetailPage";
 import { LanguageProvider } from "@/lib/language";
+import { UserProvider } from "@/lib/user";
 import { ProgressProvider } from "@/lib/progress";
 
 function Router() {
@@ -28,14 +29,16 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <ProgressProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </ProgressProvider>
-      </LanguageProvider>
+      <UserProvider>
+        <LanguageProvider>
+          <ProgressProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </ProgressProvider>
+        </LanguageProvider>
+      </UserProvider>
     </QueryClientProvider>
   );
 }
