@@ -30,27 +30,163 @@ function DesertTerrain() {
   const meshRef = useRef<THREE.Mesh>(null);
   
   return (
-    <mesh 
-      ref={meshRef} 
-      rotation={[-Math.PI / 2, 0, 0]} 
-      position={[0, -0.5, 0]}
-      receiveShadow
-    >
-      <planeGeometry args={[100, 100, 64, 64]} />
-      <meshStandardMaterial 
-        color="#D4A045"
-        roughness={0.9}
-        metalness={0.1}
-      />
-    </mesh>
+    <group>
+      <mesh 
+        ref={meshRef} 
+        rotation={[-Math.PI / 2, 0, 0]} 
+        position={[0, -0.5, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[200, 200, 128, 128]} />
+        <meshStandardMaterial 
+          color="#D4A045"
+          roughness={0.95}
+          metalness={0.05}
+        />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.48, 0]}>
+        <planeGeometry args={[200, 200]} />
+        <meshStandardMaterial 
+          color="#C8983A"
+          roughness={1}
+          transparent
+          opacity={0.3}
+        />
+      </mesh>
+    </group>
   );
 }
 
-function Dune({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+function SandDune({ position, scale = 1, rotation = 0 }: { position: [number, number, number]; scale?: number; rotation?: number }) {
   return (
-    <mesh position={position} scale={scale}>
-      <sphereGeometry args={[3, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-      <meshStandardMaterial color="#C4923E" roughness={0.95} />
+    <group position={position} rotation={[0, rotation, 0]} scale={scale}>
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <sphereGeometry args={[4, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#C4923E" roughness={0.98} />
+      </mesh>
+      <mesh position={[3, -0.3, 1]} scale={0.7} castShadow>
+        <sphereGeometry args={[3, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#BF8E38" roughness={0.96} />
+      </mesh>
+      <mesh position={[-2.5, -0.2, -1.5]} scale={0.5} castShadow>
+        <sphereGeometry args={[3.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#D09E42" roughness={0.97} />
+      </mesh>
+    </group>
+  );
+}
+
+function DesertRock({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh castShadow rotation={[0.2, 0.5, 0.1]}>
+        <dodecahedronGeometry args={[0.8, 0]} />
+        <meshStandardMaterial color="#8B7355" roughness={0.9} />
+      </mesh>
+      <mesh position={[0.5, -0.3, 0.3]} scale={0.6} castShadow rotation={[0.3, 0.8, 0]}>
+        <dodecahedronGeometry args={[0.6, 0]} />
+        <meshStandardMaterial color="#9B8365" roughness={0.85} />
+      </mesh>
+    </group>
+  );
+}
+
+function DesertPlant({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 0.3, 0]}>
+        <coneGeometry args={[0.15, 0.8, 8]} />
+        <meshStandardMaterial color="#5D7A3D" roughness={0.8} />
+      </mesh>
+      <mesh position={[0.15, 0.2, 0.1]} rotation={[0, 0, 0.3]}>
+        <coneGeometry args={[0.1, 0.5, 6]} />
+        <meshStandardMaterial color="#4A6830" roughness={0.8} />
+      </mesh>
+      <mesh position={[-0.12, 0.15, -0.08]} rotation={[0, 0, -0.25]}>
+        <coneGeometry args={[0.08, 0.4, 6]} />
+        <meshStandardMaterial color="#6B8B45" roughness={0.8} />
+      </mesh>
+    </group>
+  );
+}
+
+function Cactus({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 0.8, 0]} castShadow>
+        <cylinderGeometry args={[0.2, 0.25, 1.6, 12]} />
+        <meshStandardMaterial color="#4A7C3F" roughness={0.7} />
+      </mesh>
+      <mesh position={[0.35, 0.9, 0]} rotation={[0, 0, -0.5]} castShadow>
+        <cylinderGeometry args={[0.12, 0.15, 0.6, 10]} />
+        <meshStandardMaterial color="#3D6A33" roughness={0.7} />
+      </mesh>
+      <mesh position={[-0.3, 0.7, 0]} rotation={[0, 0, 0.6]} castShadow>
+        <cylinderGeometry args={[0.1, 0.12, 0.5, 10]} />
+        <meshStandardMaterial color="#5A8C4F" roughness={0.7} />
+      </mesh>
+    </group>
+  );
+}
+
+function DustParticles() {
+  const particlesRef = useRef<THREE.Points>(null);
+  const particleCount = 200;
+  
+  const positions = new Float32Array(particleCount * 3);
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 80;
+    positions[i * 3 + 1] = Math.random() * 15 + 0.5;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 80;
+  }
+
+  useFrame((state) => {
+    if (particlesRef.current) {
+      particlesRef.current.rotation.y = state.clock.elapsedTime * 0.02;
+      const positions = particlesRef.current.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3 + 1] += Math.sin(state.clock.elapsedTime + i) * 0.002;
+      }
+      particlesRef.current.geometry.attributes.position.needsUpdate = true;
+    }
+  });
+
+  return (
+    <points ref={particlesRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={particleCount}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.15}
+        color="#E8D5B7"
+        transparent
+        opacity={0.4}
+        sizeAttenuation
+      />
+    </points>
+  );
+}
+
+function Tumbleweed({ position }: { position: [number, number, number] }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.5;
+      meshRef.current.rotation.z = state.clock.elapsedTime * 0.3;
+      meshRef.current.position.x = position[0] + Math.sin(state.clock.elapsedTime * 0.2) * 2;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={position}>
+      <icosahedronGeometry args={[0.4, 1]} />
+      <meshStandardMaterial color="#8B7355" roughness={1} wireframe />
     </mesh>
   );
 }
@@ -128,33 +264,77 @@ function Scene({
 
   return (
     <>
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.5} color="#FFF5E6" />
       <directionalLight 
-        position={[10, 20, 10]} 
-        intensity={1.5} 
+        position={[50, 40, 30]} 
+        intensity={2} 
         castShadow
-        shadow-mapSize={[1024, 1024]}
+        shadow-mapSize={[2048, 2048]}
+        color="#FFE4B5"
+      />
+      <directionalLight 
+        position={[-30, 20, -20]} 
+        intensity={0.4} 
+        color="#87CEEB"
+      />
+      <hemisphereLight 
+        color="#FFF5E6"
+        groundColor="#D4A045"
+        intensity={0.6}
       />
       
       <Sky 
         distance={450000}
-        sunPosition={[100, 20, 100]}
-        inclination={0.6}
+        sunPosition={[100, 30, 100]}
+        inclination={0.55}
         azimuth={0.25}
-        rayleigh={0.5}
+        rayleigh={0.4}
+        turbidity={8}
+        mieCoefficient={0.005}
+        mieDirectionalG={0.8}
       />
       
-      <fog attach="fog" args={['#E8D5B7', 30, 80]} />
+      <fog attach="fog" args={['#E8D5B7', 25, 100]} />
       
       <DesertTerrain />
       
-      <Dune position={[-15, -0.5, -20]} scale={2} />
-      <Dune position={[20, -0.5, -15]} scale={1.5} />
-      <Dune position={[-10, -0.5, 15]} scale={1.8} />
-      <Dune position={[15, -0.5, 20]} scale={2.2} />
-      <Dune position={[0, -0.5, -25]} scale={1.6} />
+      <DustParticles />
       
-      {animalHotspots.map((hotspot, index) => (
+      <SandDune position={[-20, -0.5, -25]} scale={2.5} rotation={0.3} />
+      <SandDune position={[25, -0.5, -20]} scale={2} rotation={-0.5} />
+      <SandDune position={[-15, -0.5, 20]} scale={2.2} rotation={0.8} />
+      <SandDune position={[20, -0.5, 25]} scale={2.8} rotation={-0.2} />
+      <SandDune position={[0, -0.5, -35]} scale={2} rotation={0.5} />
+      <SandDune position={[-30, -0.5, 0]} scale={1.8} rotation={1.2} />
+      <SandDune position={[35, -0.5, 5]} scale={2.3} rotation={-0.8} />
+      <SandDune position={[-8, -0.5, -40]} scale={1.5} rotation={0.1} />
+      <SandDune position={[12, -0.5, 35]} scale={1.7} rotation={-1.1} />
+      <SandDune position={[-35, -0.5, -15]} scale={2.1} rotation={0.6} />
+      
+      <DesertRock position={[-5, -0.3, -8]} scale={1.2} />
+      <DesertRock position={[7, -0.3, -12]} scale={0.8} />
+      <DesertRock position={[-12, -0.3, 3]} scale={1} />
+      <DesertRock position={[15, -0.3, -6]} scale={0.6} />
+      <DesertRock position={[3, -0.3, 10]} scale={0.9} />
+      <DesertRock position={[-9, -0.3, -18]} scale={1.1} />
+      
+      <DesertPlant position={[-3, -0.5, -6]} scale={1.2} />
+      <DesertPlant position={[5, -0.5, -10]} scale={0.9} />
+      <DesertPlant position={[-8, -0.5, 8]} scale={1.1} />
+      <DesertPlant position={[12, -0.5, 3]} scale={0.8} />
+      <DesertPlant position={[-15, -0.5, -5]} scale={1} />
+      <DesertPlant position={[8, -0.5, -18]} scale={1.3} />
+      <DesertPlant position={[-2, -0.5, 15]} scale={0.7} />
+      
+      <Cactus position={[-18, -0.5, -8]} scale={1.2} />
+      <Cactus position={[18, -0.5, 12]} scale={0.9} />
+      <Cactus position={[-10, -0.5, 18]} scale={1} />
+      <Cactus position={[22, -0.5, -10]} scale={1.1} />
+      
+      <Tumbleweed position={[5, 0, 5]} />
+      <Tumbleweed position={[-12, 0, -3]} />
+      
+      {animalHotspots.map((hotspot) => (
         <AnimalMarker
           key={hotspot.animal.id}
           hotspot={hotspot}
