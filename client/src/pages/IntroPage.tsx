@@ -8,7 +8,7 @@ import posterImage from "@assets/generated_images/portrait_of_ali_bin_thalith_in
 export default function IntroPage() {
   const [, setLocation] = useLocation();
   const { t } = useLanguage();
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
 
@@ -78,6 +78,7 @@ export default function IntroPage() {
                     src="/videos/intro_video.webm"
                     className="w-full h-full object-cover"
                     autoPlay
+                    muted
                     playsInline
                     onEnded={() => setCanProceed(true)}
                 />
