@@ -79,6 +79,18 @@ export default function AnimalDetailPage() {
     }
   }, [isMuted]);
 
+  // Pause all media when AR opens
+  useEffect(() => {
+    if (isArOpen) {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      if (voiceoverRef.current) {
+        voiceoverRef.current.pause();
+      }
+    }
+  }, [isArOpen]);
+
   if (!animal) {
     return <div>Animal not found</div>;
   }
