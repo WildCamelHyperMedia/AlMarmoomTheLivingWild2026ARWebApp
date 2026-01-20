@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, Globe } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
@@ -175,6 +175,24 @@ export default function GalleryPage() {
             aria-label={`Go to page ${index + 1}`}
           />
         ))}
+      </div>
+
+      {/* Launch 3D World Button */}
+      <div className="px-6 pb-6 relative z-20 shrink-0">
+        <Link href="/world3d">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="w-full bg-gradient-to-r from-[#D4A045] to-[#E8B84A] hover:from-[#C4923E] hover:to-[#D4A045] text-white font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-lg"
+            data-testid="button-launch-3d"
+          >
+            <Globe className="w-5 h-5" />
+            <span className="text-sm tracking-widest uppercase font-bold">
+              {t("gallery.launch3d") || "Launch 3D World"}
+            </span>
+          </motion.button>
+        </Link>
       </div>
 
     </div>
