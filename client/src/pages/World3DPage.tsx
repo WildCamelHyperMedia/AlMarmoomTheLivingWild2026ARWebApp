@@ -307,6 +307,89 @@ function Tumbleweed({ position }: { position: [number, number, number] }) {
   );
 }
 
+function Cloud({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  const groupRef = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.position.x = position[0] + Math.sin(state.clock.elapsedTime * 0.05) * 5;
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={position} scale={scale}>
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[3, 16, 16]} />
+        <meshStandardMaterial color="#FFFFFF" transparent opacity={0.85} />
+      </mesh>
+      <mesh position={[3, -0.5, 0]}>
+        <sphereGeometry args={[2.5, 16, 16]} />
+        <meshStandardMaterial color="#FFFFFF" transparent opacity={0.8} />
+      </mesh>
+      <mesh position={[-2.5, -0.3, 0.5]}>
+        <sphereGeometry args={[2, 16, 16]} />
+        <meshStandardMaterial color="#FFFFFF" transparent opacity={0.75} />
+      </mesh>
+      <mesh position={[1.5, 0.8, -0.5]}>
+        <sphereGeometry args={[2, 16, 16]} />
+        <meshStandardMaterial color="#FFF8E7" transparent opacity={0.7} />
+      </mesh>
+      <mesh position={[-1, 0.5, 1]}>
+        <sphereGeometry args={[1.8, 16, 16]} />
+        <meshStandardMaterial color="#FFFAF0" transparent opacity={0.65} />
+      </mesh>
+    </group>
+  );
+}
+
+function DesertSky() {
+  return (
+    <group>
+      <Sky 
+        distance={450000}
+        sunPosition={[150, 25, 80]}
+        inclination={0.52}
+        azimuth={0.2}
+        rayleigh={0.5}
+        turbidity={10}
+        mieCoefficient={0.003}
+        mieDirectionalG={0.95}
+      />
+      
+      <mesh position={[0, 100, 0]}>
+        <sphereGeometry args={[300, 32, 32]} />
+        <meshBasicMaterial 
+          color="#FFD4A3" 
+          transparent 
+          opacity={0.15} 
+          side={THREE.BackSide}
+        />
+      </mesh>
+      
+      <Cloud position={[50, 40, -80]} scale={1.5} />
+      <Cloud position={[-70, 45, -100]} scale={1.2} />
+      <Cloud position={[100, 35, -60]} scale={1} />
+      <Cloud position={[-40, 50, -120]} scale={1.8} />
+      <Cloud position={[20, 42, -140]} scale={1.3} />
+      <Cloud position={[-100, 38, -70]} scale={0.9} />
+      <Cloud position={[80, 48, -110]} scale={1.1} />
+      
+      <mesh position={[150, 25, 80]}>
+        <sphereGeometry args={[12, 32, 32]} />
+        <meshBasicMaterial color="#FFF9C4" />
+      </mesh>
+      <mesh position={[150, 25, 80]}>
+        <sphereGeometry args={[18, 32, 32]} />
+        <meshBasicMaterial color="#FFE082" transparent opacity={0.4} />
+      </mesh>
+      <mesh position={[150, 25, 80]}>
+        <sphereGeometry args={[25, 32, 32]} />
+        <meshBasicMaterial color="#FFCC80" transparent opacity={0.2} />
+      </mesh>
+    </group>
+  );
+}
+
 function AnimalMarker({ 
   hotspot, 
   onClick, 
@@ -399,16 +482,7 @@ function Scene({
         intensity={0.6}
       />
       
-      <Sky 
-        distance={450000}
-        sunPosition={[100, 30, 100]}
-        inclination={0.55}
-        azimuth={0.25}
-        rayleigh={0.4}
-        turbidity={8}
-        mieCoefficient={0.005}
-        mieDirectionalG={0.8}
-      />
+      <DesertSky />
       
       <fog attach="fog" args={['#E8D5B7', 25, 100]} />
       
