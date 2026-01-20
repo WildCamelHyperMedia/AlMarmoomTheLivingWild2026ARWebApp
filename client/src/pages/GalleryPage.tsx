@@ -131,13 +131,13 @@ export default function GalleryPage() {
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center gap-3 mt-12">
+      <div className="flex justify-center gap-3 mt-12 mb-8 relative z-20">
         {chunks.map((_, index) => (
           <button
             key={index}
             onClick={() => emblaApi && emblaApi.scrollTo(index)}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-              index === selectedIndex ? "bg-white scale-110" : "bg-white/20"
+            className={`w-4 h-4 rounded-full transition-all duration-300 cursor-pointer border border-transparent hover:border-white/50 ${
+              index === selectedIndex ? "bg-white scale-110" : "bg-white/20 hover:bg-white/40"
             }`}
             aria-label={`Go to page ${index + 1}`}
           />
