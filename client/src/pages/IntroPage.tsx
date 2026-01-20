@@ -61,11 +61,21 @@ export default function IntroPage() {
         transition={{ delay: 0.2 }}
         className="relative w-full aspect-[9/16] max-h-[50vh] bg-black/20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl z-10 mb-8"
       >
-        <img 
-          src={posterImage} 
-          alt="Ali Bin Thalith" 
-          className="w-full h-full object-cover"
-        />
+        {!isPlaying ? (
+            <img 
+              src={posterImage} 
+              alt="Ali Bin Thalith" 
+              className="w-full h-full object-cover"
+            />
+        ) : (
+            <video
+                src="/videos/intro_video.webm"
+                className="w-full h-full object-cover"
+                autoPlay
+                controls
+                playsInline
+            />
+        )}
         
         {/* Play Button Overlay */}
         {!isPlaying && (
