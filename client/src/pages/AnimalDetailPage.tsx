@@ -20,15 +20,29 @@ export default function AnimalDetailPage() {
   return (
     <div className="h-[100dvh] w-full bg-background text-white relative overflow-hidden">
       
-      {/* Background Image (Full Screen) */}
+      {/* Background Media (Full Screen) */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
         <div className="absolute inset-0 bg-black/20 z-10" />
-        <img 
-          src={animal.image} 
-          alt={t(`animals.${animal.id}`)}
-          className="w-full h-full object-cover"
-        />
+        
+        {/* Render either video or image as background */}
+        {isPlaying && animal.video ? (
+          <video 
+            src={animal.video} 
+            autoPlay 
+            controls={false} // Hide default controls for seamless look
+            playsInline
+            loop
+            onClick={() => setIsPlaying(false)} // Click to stop/pause
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <img 
+            src={animal.image} 
+            alt={t(`animals.${animal.id}`)}
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
 
       {/* Header */}
@@ -56,22 +70,16 @@ export default function AnimalDetailPage() {
         </div>
       )}
 
-      {/* Video Player */}
-      {isPlaying && animal.video && (
-         <div className="absolute inset-0 z-40 bg-black flex items-center justify-center">
-            <button 
+      {/* Stop/Close Button for Video */}
+      {isPlaying && (
+        <div className="absolute top-6 right-6 z-50">
+           <button 
               onClick={() => setIsPlaying(false)}
-              className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
-            <video 
-              src={animal.video} 
-              autoPlay 
-              controls 
-              className="w-full h-full object-contain"
-            />
-         </div>
+        </div>
       )}
 
       {/* Mattercraft AR Overlay */}
