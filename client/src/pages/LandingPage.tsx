@@ -41,12 +41,8 @@ export default function LandingPage() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-12 flex flex-col items-center gap-4"
         >
-          <div className="font-arabic text-4xl mb-2">المرموم</div>
-          <h1 className="font-serif text-5xl font-light tracking-[0.2em] uppercase text-primary/90">
-            Al Marmoom
-          </h1>
-          <div className="h-px w-24 bg-primary/60 my-4" />
-          <h2 className="font-sans text-sm tracking-widest uppercase text-white/80">
+          <img src="/logo.png" alt="Al Marmoom" className="w-64 h-auto" />
+          <h2 className="font-sans text-sm tracking-widest uppercase text-white/80 mt-2">
             Drive-Through Photography Exhibition
           </h2>
           <p className="font-sans text-xs tracking-wider text-white/60 mt-1">

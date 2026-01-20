@@ -51,10 +51,7 @@ export default function IntroPage() {
         transition={{ delay: 0.1 }}
         className="text-center mb-8 z-10"
       >
-        <div className="font-arabic text-3xl mb-1 text-primary">المرموم</div>
-        <h1 className="font-serif text-xl tracking-[0.2em] uppercase text-white/90">
-          Al Marmoom
-        </h1>
+        <img src="/logo.png" alt="Al Marmoom" className="w-40 h-auto mx-auto" />
       </motion.div>
 
       {/* Video Player Area */}
