@@ -1,12 +1,40 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Dubai";
+  src: url("/fonts/Dubai-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-serif: "Playfair Display", serif;
-  --font-sans: "DM Sans", sans-serif;
-  --font-arabic: "Amiri", serif;
+  --font-serif: "Dubai", serif;
+  --font-sans: "Dubai", sans-serif;
+  --font-arabic: "Dubai", serif;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
