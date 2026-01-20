@@ -12,14 +12,14 @@ export const animals: Animal[] = [
     id: "eurasian_stone_curlew",
     image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
     scientificName: "BURHINUS OEDICNEMUS",
-    video: "/videos/stone_curlew.webm",
+    video: "/videos/stone_curlew.mp4",
     arUrl: "https://pk6zz.zappar-us.io/7171000204019462389/"
   },
   {
     id: "white_tailed_lapwing",
     image: "/animals/All Animals - Pictures/25- white tailes lapwing.jpg",
     scientificName: "VANELLUS LEUCURUS",
-    video: "/videos/stone_curlew.webm"
+    video: "/videos/stone_curlew.mp4"
   },
   {
     id: "water_rail",
