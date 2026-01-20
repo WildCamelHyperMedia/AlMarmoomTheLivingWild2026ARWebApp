@@ -50,14 +50,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const currentIndex = animals.findIndex(a => a.id === currentId);
     if (currentIndex === -1) return;
 
-    const newWatchedCount = watchedCount + 1;
-    setWatchedCount(newWatchedCount);
-
     if (currentIndex < animals.length - 1) {
       const nextAnimal = animals[currentIndex + 1];
       if (!unlockedAnimals.includes(nextAnimal.id)) {
         const newUnlocked = [...unlockedAnimals, nextAnimal.id];
+        const newWatchedCount = newUnlocked.length - 1;
+        
         setUnlockedAnimals(newUnlocked);
+        setWatchedCount(newWatchedCount);
 
         if (user) {
           try {

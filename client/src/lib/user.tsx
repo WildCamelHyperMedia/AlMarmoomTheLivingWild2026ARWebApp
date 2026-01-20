@@ -15,10 +15,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
-    const savedEmail = localStorage.getItem("userEmail");
+    const savedPhone = localStorage.getItem("userPhone");
     
-    if (savedUserId && savedEmail) {
-      fetch(`/api/users/by-email/${encodeURIComponent(savedEmail)}`)
+    if (savedUserId && savedPhone) {
+      fetch(`/api/users/by-phone/${encodeURIComponent(savedPhone)}`)
         .then(res => {
           if (!res.ok) throw new Error("User not found");
           return res.json();
@@ -29,7 +29,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           localStorage.removeItem("userId");
-          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userPhone");
           setIsLoading(false);
         });
     } else {
@@ -41,10 +41,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserState(user);
     if (user) {
       localStorage.setItem("userId", user.id);
-      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userPhone", user.phone);
     } else {
       localStorage.removeItem("userId");
-      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userPhone");
     }
   };
 

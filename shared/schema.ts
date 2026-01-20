@@ -7,8 +7,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  phone: text("phone").notNull(),
+  phone: text("phone").notNull().unique(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({

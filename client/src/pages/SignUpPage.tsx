@@ -13,14 +13,13 @@ export default function SignUpPage() {
   
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: ""
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleContinue = async () => {
-    if (!formData.name || !formData.email || !formData.phone) {
+    if (!formData.name || !formData.phone) {
       setError("Please fill in all fields");
       return;
     }
@@ -95,18 +94,6 @@ export default function SignUpPage() {
               className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
               dir={dir}
               data-testid="input-name"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Input 
-              type="email" 
-              placeholder={language === 'en' ? 'Email' : 'البريد الإلكتروني'}
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-              dir={dir}
-              data-testid="input-email"
             />
           </div>
 

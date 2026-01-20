@@ -13,10 +13,10 @@ export async function registerRoutes(
     try {
       const validatedData = insertUserSchema.parse(req.body);
       
-      // Check if email already exists
-      const existingUser = await storage.getUserByEmail(validatedData.email);
+      // Check if phone already exists
+      const existingUser = await storage.getUserByPhone(validatedData.phone);
       if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
+        return res.status(400).json({ error: "Phone number already registered" });
       }
 
       const user = await storage.createUser(validatedData);
@@ -33,10 +33,10 @@ export async function registerRoutes(
     }
   });
 
-  // Get user by email
-  app.get("/api/users/by-email/:email", async (req, res) => {
+  // Get user by phone
+  app.get("/api/users/by-phone/:phone", async (req, res) => {
     try {
-      const user = await storage.getUserByEmail(req.params.email);
+      const user = await storage.getUserByPhone(req.params.phone);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -62,6 +62,11 @@ export async function registerRoutes(
   // Update user progress
   app.patch("/api/progress/:userId", async (req, res) => {
     try {
+      const existingProgress = await storage.getProgress(req.params.userId);
+      if (!existingProgress) {
+        return res.status(404).json({ error: "Progress not found" });
+      }
+      
       const validatedData = updateUserProgressSchema.parse(req.body);
       const progress = await storage.updateProgress(req.params.userId, validatedData);
       res.json({ progress });
