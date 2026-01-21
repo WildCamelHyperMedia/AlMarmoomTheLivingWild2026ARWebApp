@@ -114,26 +114,6 @@ export default function IntroPage() {
       {/* Action Buttons */}
       <div className="w-full max-w-sm space-y-4 z-10 mt-auto">
         
-        {/* Sign Up Button - Always clickable */}
-        <div className="relative">
-          <motion.button
-            onClick={() => setLocation("/signup")}
-            className="w-full py-4 rounded-xl font-bold tracking-wide transition-all duration-500 overflow-hidden relative bg-primary text-background hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {t("intro.signup")}
-            </span>
-          </motion.button>
-          
-          {/* Shine Effect */}
-          <motion.div
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: "100%", opacity: [0, 1, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none rounded-xl"
-          />
-        </div>
-
         {/* Start Journey Button - Clickable after 5 seconds */}
         <div className="relative">
           <motion.button
@@ -141,8 +121,8 @@ export default function IntroPage() {
             disabled={!canProceed}
             className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all duration-300 overflow-hidden relative ${
               canProceed 
-                ? "bg-white/10 text-white hover:bg-white/20 active:scale-[0.98] cursor-pointer border border-white/20" 
-                : "bg-white/5 text-white/30 cursor-not-allowed border border-white/10"
+                ? "bg-primary text-background hover:bg-primary/90 active:scale-[0.98] cursor-pointer" 
+                : "bg-white/10 text-white/30 cursor-not-allowed"
             }`}
           >
             {/* Progress Bar Background for disabled state */}
@@ -159,7 +139,27 @@ export default function IntroPage() {
               {!canProceed && <span className="text-xs opacity-50">({countdown}s)</span>}
             </span>
           </motion.button>
+          
+          {/* Shine Effect when enabled */}
+          <AnimatePresence>
+            {canProceed && (
+              <motion.div
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ x: "100%", opacity: [0, 1, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none rounded-xl"
+              />
+            )}
+          </AnimatePresence>
         </div>
+
+        {/* Sign Up Button - Always clickable */}
+        <motion.button
+          onClick={() => setLocation("/signup")}
+          className="w-full py-4 rounded-xl font-bold tracking-wide transition-all duration-300 bg-white/10 text-white hover:bg-white/20 active:scale-[0.98] cursor-pointer border border-white/20"
+        >
+          {t("intro.signup")}
+        </motion.button>
 
         {/* Partner Logo */}
         <motion.div 
