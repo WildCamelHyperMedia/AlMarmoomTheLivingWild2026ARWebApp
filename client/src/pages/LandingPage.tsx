@@ -11,7 +11,7 @@ export default function LandingPage() {
 
   const handleLanguageSelect = (lang: "en" | "ar") => {
     setLanguage(lang);
-    setLocation("/signup");
+    setLocation("/intro");
   };
 
   return (

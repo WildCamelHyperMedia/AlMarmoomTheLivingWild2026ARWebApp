@@ -58,7 +58,7 @@ export default function SignUpPage() {
       }
 
       setUser(data.user);
-      setLocation("/intro");
+      setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);

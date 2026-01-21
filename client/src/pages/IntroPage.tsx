@@ -22,9 +22,9 @@ export default function IntroPage() {
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  const handleStartJourney = () => {
+  const handleSignUp = () => {
     if (canProceed) {
-      setLocation("/gallery");
+      setLocation("/signup");
     }
   };
 
@@ -108,10 +108,10 @@ export default function IntroPage() {
       {/* Action Buttons */}
       <div className="w-full max-w-sm space-y-4 z-10 mt-auto">
         
-        {/* Start Journey Button */}
+        {/* Sign Up Button */}
         <div className="relative">
           <motion.button
-            onClick={handleStartJourney}
+            onClick={handleSignUp}
             disabled={!canProceed}
             className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all duration-500 overflow-hidden relative ${
               canProceed 
@@ -129,7 +129,7 @@ export default function IntroPage() {
               />
             )}
             <span className="relative z-10 flex items-center justify-center gap-2">
-              {t("intro.start")}
+              {t("intro.signup")}
               {!canProceed && <span className="text-xs opacity-50">({countdown}s)</span>}
             </span>
           </motion.button>
