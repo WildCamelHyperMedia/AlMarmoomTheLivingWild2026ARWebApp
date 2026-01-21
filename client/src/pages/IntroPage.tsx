@@ -28,6 +28,12 @@ export default function IntroPage() {
     }
   };
 
+  const handleStartJourney = () => {
+    if (canProceed) {
+      setLocation("/gallery");
+    }
+  };
+
   return (
     <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-8 relative overflow-hidden">
       
@@ -146,6 +152,19 @@ export default function IntroPage() {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Start Journey Button */}
+        <motion.button
+          onClick={handleStartJourney}
+          disabled={!canProceed}
+          className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all duration-300 ${
+            canProceed 
+              ? "bg-white/10 text-white hover:bg-white/20 active:scale-[0.98] cursor-pointer border border-white/20" 
+              : "bg-white/5 text-white/30 cursor-not-allowed border border-white/10"
+          }`}
+        >
+          {t("intro.start")}
+        </motion.button>
 
         {/* Partner Logo */}
         <motion.div 
