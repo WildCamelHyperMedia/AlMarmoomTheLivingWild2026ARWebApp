@@ -1,6 +1,6 @@
-import { users, userProgress, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress } from "@shared/schema";
+import { users, userProgress, loginHistory, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -14,6 +14,13 @@ export interface IStorage {
   getProgress(userId: string): Promise<UserProgress | undefined>;
   createProgress(progress: InsertUserProgress): Promise<UserProgress>;
   updateProgress(userId: string, update: UpdateUserProgress): Promise<UserProgress>;
+  getAllProgress(): Promise<UserProgress[]>;
+  
+  // Login history operations
+  createLoginHistory(login: InsertLoginHistory): Promise<LoginHistory>;
+  getLoginHistory(limit?: number): Promise<LoginHistory[]>;
+  getUserLoginHistory(userId: string): Promise<LoginHistory[]>;
+  getLoginStats(): Promise<{ date: string; count: number }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -64,6 +71,37 @@ export class DatabaseStorage implements IStorage {
       .where(eq(userProgress.userId, userId))
       .returning();
     return progress;
+  }
+
+  async getAllProgress(): Promise<UserProgress[]> {
+    return await db.select().from(userProgress);
+  }
+
+  async createLoginHistory(login: InsertLoginHistory): Promise<LoginHistory> {
+    const [history] = await db
+      .insert(loginHistory)
+      .values(login)
+      .returning();
+    return history;
+  }
+
+  async getLoginHistory(limit: number = 100): Promise<LoginHistory[]> {
+    return await db.select().from(loginHistory).orderBy(desc(loginHistory.loginAt)).limit(limit);
+  }
+
+  async getUserLoginHistory(userId: string): Promise<LoginHistory[]> {
+    return await db.select().from(loginHistory).where(eq(loginHistory.userId, userId)).orderBy(desc(loginHistory.loginAt));
+  }
+
+  async getLoginStats(): Promise<{ date: string; count: number }[]> {
+    const result = await db.execute(sql`
+      SELECT DATE(login_at) as date, COUNT(*) as count 
+      FROM login_history 
+      WHERE login_at >= NOW() - INTERVAL '30 days'
+      GROUP BY DATE(login_at) 
+      ORDER BY date DESC
+    `);
+    return result.rows as { date: string; count: number }[];
   }
 }
 

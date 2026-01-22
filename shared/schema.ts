@@ -49,3 +49,20 @@ export const updateUserProgressSchema = createInsertSchema(userProgress).pick({
 export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
 export type UpdateUserProgress = z.infer<typeof updateUserProgressSchema>;
 export type UserProgress = typeof userProgress.$inferSelect;
+
+// Login history table for tracking user logins
+export const loginHistory = pgTable("login_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  loginAt: timestamp("login_at").notNull().defaultNow(),
+  userAgent: text("user_agent"),
+  ipAddress: text("ip_address"),
+});
+
+export const insertLoginHistorySchema = createInsertSchema(loginHistory).omit({
+  id: true,
+  loginAt: true,
+});
+
+export type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;
+export type LoginHistory = typeof loginHistory.$inferSelect;
