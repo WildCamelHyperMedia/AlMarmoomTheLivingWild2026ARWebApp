@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play } from "lucide-react";
+import { Play, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -8,8 +8,8 @@ import posterImage from "@assets/generated_images/portrait_of_ali_bin_thalith_in
 
 export default function IntroPage() {
   const [, setLocation] = useLocation();
-  const { t } = useLanguage();
-  const { user, isLoading } = useUser();
+  const { t, language } = useLanguage();
+  const { user, isLoading, logout } = useUser();
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -17,6 +17,11 @@ export default function IntroPage() {
       setLocation("/auth");
     }
   }, [user, isLoading, setLocation]);
+
+  const handleLogout = () => {
+    logout();
+    setLocation("/");
+  };
 
   if (isLoading || !user) {
     return (
@@ -57,14 +62,24 @@ export default function IntroPage() {
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none" />
 
-      {/* Header - Top Left */}
+      {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full mb-8 z-10 text-left"
+        className="w-full mb-8 z-10 flex justify-between items-start"
       >
-        <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">Intro By</h2>
-        <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">Ali Bin Thalith</h1>
+        <div className="text-left">
+          <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">Intro By</h2>
+          <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">Ali Bin Thalith</h1>
+        </div>
+        <button 
+          onClick={handleLogout}
+          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+          data-testid="button-logout"
+          title={language === 'en' ? 'Logout' : 'تسجيل الخروج'}
+        >
+          <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
+        </button>
       </motion.div>
 
       {/* Logo Area */}
