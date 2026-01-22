@@ -1,8 +1,8 @@
-# Al Marmoom - Drive-Through Photography Exhibition
+# The Living Wild - Drive-Through Photography Exhibition
 
 ## Overview
 
-Al Marmoom is a mobile-first digital gallery application for the Al Marmoom Desert Conservation Reserve photography exhibition. The app provides an interactive wildlife discovery experience where users sign up, watch animal videos to progressively unlock the collection, and can access AR experiences for select animals. The application supports bilingual content (English and Arabic) with RTL layout support.
+The Living Wild is a mobile-first digital gallery application for the Al Marmoom Desert Conservation Reserve photography exhibition. The app provides an interactive wildlife discovery experience where users sign up, watch animal videos to progressively unlock the collection, access AR experiences for select animals, and ask AI-powered questions about wildlife. The application supports bilingual content (English and Arabic) with RTL layout support.
 
 ## User Preferences
 
@@ -42,11 +42,19 @@ Preferred communication style: Simple, everyday language.
 - **Password Security**: bcrypt hashing with salt rounds
 - **Request Validation**: Zod schema validation on all auth endpoints
 
+### AI Integration
+- **Provider**: OpenAI via Replit AI Integrations
+- **Model**: gpt-4o-mini for wildlife Q&A
+- **Endpoint**: POST `/api/animal-guide` - protected by auth middleware
+- **Features**: Bilingual responses (English/Arabic), context-aware animal information
+- **Environment Variables**: `AI_INTEGRATIONS_OPENAI_API_KEY`, `AI_INTEGRATIONS_OPENAI_BASE_URL` (auto-configured by Replit)
+
 ### Key Design Patterns
 - **Shared Types**: Schema definitions in `/shared/schema.ts` are used by both frontend and backend for type consistency
 - **Storage Abstraction**: `IStorage` interface in `server/storage.ts` allows for different storage implementations
 - **Progressive Unlocking**: Animals are unlocked sequentially as users watch video content
 - **Bilingual Support**: Language context provides translations and RTL/LTR direction switching
+- **AI Wildlife Guide**: Users can ask questions about each animal from the detail page
 
 ### Build Process
 - **Development**: Vite dev server with HMR for frontend, tsx for backend

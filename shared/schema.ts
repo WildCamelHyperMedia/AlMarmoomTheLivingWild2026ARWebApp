@@ -83,3 +83,14 @@ export const insertSessionSchema = createInsertSchema(sessions).omit({
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
+
+// AI Animal Guide request schema
+export const animalGuideRequestSchema = z.object({
+  animalId: z.string().min(1, "Animal ID is required"),
+  animalName: z.string().min(1, "Animal name is required"),
+  scientificName: z.string().optional(),
+  question: z.string().min(1, "Question is required").max(500, "Question too long"),
+  language: z.enum(["en", "ar"]).optional().default("en"),
+});
+
+export type AnimalGuideRequest = z.infer<typeof animalGuideRequestSchema>;

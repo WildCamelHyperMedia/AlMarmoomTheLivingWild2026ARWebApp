@@ -54,7 +54,12 @@ const translations = {
     "notification.entered.title": "You're in!",
     "notification.entered.message": "You've entered the draw. Watch 10 more videos for a chance to win a private photography session with Ali Bin Thalith.",
     "notification.button": "Continue Journey",
-    "gallery.watched": "Videos Watched"
+    "gallery.watched": "Videos Watched",
+    "aiGuide.title": "Ask the Wildlife Guide",
+    "aiGuide.placeholder": "Ask a question about this animal...",
+    "aiGuide.send": "Send",
+    "aiGuide.thinking": "Thinking...",
+    "aiGuide.error": "Sorry, I couldn't answer that. Please try again."
   },
   ar: {
     "app.title": "الحياة البرية",
@@ -105,7 +110,12 @@ const translations = {
     "notification.entered.title": "أنت مشارك!",
     "notification.entered.message": "لقد دخلت في السحب. شاهد 10 مقاطع فيديو إضافية لفرصة الفوز بجلسة تصوير خاصة مع علي بن ثالث.",
     "notification.button": "أكمل الرحلة",
-    "gallery.watched": "مقاطع الفيديو المشاهدة"
+    "gallery.watched": "مقاطع الفيديو المشاهدة",
+    "aiGuide.title": "اسأل مرشد الحياة البرية",
+    "aiGuide.placeholder": "اطرح سؤالاً عن هذا الحيوان...",
+    "aiGuide.send": "إرسال",
+    "aiGuide.thinking": "جارٍ التفكير...",
+    "aiGuide.error": "عذراً، لم أتمكن من الإجابة. حاول مرة أخرى."
   }
 };
 

@@ -1,9 +1,15 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, updateUserProgressSchema, loginSchema } from "@shared/schema";
+import { insertUserSchema, updateUserProgressSchema, loginSchema, animalGuideRequestSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
 
 const SESSION_DURATION_HOURS = 6;
 
@@ -384,6 +390,48 @@ export async function registerRoutes(
       res.json({ progress });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  });
+
+  // AI Wildlife Guide - answer questions about animals
+  app.post("/api/animal-guide", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const parseResult = animalGuideRequestSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        const errors = parseResult.error.errors.map(e => e.message).join(", ");
+        return res.status(400).json({ error: errors });
+      }
+      
+      const { animalId, animalName, scientificName, question, language } = parseResult.data;
+
+      const systemPrompt = language === 'ar' 
+        ? `أنت مرشد الحياة البرية في محمية المرموم الصحراوية. أنت خبير في الحياة البرية الصحراوية وتجيب عن الأسئلة المتعلقة بالحيوانات في المحمية. 
+
+الحيوان الحالي: ${animalName} (${scientificName})
+
+قدم إجابات موجزة ومفيدة (2-3 جمل) باللغة العربية. ركز على الحقائق المثيرة حول هذا الحيوان وموئله وسلوكه وجهود الحفاظ عليه في دولة الإمارات العربية المتحدة والمنطقة العربية.`
+        : `You are a wildlife guide at Al Marmoom Desert Conservation Reserve. You are an expert on desert wildlife and answer questions about the animals in the reserve.
+
+Current animal: ${animalName} (${scientificName})
+
+Provide concise, informative answers (2-3 sentences). Focus on fascinating facts about this animal, its habitat, behavior, and conservation efforts in UAE and the Arabian region.`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: question }
+        ],
+        max_tokens: 200,
+        temperature: 0.7,
+      });
+
+      const answer = response.choices[0]?.message?.content || "I couldn't generate a response. Please try again.";
+      
+      res.json({ answer });
+    } catch (error: any) {
+      console.error("AI Guide error:", error);
+      res.status(500).json({ error: "Failed to get AI response" });
     }
   });
 

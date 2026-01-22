@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX, MessageCircle, Send, Loader2 } from "lucide-react";
 import { Link, useRoute, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
@@ -7,6 +7,11 @@ import { useState, useRef, useEffect } from "react";
 import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
 
 const voiceoverMap: Record<string, { en: string; ar: string }> = {
   eurasian_stone_curlew: {
@@ -22,6 +27,29 @@ export default function AnimalDetailPage() {
   const { user, isLoading: userLoading } = useUser();
   const { unlockNext, watchedCount } = useProgress();
 
+  const animal = animals.find((a) => a.id === params?.id);
+  
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isArOpen, setIsArOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [showNotification, setShowNotification] = useState<"keepGoing" | "entered" | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const voiceoverRef = useRef<HTMLAudioElement>(null);
+  
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-play video when animal has video
+  useEffect(() => {
+    if (animal?.video) {
+      setIsPlaying(true);
+    }
+  }, [animal?.video]);
+
   // Redirect to auth if not logged in
   useEffect(() => {
     if (!userLoading && !user) {
@@ -29,22 +57,47 @@ export default function AnimalDetailPage() {
     }
   }, [user, userLoading, setLocation]);
 
-  if (userLoading || !user) {
-    return (
-      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
-        <div className="animate-pulse text-white/50">Loading...</div>
-      </div>
-    );
-  }
-  const animal = animals.find((a) => a.id === params?.id);
-  // Auto-play if video exists
-  const [isPlaying, setIsPlaying] = useState(!!animal?.video);
-  const [isArOpen, setIsArOpen] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [showNotification, setShowNotification] = useState<"keepGoing" | "entered" | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const voiceoverRef = useRef<HTMLAudioElement>(null);
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isAiLoading || !animal) return;
+    
+    const userMessage = chatInput.trim();
+    setChatInput("");
+    setChatMessages(prev => [...prev, { role: "user", content: userMessage }]);
+    setIsAiLoading(true);
+    
+    try {
+      const token = localStorage.getItem("auth_token");
+      const response = await fetch("/api/animal-guide", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          animalId: animal.id,
+          animalName: t(`animals.${animal.id}`),
+          scientificName: animal.scientificName,
+          question: userMessage,
+          language
+        })
+      });
+      
+      if (!response.ok) throw new Error("Failed to get response");
+      
+      const data = await response.json();
+      setChatMessages(prev => [...prev, { role: "assistant", content: data.answer }]);
+    } catch (error) {
+      setChatMessages(prev => [...prev, { role: "assistant", content: t("aiGuide.error") }]);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   // Handle video completion
   const handleVideoEnded = () => {
@@ -109,6 +162,14 @@ export default function AnimalDetailPage() {
     }
   }, [isArOpen]);
 
+  if (userLoading || !user) {
+    return (
+      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
+        <div className="animate-pulse text-white/50">Loading...</div>
+      </div>
+    );
+  }
+
   if (!animal) {
     return <div>Animal not found</div>;
   }
@@ -150,7 +211,10 @@ export default function AnimalDetailPage() {
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
         <Link href="/gallery">
-          <button className={`p-2 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}>
+          <button 
+            className={`p-2 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+            data-testid="button-back-to-gallery"
+          >
             <ArrowLeft className="h-6 w-6 text-white" />
           </button>
         </Link>
@@ -166,6 +230,7 @@ export default function AnimalDetailPage() {
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsPlaying(true)}
             className="pointer-events-auto w-20 h-20 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl group"
+            data-testid="button-play-video"
           >
             <Play className="fill-white ml-1 w-8 h-8 group-hover:scale-110 transition-transform" />
           </motion.button>
@@ -180,6 +245,7 @@ export default function AnimalDetailPage() {
              <button 
                 onClick={() => setIsMuted(!isMuted)}
                 className="p-1 rounded-full text-white hover:bg-white/10 transition-colors"
+                data-testid="button-toggle-mute"
               >
                 {isMuted || volume === 0 ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
               </button>
@@ -195,12 +261,14 @@ export default function AnimalDetailPage() {
                   setIsMuted(false);
                 }}
                 className="w-24 accent-white h-1 bg-white/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                data-testid="input-volume"
               />
            </div>
 
            <button 
               onClick={() => setIsPlaying(false)}
               className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+              data-testid="button-stop-video"
             >
               <X className="w-6 h-6" />
             </button>
@@ -214,6 +282,7 @@ export default function AnimalDetailPage() {
             <button 
               onClick={() => setIsArOpen(false)}
               className="absolute top-6 left-6 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+              data-testid="button-close-ar"
             >
               <X className="w-6 h-6" />
             </button>
@@ -264,6 +333,7 @@ export default function AnimalDetailPage() {
               <button
                 onClick={() => setShowNotification(null)}
                 className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98]"
+                data-testid="button-continue-journey"
               >
                 {t("notification.button")}
               </button>
@@ -290,22 +360,142 @@ export default function AnimalDetailPage() {
           </p>
         </motion.div>
 
-        {/* AR Button */}
-        <motion.button 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          onClick={() => setIsArOpen(true)}
-          className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
-        >
-          <ScanLine className="w-5 h-5 opacity-70" />
-          <span className="text-sm tracking-widest uppercase flex-1 text-center">
-            {t("detail.enterAr")}
-          </span>
-          <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
-        </motion.button>
+        {/* Action Buttons Row */}
+        <div className="flex gap-3">
+          {/* AR Button */}
+          <motion.button 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            onClick={() => setIsArOpen(true)}
+            className="flex-1 bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
+            data-testid="button-enter-ar"
+          >
+            <ScanLine className="w-5 h-5 opacity-70" />
+            <span className="text-sm tracking-widest uppercase flex-1 text-center">
+              {t("detail.enterAr")}
+            </span>
+            <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
+          </motion.button>
+          
+          {/* AI Guide Button */}
+          <motion.button 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            onClick={() => setIsChatOpen(true)}
+            className="w-14 h-14 bg-[#D4A045] hover:bg-[#c4923e] text-white rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center"
+            data-testid="button-open-ai-guide"
+          >
+            <MessageCircle className="w-6 h-6" />
+          </motion.button>
+        </div>
 
       </div>
+
+      {/* AI Wildlife Guide Chat Panel */}
+      <AnimatePresence>
+        {isChatOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: "100%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed inset-0 z-[60] flex flex-col bg-[#2A1F1A]"
+          >
+            {/* Chat Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-[#3E2D24]">
+              <h2 className="font-serif text-lg font-bold text-[#D4A045]">
+                {t("aiGuide.title")}
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                data-testid="button-close-ai-guide"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+            
+            {/* Animal Info */}
+            <div className="flex items-center gap-4 p-4 bg-black/20 border-b border-white/5">
+              <img 
+                src={animal.image} 
+                alt={t(`animals.${animal.id}`)}
+                className="w-12 h-12 rounded-xl object-cover"
+              />
+              <div>
+                <p className="text-white font-medium">{t(`animals.${animal.id}`)}</p>
+                <p className="text-white/50 text-xs italic">{animal.scientificName}</p>
+              </div>
+            </div>
+            
+            {/* Chat Messages */}
+            <div 
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
+            >
+              {chatMessages.length === 0 && (
+                <div className="text-center text-white/40 py-8">
+                  <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">{t("aiGuide.placeholder")}</p>
+                </div>
+              )}
+              
+              {chatMessages.map((msg, idx) => (
+                <div 
+                  key={idx}
+                  className={`flex ${msg.role === 'user' ? (dir === 'rtl' ? 'justify-start' : 'justify-end') : (dir === 'rtl' ? 'justify-end' : 'justify-start')}`}
+                >
+                  <div 
+                    className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                      msg.role === 'user' 
+                        ? 'bg-[#D4A045] text-white' 
+                        : 'bg-[#3E2D24] text-white/90 border border-white/10'
+                    }`}
+                    data-testid={`chat-message-${msg.role}-${idx}`}
+                  >
+                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+              
+              {isAiLoading && (
+                <div className={`flex ${dir === 'rtl' ? 'justify-end' : 'justify-start'}`}>
+                  <div className="bg-[#3E2D24] text-white/70 px-4 py-3 rounded-2xl border border-white/10 flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-sm">{t("aiGuide.thinking")}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Chat Input */}
+            <div className="p-4 border-t border-white/10 bg-[#3E2D24]">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
+                  placeholder={t("aiGuide.placeholder")}
+                  className="flex-1 bg-black/30 text-white placeholder-white/40 px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-[#D4A045]/50"
+                  data-testid="input-ai-question"
+                  disabled={isAiLoading}
+                />
+                <button
+                  onClick={sendChatMessage}
+                  disabled={isAiLoading || !chatInput.trim()}
+                  className="w-12 h-12 bg-[#D4A045] hover:bg-[#c4923e] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all flex items-center justify-center"
+                  data-testid="button-send-ai-question"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
