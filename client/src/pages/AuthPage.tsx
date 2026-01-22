@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ChevronDown, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ChevronDown, Eye, EyeOff, Globe } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -25,7 +25,7 @@ type SignupStep = 1 | 2;
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { t, language, dir } = useLanguage();
+  const { t, language, dir, setLanguage } = useLanguage();
   const { setUser } = useUser();
   
   const [mode, setMode] = useState<AuthMode>("signup");
@@ -173,6 +173,14 @@ export default function AuthPage() {
           data-testid="button-back"
         >
           <ArrowLeft className="h-6 w-6" />
+        </button>
+        <button 
+          onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+          className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-white/10 transition-colors text-sm"
+          data-testid="button-language"
+        >
+          <Globe className="h-4 w-4 text-white/60" />
+          <span className="text-white/80">{language === 'en' ? 'العربية' : 'English'}</span>
         </button>
       </div>
 
