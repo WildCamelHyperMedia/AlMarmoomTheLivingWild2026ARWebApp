@@ -164,7 +164,14 @@ export default function AuthPage() {
   return (
     <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-8 relative overflow-hidden">
       
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none" />
+      {/* Desert Dunes Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 pointer-events-none"
+        style={{ backgroundImage: "url('/images/desert-dunes.jpg')" }}
+      />
+      
+      {/* Background Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background pointer-events-none" />
 
       <div className="w-full flex justify-between items-center mb-8 z-10">
         <button 
