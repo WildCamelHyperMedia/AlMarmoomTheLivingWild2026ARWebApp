@@ -4,7 +4,7 @@ import { useUser } from "@/lib/user";
 import { 
   LayoutDashboard, Users, History, Trophy, LogOut, 
   TrendingUp, Eye, UserPlus, Calendar, ChevronRight,
-  Menu, X
+  Menu, X, Images
 } from "lucide-react";
 
 interface UserWithProgress {
@@ -151,6 +151,17 @@ export default function AdminPage() {
                 <span className="font-medium">{item.label}</span>
               </button>
             ))}
+            
+            {/* Gallery Link */}
+            <div className="pt-4 mt-4 border-t border-white/10">
+              <button
+                onClick={() => { setLocation("/gallery"); }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-white/10 text-white/80"
+              >
+                <Images className="w-5 h-5" />
+                <span className="font-medium">View Gallery</span>
+              </button>
+            </div>
           </nav>
 
           {/* User Info & Logout */}
