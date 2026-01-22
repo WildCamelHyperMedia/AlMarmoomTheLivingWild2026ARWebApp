@@ -5,7 +5,7 @@ import { animals } from "@/lib/data";
 import { 
   LayoutDashboard, Users, History, Trophy, LogOut, 
   TrendingUp, Eye, UserPlus, Calendar, ChevronRight,
-  Menu, X, Images, Star
+  Menu, X, Images, Star, Download
 } from "lucide-react";
 
 interface UserWithProgress {
@@ -88,6 +88,35 @@ export default function AdminPage() {
   const handleLogout = () => {
     logout();
     setLocation("/");
+  };
+
+  const exportUsersToCSV = () => {
+    const headers = ['Name', 'Email', 'Phone', 'Videos Watched', 'Animals Watched', 'Login Count', 'Signed Up', 'Last Login'];
+    const rows = regularUsers.map(user => [
+      user.name,
+      user.email,
+      user.phone,
+      user.videosWatched.toString(),
+      (user.unlockedAnimals || []).map(id => getAnimalName(id)).join('; '),
+      user.loginCount.toString(),
+      new Date(user.createdAt).toLocaleDateString(),
+      user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : '-'
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `al-marmoom-users-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const formatDate = (dateString: string) => {
@@ -324,11 +353,20 @@ export default function AdminPage() {
               {/* Users View */}
               {currentView === "users" && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-3">
                     <h2 className="text-xl md:text-2xl font-bold">Registered Users</h2>
-                    <span className="bg-[#3E2D24] px-3 py-1 rounded-full text-sm">
-                      {regularUsers.length} users
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={exportUsersToCSV}
+                        className="flex items-center gap-2 px-3 py-2 bg-[#D4A045] text-background rounded-lg font-medium text-sm hover:bg-[#D4A045]/90 transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden sm:inline">Export CSV</span>
+                      </button>
+                      <span className="bg-[#3E2D24] px-3 py-1 rounded-full text-sm">
+                        {regularUsers.length} users
+                      </span>
+                    </div>
                   </div>
 
                   {/* Mobile Card View */}
