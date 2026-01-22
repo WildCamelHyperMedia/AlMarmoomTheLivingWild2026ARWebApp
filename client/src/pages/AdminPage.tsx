@@ -120,16 +120,19 @@ export default function AdminPage() {
         >
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <h1 className="text-lg font-bold text-[#D4A045]">Admin Dashboard</h1>
+        <img src="/logo.png" alt="Al Marmoom" className="h-8 w-auto" />
+        <span className="text-sm text-white/50">Admin</span>
       </div>
 
       {/* Sidebar */}
       <div className={`fixed md:sticky top-[52px] md:top-0 bottom-0 left-0 z-40 w-64 bg-[#2A1F1A] md:h-screen md:flex-shrink-0 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Logo - hidden on mobile since we have header */}
-          <div className="hidden md:block p-6 border-b border-white/10">
-            <h1 className="text-xl font-bold text-[#D4A045]">Al Marmoom</h1>
-            <p className="text-xs text-white/50 mt-1">Admin Dashboard</p>
+          <div className="hidden md:flex p-6 border-b border-white/10 items-center gap-3">
+            <img src="/logo.png" alt="Al Marmoom" className="h-10 w-auto" />
+            <div>
+              <p className="text-xs text-white/50">Admin Dashboard</p>
+            </div>
           </div>
 
           {/* Navigation */}
