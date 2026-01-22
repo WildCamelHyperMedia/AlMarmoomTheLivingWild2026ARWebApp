@@ -362,43 +362,120 @@ export default function AdminPage() {
 
               {/* Leaderboard View */}
               {currentView === "leaderboard" && analytics && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">Video Watch Leaderboard</h2>
+                <div className="space-y-8">
+                  <h2 className="text-2xl font-bold text-center">Video Watch Champions</h2>
 
-                  <div className="grid gap-4">
-                    {analytics.leaderboard.map((user, i) => (
-                      <div 
-                        key={user.id} 
-                        className={`bg-[#3E2D24]/60 rounded-xl p-6 flex items-center gap-4 ${
-                          i === 0 ? 'border-2 border-yellow-500/50' :
-                          i === 1 ? 'border-2 border-gray-400/50' :
-                          i === 2 ? 'border-2 border-orange-600/50' : ''
-                        }`}
-                      >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl ${
-                          i === 0 ? 'bg-yellow-500/20 text-yellow-500' :
-                          i === 1 ? 'bg-gray-400/20 text-gray-400' :
-                          i === 2 ? 'bg-orange-600/20 text-orange-600' :
-                          'bg-white/10 text-white/50'
-                        }`}>
-                          {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+                  {analytics.leaderboard.length >= 3 ? (
+                    <>
+                      {/* Podium for Top 3 */}
+                      <div className="flex items-end justify-center gap-4 py-8">
+                        {/* 2nd Place */}
+                        <div className="flex flex-col items-center">
+                          <div className="relative mb-4">
+                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 p-1">
+                              <div className="w-full h-full rounded-full bg-[#2A1F1A] flex items-center justify-center">
+                                <span className="text-2xl md:text-3xl font-bold text-gray-300">
+                                  {analytics.leaderboard[1]?.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-background font-bold shadow-lg">
+                              2
+                            </div>
+                          </div>
+                          <div className="bg-gradient-to-t from-gray-500/40 to-gray-400/20 rounded-t-xl w-28 md:w-32 h-32 flex flex-col items-center justify-end pb-4 border-t-4 border-gray-400">
+                            <p className="font-bold text-center truncate w-full px-2">{analytics.leaderboard[1]?.name}</p>
+                            <p className="text-2xl font-bold text-gray-300">{analytics.leaderboard[1]?.videosWatched}</p>
+                            <p className="text-xs text-white/50">videos</p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <p className="font-bold text-lg">{user.name}</p>
-                          <p className="text-sm text-white/50">{user.email}</p>
+
+                        {/* 1st Place */}
+                        <div className="flex flex-col items-center -mt-8">
+                          <div className="text-4xl mb-2 animate-bounce">👑</div>
+                          <div className="relative mb-4">
+                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 p-1 shadow-lg shadow-yellow-500/30">
+                              <div className="w-full h-full rounded-full bg-[#2A1F1A] flex items-center justify-center">
+                                <span className="text-3xl md:text-4xl font-bold text-yellow-400">
+                                  {analytics.leaderboard[0]?.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-background font-bold text-lg shadow-lg">
+                              1
+                            </div>
+                          </div>
+                          <div className="bg-gradient-to-t from-yellow-600/40 to-yellow-400/20 rounded-t-xl w-32 md:w-40 h-44 flex flex-col items-center justify-end pb-4 border-t-4 border-yellow-400">
+                            <p className="font-bold text-lg text-center truncate w-full px-2">{analytics.leaderboard[0]?.name}</p>
+                            <p className="text-3xl font-bold text-yellow-400">{analytics.leaderboard[0]?.videosWatched}</p>
+                            <p className="text-xs text-white/50">videos</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-[#D4A045]">{user.videosWatched}</p>
-                          <p className="text-xs text-white/50">videos watched</p>
+
+                        {/* 3rd Place */}
+                        <div className="flex flex-col items-center">
+                          <div className="relative mb-4">
+                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-orange-400 to-orange-700 p-1">
+                              <div className="w-full h-full rounded-full bg-[#2A1F1A] flex items-center justify-center">
+                                <span className="text-2xl md:text-3xl font-bold text-orange-400">
+                                  {analytics.leaderboard[2]?.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-700 rounded-full flex items-center justify-center text-background font-bold shadow-lg">
+                              3
+                            </div>
+                          </div>
+                          <div className="bg-gradient-to-t from-orange-700/40 to-orange-500/20 rounded-t-xl w-28 md:w-32 h-24 flex flex-col items-center justify-end pb-4 border-t-4 border-orange-500">
+                            <p className="font-bold text-center truncate w-full px-2">{analytics.leaderboard[2]?.name}</p>
+                            <p className="text-2xl font-bold text-orange-400">{analytics.leaderboard[2]?.videosWatched}</p>
+                            <p className="text-xs text-white/50">videos</p>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                    {analytics.leaderboard.length === 0 && (
-                      <div className="text-center py-12 text-white/60 bg-[#3E2D24]/60 rounded-xl">
-                        No users on the leaderboard yet
+
+                      {/* Rest of the leaderboard */}
+                      {analytics.leaderboard.length > 3 && (
+                        <div className="bg-[#3E2D24]/60 rounded-xl p-4">
+                          <h3 className="text-center text-white/60 mb-4 text-sm uppercase tracking-wider">Other Participants</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {analytics.leaderboard.slice(3).map((user, i) => (
+                              <div 
+                                key={user.id}
+                                className="bg-[#2A1F1A]/80 rounded-lg p-4 text-center hover:bg-[#2A1F1A] transition-colors"
+                              >
+                                <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-[#D4A045]/10 flex items-center justify-center">
+                                  <span className="text-[#D4A045] font-bold">{i + 4}</span>
+                                </div>
+                                <p className="font-medium truncate text-sm">{user.name}</p>
+                                <p className="text-lg font-bold text-[#D4A045] mt-1">{user.videosWatched}</p>
+                                <p className="text-[10px] text-white/40">videos</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : analytics.leaderboard.length > 0 ? (
+                    <div className="text-center py-12 bg-[#3E2D24]/60 rounded-xl">
+                      <p className="text-white/60 mb-4">Need at least 3 users to show the podium</p>
+                      <div className="space-y-3 max-w-sm mx-auto">
+                        {analytics.leaderboard.map((user, i) => (
+                          <div key={user.id} className="flex items-center gap-3 bg-[#2A1F1A] p-4 rounded-lg">
+                            <span className="text-xl">{i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
+                            <span className="flex-1 font-medium">{user.name}</span>
+                            <span className="text-[#D4A045] font-bold">{user.videosWatched}</span>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-16 bg-[#3E2D24]/60 rounded-xl">
+                      <Trophy className="w-16 h-16 mx-auto text-white/20 mb-4" />
+                      <p className="text-white/60">No champions yet</p>
+                      <p className="text-sm text-white/40 mt-2">Users will appear here as they watch videos</p>
+                    </div>
+                  )}
                 </div>
               )}
             </>
