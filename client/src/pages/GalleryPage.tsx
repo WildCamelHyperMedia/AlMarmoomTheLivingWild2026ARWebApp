@@ -164,7 +164,7 @@ export default function GalleryPage() {
         <div className="flex h-full touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
             <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative overflow-y-auto" key={pageIndex}>
-              <div className="grid grid-cols-3 gap-y-6 gap-x-4 pb-4">
+              <div className="grid grid-cols-2 gap-6 pb-4">
                 {chunk.map((animal) => {
                   const unlocked = isUnlocked(animal.id);
                   
