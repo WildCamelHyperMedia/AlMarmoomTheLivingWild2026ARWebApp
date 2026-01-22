@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useUser } from "@/lib/user";
+import { animals } from "@/lib/data";
 import { 
   LayoutDashboard, Users, History, Trophy, LogOut, 
   TrendingUp, Eye, UserPlus, Calendar, ChevronRight,
-  Menu, X, Images
+  Menu, X, Images, Star
 } from "lucide-react";
 
 interface UserWithProgress {
@@ -37,6 +38,12 @@ interface Analytics {
 
 type AdminView = "dashboard" | "users" | "history" | "leaderboard";
 
+const getAnimalName = (id: string): string => {
+  const animal = animals.find(a => a.id === id);
+  if (!animal) return id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
 export default function AdminPage() {
   const [, setLocation] = useLocation();
   const { user, logout } = useUser();
@@ -45,6 +52,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentView, setCurrentView] = useState<AdminView>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedUserAnimals, setSelectedUserAnimals] = useState<{ name: string; animals: string[] } | null>(null);
 
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -109,6 +117,27 @@ export default function AdminPage() {
   ];
 
   const regularUsers = users.filter(u => !u.isAdmin);
+
+  // Calculate most engaged animal
+  const mostEngagedAnimal = useMemo(() => {
+    const animalCounts: Record<string, number> = {};
+    regularUsers.forEach(user => {
+      (user.unlockedAnimals || []).forEach(animalId => {
+        animalCounts[animalId] = (animalCounts[animalId] || 0) + 1;
+      });
+    });
+    
+    let maxAnimal = '';
+    let maxCount = 0;
+    Object.entries(animalCounts).forEach(([id, count]) => {
+      if (count > maxCount) {
+        maxAnimal = id;
+        maxCount = count;
+      }
+    });
+    
+    return maxAnimal ? { id: maxAnimal, name: getAnimalName(maxAnimal), count: maxCount } : null;
+  }, [regularUsers]);
 
   return (
     <div className="min-h-[100dvh] bg-background text-white flex flex-col md:flex-row">
@@ -312,9 +341,12 @@ export default function AdminPage() {
                             <p className="text-sm text-white/60">{user.email}</p>
                             <p className="text-xs text-white/40">{user.phone}</p>
                           </div>
-                          <span className="bg-[#D4A045]/20 text-[#D4A045] px-3 py-1 rounded-full text-sm font-bold">
+                          <button 
+                            onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.unlockedAnimals || [] })}
+                            className="bg-[#D4A045]/20 text-[#D4A045] px-3 py-1 rounded-full text-sm font-bold hover:bg-[#D4A045]/30 transition-colors"
+                          >
                             {user.videosWatched} videos
-                          </span>
+                          </button>
                         </div>
                         <div className="flex gap-4 text-xs text-white/50 pt-2 border-t border-white/10">
                           <span>{user.loginCount} logins</span>
@@ -349,9 +381,12 @@ export default function AdminPage() {
                               <td className="p-4 text-white/80">{user.email}</td>
                               <td className="p-4 text-white/80">{user.phone}</td>
                               <td className="p-4">
-                                <span className="bg-[#D4A045]/20 text-[#D4A045] px-2 py-1 rounded-full text-sm">
+                                <button 
+                                  onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.unlockedAnimals || [] })}
+                                  className="bg-[#D4A045]/20 text-[#D4A045] px-2 py-1 rounded-full text-sm hover:bg-[#D4A045]/30 transition-colors cursor-pointer"
+                                >
                                   {user.videosWatched}
-                                </span>
+                                </button>
                               </td>
                               <td className="p-4 text-white/60">{user.loginCount}</td>
                               <td className="p-4 text-white/60 text-sm">{formatDate(user.createdAt)}</td>
@@ -424,6 +459,25 @@ export default function AdminPage() {
               {currentView === "leaderboard" && analytics && (
                 <div className="space-y-8">
                   <h2 className="text-2xl font-bold text-center">Video Watch Champions</h2>
+
+                  {/* Most Engaged Animal */}
+                  {mostEngagedAnimal && (
+                    <div className="bg-gradient-to-r from-[#D4A045]/20 to-[#D4A045]/5 rounded-xl p-4 border border-[#D4A045]/30">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#D4A045]/20 flex items-center justify-center">
+                          <Star className="w-6 h-6 text-[#D4A045]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-white/50 uppercase tracking-wider">Most Engaged Animal</p>
+                          <p className="text-lg font-bold text-[#D4A045]">{mostEngagedAnimal.name}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold">{mostEngagedAnimal.count}</p>
+                          <p className="text-xs text-white/50">users watched</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {analytics.leaderboard.length >= 3 ? (
                     <>
@@ -542,6 +596,42 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* Animals Watched Modal */}
+      {selectedUserAnimals && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/70" 
+            onClick={() => setSelectedUserAnimals(null)} 
+          />
+          <div className="relative bg-[#2A1F1A] rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto border border-white/10">
+            <button 
+              onClick={() => setSelectedUserAnimals(null)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-lg font-bold mb-4">Videos Watched by {selectedUserAnimals.name}</h3>
+            <div className="space-y-2">
+              {selectedUserAnimals.animals.length > 0 ? (
+                selectedUserAnimals.animals.map((animalId, i) => (
+                  <div 
+                    key={animalId} 
+                    className="flex items-center gap-3 p-3 bg-[#3E2D24]/60 rounded-lg"
+                  >
+                    <span className="w-6 h-6 rounded-full bg-[#D4A045]/20 flex items-center justify-center text-xs text-[#D4A045]">
+                      {i + 1}
+                    </span>
+                    <span className="flex-1">{getAnimalName(animalId)}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-white/50 text-center py-4">No videos watched yet</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
