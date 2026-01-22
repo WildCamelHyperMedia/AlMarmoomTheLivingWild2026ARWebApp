@@ -8,7 +8,7 @@ import { animals } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 
-const ANIMALS_PER_PAGE = 9;
+const ANIMALS_PER_PAGE = 8;
 
 export default function GalleryPage() {
   const [, setLocation] = useLocation();
