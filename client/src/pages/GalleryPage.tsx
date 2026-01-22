@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Lock } from "lucide-react";
-import { Link } from "wouter";
+import { ArrowLeft, Lock, LogOut, Shield } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
 import { useState, useEffect, useMemo } from "react";
 import { animals } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
+import { useUser } from "@/lib/user";
 
 function useResponsiveChunkSize() {
   const [chunkSize, setChunkSize] = useState(6);
@@ -35,7 +36,9 @@ function useResponsiveChunkSize() {
 }
 
 export default function GalleryPage() {
-  const { t, dir } = useLanguage();
+  const [, setLocation] = useLocation();
+  const { t, dir, language } = useLanguage();
+  const { user, logout } = useUser();
   const { isUnlocked, watchedCount } = useProgress();
   const chunkSize = useResponsiveChunkSize();
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -45,6 +48,11 @@ export default function GalleryPage() {
     dragFree: false
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const handleLogout = () => {
+    logout();
+    setLocation("/");
+  };
 
   useEffect(() => {
     if (emblaApi) {
@@ -81,6 +89,29 @@ export default function GalleryPage() {
             <ArrowLeft className="h-6 w-6 text-white" />
           </button>
         </Link>
+        
+        <div className="flex items-center gap-2">
+          {user?.isAdmin && (
+            <button 
+              onClick={() => setLocation("/admin")}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              data-testid="button-admin"
+              title={language === 'en' ? 'Admin Dashboard' : 'لوحة الإدارة'}
+            >
+              <Shield className="h-5 w-5 text-[#D4A045]" />
+            </button>
+          )}
+          {user && (
+            <button 
+              onClick={handleLogout}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              data-testid="button-logout"
+              title={language === 'en' ? 'Logout' : 'تسجيل الخروج'}
+            >
+              <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
+            </button>
+          )}
+        </div>
       </div>
 
       <motion.div 

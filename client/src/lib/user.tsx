@@ -1,24 +1,32 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import type { User } from "@shared/schema";
+
+interface SafeUser {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  isAdmin: boolean;
+  createdAt: Date;
+}
 
 interface UserContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: SafeUser | null;
+  setUser: (user: SafeUser | null) => void;
+  logout: () => void;
   isLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUserState] = useState<User | null>(null);
+  const [user, setUserState] = useState<SafeUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
-    const savedPhone = localStorage.getItem("userPhone");
     
-    if (savedUserId && savedPhone) {
-      fetch(`/api/users/by-phone/${encodeURIComponent(savedPhone)}`)
+    if (savedUserId) {
+      fetch(`/api/auth/user/${savedUserId}`)
         .then(res => {
           if (!res.ok) throw new Error("User not found");
           return res.json();
@@ -29,7 +37,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           localStorage.removeItem("userId");
-          localStorage.removeItem("userPhone");
           setIsLoading(false);
         });
     } else {
@@ -37,19 +44,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const setUser = (user: User | null) => {
+  const setUser = (user: SafeUser | null) => {
     setUserState(user);
     if (user) {
       localStorage.setItem("userId", user.id);
-      localStorage.setItem("userPhone", user.phone);
     } else {
       localStorage.removeItem("userId");
-      localStorage.removeItem("userPhone");
     }
   };
 
+  const logout = () => {
+    setUserState(null);
+    localStorage.removeItem("userId");
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading }}>
+    <UserContext.Provider value={{ user, setUser, logout, isLoading }}>
       {children}
     </UserContext.Provider>
   );
