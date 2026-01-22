@@ -27,8 +27,20 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage
 - **Database**: PostgreSQL (connection via DATABASE_URL environment variable)
-- **Schema**: Two tables - `users` (id, name, phone) and `user_progress` (id, userId, unlockedAnimals array, lastUpdated)
+- **Schema**: Four tables:
+  - `users` (id, name, email, phone, password, isAdmin, createdAt)
+  - `user_progress` (id, userId, unlockedAnimals array, lastUpdated)
+  - `login_history` (id, userId, loginAt, userAgent, ipAddress)
+  - `sessions` (id, userId, token, expiresAt, createdAt)
 - **Migrations**: Managed via drizzle-kit with migrations stored in `/migrations`
+
+### Security Architecture
+- **Authentication**: Token-based sessions with 6-hour expiry
+- **Session Management**: Server-side session storage with automatic cleanup
+- **Authorization**: User ownership checks (users can only access their own data, admins can access all)
+- **Admin Protection**: Dedicated auth + admin middleware for admin endpoints
+- **Password Security**: bcrypt hashing with salt rounds
+- **Request Validation**: Zod schema validation on all auth endpoints
 
 ### Key Design Patterns
 - **Shared Types**: Schema definitions in `/shared/schema.ts` are used by both frontend and backend for type consistency
