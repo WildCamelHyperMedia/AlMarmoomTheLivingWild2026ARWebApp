@@ -10,31 +10,17 @@ export default function IntroPage() {
   const [, setLocation] = useLocation();
   const { t, language } = useLanguage();
   const { user, isLoading, logout } = useUser();
-
-  // Redirect to auth if not logged in, or to gallery if admin
-  useEffect(() => {
-    if (!isLoading && !user) {
-      setLocation("/auth");
-    } else if (!isLoading && user?.isAdmin) {
-      setLocation("/gallery");
-    }
-  }, [user, isLoading, setLocation]);
-
-  const handleLogout = () => {
-    logout();
-    setLocation("/");
-  };
-
-  if (isLoading || !user || user.isAdmin) {
-    return (
-      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
-        <div className="animate-pulse text-white/50">Loading...</div>
-      </div>
-    );
-  }
+  
   const [isPlaying, setIsPlaying] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
+
+  // If already logged in and admin, go to gallery
+  useEffect(() => {
+    if (!isLoading && user?.isAdmin) {
+      setLocation("/gallery");
+    }
+  }, [user, isLoading, setLocation]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -46,6 +32,11 @@ export default function IntroPage() {
     return () => clearTimeout(timer);
   }, [countdown]);
 
+  const handleLogout = () => {
+    logout();
+    setLocation("/");
+  };
+
   const handleSignUp = () => {
     if (canProceed) {
       setLocation("/auth");
@@ -54,9 +45,23 @@ export default function IntroPage() {
 
   const handleStartJourney = () => {
     if (canProceed) {
-      setLocation("/gallery");
+      // If already logged in, go to gallery; otherwise go to auth
+      if (user) {
+        setLocation("/gallery");
+      } else {
+        setLocation("/auth");
+      }
     }
   };
+
+  // If admin, show loading while redirecting
+  if (!isLoading && user?.isAdmin) {
+    return (
+      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
+        <div className="animate-pulse text-white/50">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-8 relative overflow-hidden">
@@ -80,14 +85,16 @@ export default function IntroPage() {
           <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">Intro By</h2>
           <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">Ali Bin Thalith</h1>
         </div>
-        <button 
-          onClick={handleLogout}
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          data-testid="button-logout"
-          title={language === 'en' ? 'Logout' : 'تسجيل الخروج'}
-        >
-          <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
-        </button>
+        {user && (
+          <button 
+            onClick={handleLogout}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            data-testid="button-logout"
+            title={language === 'en' ? 'Logout' : 'تسجيل الخروج'}
+          >
+            <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
+          </button>
+        )}
       </motion.div>
 
       {/* Logo Area */}

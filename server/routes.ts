@@ -75,8 +75,8 @@ export async function registerRoutes(
 
       const { name, email, phone, password } = result.data;
       
-      if (password.length < 6) {
-        return res.status(400).json({ error: "Password must be at least 6 characters" });
+      if (password.length < 4) {
+        return res.status(400).json({ error: "Password must be at least 4 characters" });
       }
 
       const existingUser = await storage.getUserByEmail(email);

@@ -21,7 +21,6 @@ const countryCodes = [
 ];
 
 type AuthMode = "signup" | "login";
-type SignupStep = 1 | 2;
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -29,23 +28,20 @@ export default function AuthPage() {
   const { setUser } = useUser();
   
   const [mode, setMode] = useState<AuthMode>("signup");
-  const [signupStep, setSignupStep] = useState<SignupStep>(1);
   
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    password: "",
-    confirmPassword: ""
+    password: ""
   });
   const [countryCode, setCountryCode] = useState("+971");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSignupStep1 = () => {
-    if (!formData.name || !formData.email || !formData.phone) {
+  const handleSignup = async () => {
+    if (!formData.name || !formData.email || !formData.phone || !formData.password) {
       setError(language === 'en' ? "Please fill in all fields" : "يرجى ملء جميع الحقول");
       return;
     }
@@ -56,23 +52,8 @@ export default function AuthPage() {
       return;
     }
     
-    setError("");
-    setSignupStep(2);
-  };
-
-  const handleSignup = async () => {
-    if (!formData.password || !formData.confirmPassword) {
-      setError(language === 'en' ? "Please fill in all fields" : "يرجى ملء جميع الحقول");
-      return;
-    }
-    
-    if (formData.password.length < 6) {
-      setError(language === 'en' ? "Password must be at least 6 characters" : "يجب أن تكون كلمة المرور 6 أحرف على الأقل");
-      return;
-    }
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError(language === 'en' ? "Passwords do not match" : "كلمتا المرور غير متطابقتين");
+    if (formData.password.length < 4) {
+      setError(language === 'en' ? "Password must be at least 4 characters" : "يجب أن تكون كلمة المرور 4 أحرف على الأقل");
       return;
     }
     
@@ -99,7 +80,7 @@ export default function AuthPage() {
       }
 
       setUser(data.user, data.token, data.expiresAt);
-      setLocation(data.user.isAdmin ? "/gallery" : "/intro");
+      setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
@@ -132,7 +113,7 @@ export default function AuthPage() {
       }
 
       setUser(data.user, data.token, data.expiresAt);
-      setLocation(data.user.isAdmin ? "/gallery" : "/intro");
+      setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
@@ -141,24 +122,17 @@ export default function AuthPage() {
 
   const toggleMode = () => {
     setMode(mode === "signup" ? "login" : "signup");
-    setSignupStep(1);
     setError("");
     setFormData({
       name: "",
       email: "",
       phone: "",
-      password: "",
-      confirmPassword: ""
+      password: ""
     });
   };
 
   const handleBack = () => {
-    if (mode === "signup" && signupStep === 2) {
-      setSignupStep(1);
-      setError("");
-    } else {
-      setLocation("/");
-    }
+    setLocation("/intro");
   };
 
   return (
@@ -193,178 +167,119 @@ export default function AuthPage() {
 
       <AnimatePresence mode="wait">
         {mode === "signup" ? (
-          signupStep === 1 ? (
-            <motion.div 
-              key="signup-step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
-            >
-              <div className="text-center mb-8">
-                <h1 className="font-bold text-4xl md:text-5xl tracking-tight mb-4 font-sans">
-                  {language === 'en' ? 'Create Account' : 'إنشاء حساب'}
-                </h1>
-                <p className="text-white/60 text-sm">
-                  {language === 'en' ? 'Step 1 of 2 - Your Information' : 'الخطوة 1 من 2 - معلوماتك'}
-                </p>
-              </div>
-
-              <div className="flex-1"></div>
-
-              <div className="w-full space-y-4 mb-6">
-                <Input 
-                  type="text" 
-                  placeholder={language === 'en' ? "Full Name" : "الاسم الكامل"}
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                  dir={dir}
-                  data-testid="input-name"
-                />
-
-                <Input 
-                  type="email" 
-                  placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                  dir="ltr"
-                  data-testid="input-email"
-                />
-
-                <div className="flex gap-2">
-                  <div className="relative">
-                    <select
-                      value={countryCode}
-                      onChange={(e) => setCountryCode(e.target.value)}
-                      className="appearance-none bg-[#3E2D24]/80 border-none text-white h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm pl-4 pr-10 cursor-pointer"
-                      data-testid="select-country-code"
-                    >
-                      {countryCodes.map((c) => (
-                        <option key={c.code} value={c.code} className="bg-[#3E2D24]">
-                          {c.flag} {c.code}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-                  </div>
-                  <Input 
-                    type="tel" 
-                    placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="flex-1 bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                    dir="ltr"
-                    data-testid="input-phone"
-                  />
-                </div>
-                
-                {error && (
-                  <p className="text-red-400 text-sm text-center" data-testid="text-error">{error}</p>
-                )}
-              </div>
-
-              <button 
-                onClick={handleSignupStep1}
-                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-4 shadow-lg"
-                data-testid="button-next"
-              >
-                {language === 'en' ? 'Next' : 'التالي'}
-              </button>
-
-              <button 
-                onClick={toggleMode}
-                className="text-white/60 text-sm hover:text-white transition-colors"
-                data-testid="button-toggle-login"
-              >
-                {language === 'en' ? 'Already have an account? ' : 'لديك حساب بالفعل؟ '}
-                <span className="text-[#D4A045] font-semibold">{language === 'en' ? 'Login' : 'تسجيل الدخول'}</span>
-              </button>
-            </motion.div>
-          ) : (
-            <motion.div 
-              key="signup-step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
-            >
-              <div className="text-center mb-8">
-                <h1 className="font-bold text-4xl md:text-5xl tracking-tight mb-4 font-sans">
-                  {language === 'en' ? 'Set Password' : 'إنشاء كلمة المرور'}
-                </h1>
-                <p className="text-white/60 text-sm">
-                  {language === 'en' ? 'Step 2 of 2 - Secure your account' : 'الخطوة 2 من 2 - تأمين حسابك'}
-                </p>
-              </div>
-
-              <div className="flex-1"></div>
-
-              <div className="w-full space-y-4 mb-6">
-                <div className="relative">
-                  <Input 
-                    type={showPassword ? "text" : "password"}
-                    placeholder={language === 'en' ? "Password" : "كلمة المرور"}
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4 pr-12"
-                    dir="ltr"
-                    data-testid="input-password"
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-
-                <div className="relative">
-                  <Input 
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder={language === 'en' ? "Confirm Password" : "تأكيد كلمة المرور"}
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4 pr-12"
-                    dir="ltr"
-                    data-testid="input-confirm-password"
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-
-                <p className="text-white/40 text-xs text-center">
-                  {language === 'en' ? 'Password must be at least 6 characters' : 'يجب أن تكون كلمة المرور 6 أحرف على الأقل'}
-                </p>
-                
-                {error && (
-                  <p className="text-red-400 text-sm text-center" data-testid="text-error">{error}</p>
-                )}
-              </div>
-
-              <button 
-                onClick={handleSignup}
-                disabled={isLoading}
-                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-4 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                data-testid="button-signup"
-              >
-                {isLoading ? (language === 'en' ? 'Creating account...' : 'جاري إنشاء الحساب...') : (language === 'en' ? 'Create Account' : 'إنشاء حساب')}
-              </button>
-
-              <p className="text-center text-[10px] text-white/50 leading-relaxed mb-4">
-                {language === 'en' 
-                  ? 'By signing up, you agree to our Terms of Service and Privacy Policy' 
-                  : 'بالتسجيل، فإنك توافق على شروط الخدمة وسياسة الخصوصية'}
+          <motion.div 
+            key="signup"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
+          >
+            <div className="text-center mb-6">
+              <h1 className="font-bold text-3xl md:text-4xl tracking-tight mb-2 font-sans">
+                {language === 'en' ? 'Create Account' : 'إنشاء حساب'}
+              </h1>
+              <p className="text-white/60 text-sm">
+                {language === 'en' ? 'Join The Living Wild experience' : 'انضم إلى تجربة الحياة البرية'}
               </p>
-            </motion.div>
-          )
+            </div>
+
+            <div className="w-full space-y-3 mb-4">
+              <Input 
+                type="text" 
+                placeholder={language === 'en' ? "Full Name" : "الاسم الكامل"}
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
+                dir={dir}
+                data-testid="input-name"
+              />
+
+              <Input 
+                type="email" 
+                placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
+                dir="ltr"
+                data-testid="input-email"
+              />
+
+              <div className="flex gap-2">
+                <div className="relative">
+                  <select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className="appearance-none bg-[#3E2D24]/80 border-none text-white h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm pl-4 pr-10 cursor-pointer"
+                    data-testid="select-country-code"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code} value={c.code} className="bg-[#3E2D24]">
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+                </div>
+                <Input 
+                  type="tel" 
+                  placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  className="flex-1 bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
+                  dir="ltr"
+                  data-testid="input-phone"
+                />
+              </div>
+
+              <div className="relative">
+                <Input 
+                  type={showPassword ? "text" : "password"}
+                  placeholder={language === 'en' ? "Password (min 4 characters)" : "كلمة المرور (4 أحرف على الأقل)"}
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4 pr-12"
+                  dir="ltr"
+                  data-testid="input-password"
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                  data-testid="button-toggle-password"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              
+              {error && (
+                <p className="text-red-400 text-sm text-center" data-testid="text-error">{error}</p>
+              )}
+            </div>
+
+            <button 
+              onClick={handleSignup}
+              disabled={isLoading}
+              className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-3 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-signup"
+            >
+              {isLoading ? (language === 'en' ? 'Creating account...' : 'جاري إنشاء الحساب...') : (language === 'en' ? 'Create Account' : 'إنشاء حساب')}
+            </button>
+
+            <p className="text-center text-[10px] text-white/50 leading-relaxed mb-3">
+              {language === 'en' 
+                ? 'By signing up, you agree to our Terms of Service and Privacy Policy' 
+                : 'بالتسجيل، فإنك توافق على شروط الخدمة وسياسة الخصوصية'}
+            </p>
+
+            <button 
+              onClick={toggleMode}
+              className="text-white/60 text-sm hover:text-white transition-colors"
+              data-testid="button-toggle-login"
+            >
+              {language === 'en' ? 'Already have an account? ' : 'لديك حساب بالفعل؟ '}
+              <span className="text-[#D4A045] font-semibold">{language === 'en' ? 'Login' : 'تسجيل الدخول'}</span>
+            </button>
+          </motion.div>
         ) : (
           <motion.div 
             key="login"
