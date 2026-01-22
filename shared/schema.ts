@@ -66,3 +66,20 @@ export const insertLoginHistorySchema = createInsertSchema(loginHistory).omit({
 
 export type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;
 export type LoginHistory = typeof loginHistory.$inferSelect;
+
+// Sessions table for server-side session management
+export const sessions = pgTable("sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertSessionSchema = createInsertSchema(sessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertSession = z.infer<typeof insertSessionSchema>;
+export type Session = typeof sessions.$inferSelect;

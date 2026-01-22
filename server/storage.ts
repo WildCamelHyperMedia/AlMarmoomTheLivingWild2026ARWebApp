@@ -1,6 +1,6 @@
-import { users, userProgress, loginHistory, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory } from "@shared/schema";
+import { users, userProgress, loginHistory, sessions, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory, type Session, type InsertSession } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, gt } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -21,6 +21,13 @@ export interface IStorage {
   getLoginHistory(limit?: number): Promise<LoginHistory[]>;
   getUserLoginHistory(userId: string): Promise<LoginHistory[]>;
   getLoginStats(): Promise<{ date: string; count: number }[]>;
+  
+  // Session operations
+  createSession(session: InsertSession): Promise<Session>;
+  getSessionByToken(token: string): Promise<Session | undefined>;
+  deleteSession(token: string): Promise<void>;
+  deleteUserSessions(userId: string): Promise<void>;
+  cleanExpiredSessions(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -102,6 +109,34 @@ export class DatabaseStorage implements IStorage {
       ORDER BY date DESC
     `);
     return result.rows as { date: string; count: number }[];
+  }
+
+  async createSession(session: InsertSession): Promise<Session> {
+    const [newSession] = await db
+      .insert(sessions)
+      .values(session)
+      .returning();
+    return newSession;
+  }
+
+  async getSessionByToken(token: string): Promise<Session | undefined> {
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.token, token), gt(sessions.expiresAt, new Date())));
+    return session || undefined;
+  }
+
+  async deleteSession(token: string): Promise<void> {
+    await db.delete(sessions).where(eq(sessions.token, token));
+  }
+
+  async deleteUserSessions(userId: string): Promise<void> {
+    await db.delete(sessions).where(eq(sessions.userId, userId));
+  }
+
+  async cleanExpiredSessions(): Promise<void> {
+    await db.delete(sessions).where(sql`expires_at < NOW()`);
   }
 }
 

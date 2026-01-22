@@ -13,7 +13,7 @@ interface ProgressContextType {
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
-  const { user, isLoading: userLoading } = useUser();
+  const { user, isLoading: userLoading, getAuthHeaders } = useUser();
   const [unlockedAnimals, setUnlockedAnimals] = useState<string[]>(["eurasian_stone_curlew"]);
   const [watchedCount, setWatchedCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +22,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     if (userLoading) return;
     
     if (user) {
-      fetch(`/api/progress/${user.id}`)
+      fetch(`/api/progress/${user.id}`, {
+        headers: getAuthHeaders()
+      })
         .then(res => {
           if (!res.ok) throw new Error("Progress not found");
           return res.json();
@@ -63,7 +65,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           try {
             await fetch(`/api/progress/${user.id}`, {
               method: "PATCH",
-              headers: { "Content-Type": "application/json" },
+              headers: getAuthHeaders(),
               body: JSON.stringify({ unlockedAnimals: newUnlocked })
             });
           } catch (error) {

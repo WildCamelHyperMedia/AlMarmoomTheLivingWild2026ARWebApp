@@ -1,23 +1,74 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, updateUserProgressSchema, loginSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+
+const SESSION_DURATION_HOURS = 6;
+
+function generateToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function getExpiryDate(): Date {
+  return new Date(Date.now() + SESSION_DURATION_HOURS * 60 * 60 * 1000);
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: { id: string; isAdmin: boolean };
+}
+
+async function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No valid authorization token" });
+  }
+
+  const token = authHeader.slice(7);
+  const session = await storage.getSessionByToken(token);
+  
+  if (!session) {
+    return res.status(401).json({ error: "Invalid or expired session" });
+  }
+
+  const user = await storage.getUser(session.userId);
+  if (!user) {
+    return res.status(401).json({ error: "User not found" });
+  }
+
+  req.user = { id: user.id, isAdmin: user.isAdmin };
+  next();
+}
+
+async function adminMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  if (!req.user?.isAdmin) {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+  next();
+}
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  // Clean expired sessions periodically
+  setInterval(() => {
+    storage.cleanExpiredSessions().catch(console.error);
+  }, 60 * 60 * 1000);
   
   // Sign up a new user
   app.post("/api/auth/signup", async (req, res) => {
     try {
-      const { name, email, phone, password } = req.body;
-      
-      if (!name || !email || !phone || !password) {
-        return res.status(400).json({ error: "All fields are required" });
+      const result = insertUserSchema.safeParse(req.body);
+      if (!result.success) {
+        const errors = result.error.errors.map(e => e.message).join(", ");
+        return res.status(400).json({ error: errors || "Invalid request data" });
       }
 
+      const { name, email, phone, password } = result.data;
+      
       if (password.length < 6) {
         return res.status(400).json({ error: "Password must be at least 6 characters" });
       }
@@ -48,8 +99,16 @@ export async function registerRoutes(
         ipAddress: req.ip || req.socket.remoteAddress || null
       });
 
+      // Create session token
+      const token = generateToken();
+      await storage.createSession({
+        userId: user.id,
+        token,
+        expiresAt: getExpiryDate()
+      });
+
       const { password: _, ...safeUser } = user;
-      res.json({ user: safeUser });
+      res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
@@ -58,11 +117,13 @@ export async function registerRoutes(
   // Login user
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
+      const result = loginSchema.safeParse(req.body);
+      if (!result.success) {
+        const errors = result.error.errors.map(e => e.message).join(", ");
+        return res.status(400).json({ error: errors || "Email and password are required" });
       }
+
+      const { email, password } = result.data;
 
       const user = await storage.getUserByEmail(email);
       if (!user) {
@@ -81,17 +142,70 @@ export async function registerRoutes(
         ipAddress: req.ip || req.socket.remoteAddress || null
       });
 
+      // Create session token
+      const token = generateToken();
+      await storage.createSession({
+        userId: user.id,
+        token,
+        expiresAt: getExpiryDate()
+      });
+
       const { password: _, ...safeUser } = user;
-      res.json({ user: safeUser });
+      res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Get current user by ID
-  app.get("/api/auth/user/:id", async (req, res) => {
+  // Logout - invalidate session
+  app.post("/api/auth/logout", async (req, res) => {
     try {
-      const user = await storage.getUser(req.params.id);
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.slice(7);
+        await storage.deleteSession(token);
+      }
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Validate session
+  app.get("/api/auth/validate", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ valid: false });
+      }
+
+      const token = authHeader.slice(7);
+      const session = await storage.getSessionByToken(token);
+      
+      if (!session) {
+        return res.status(401).json({ valid: false });
+      }
+
+      const user = await storage.getUser(session.userId);
+      if (!user) {
+        return res.status(401).json({ valid: false });
+      }
+
+      const { password: _, ...safeUser } = user;
+      res.json({ valid: true, user: safeUser, expiresAt: session.expiresAt.toISOString() });
+    } catch (error: any) {
+      res.status(500).json({ valid: false, error: error.message });
+    }
+  });
+
+  // Get current user by ID (authenticated - users can only access their own data)
+  app.get("/api/auth/user/:id", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.params.id as string;
+      if (req.user?.id !== userId && !req.user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -103,18 +217,8 @@ export async function registerRoutes(
   });
 
   // Admin: Get all users with progress
-  app.get("/api/admin/users", async (req, res) => {
+  app.get("/api/admin/users", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
-      const adminId = req.headers["x-admin-id"] as string;
-      if (!adminId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const admin = await storage.getUser(adminId);
-      if (!admin || !admin.isAdmin) {
-        return res.status(403).json({ error: "Forbidden" });
-      }
-
       const users = await storage.getAllUsers();
       
       const usersWithProgress = await Promise.all(
@@ -140,18 +244,8 @@ export async function registerRoutes(
   });
 
   // Admin: Get analytics dashboard data
-  app.get("/api/admin/analytics", async (req, res) => {
+  app.get("/api/admin/analytics", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
-      const adminId = req.headers["x-admin-id"] as string;
-      if (!adminId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const admin = await storage.getUser(adminId);
-      if (!admin || !admin.isAdmin) {
-        return res.status(403).json({ error: "Forbidden" });
-      }
-
       const users = await storage.getAllUsers();
       const allProgress = await storage.getAllProgress();
       const loginStats = await storage.getLoginStats();
@@ -220,18 +314,8 @@ export async function registerRoutes(
   });
 
   // Admin: Get login history
-  app.get("/api/admin/login-history", async (req, res) => {
+  app.get("/api/admin/login-history", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
-      const adminId = req.headers["x-admin-id"] as string;
-      if (!adminId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const admin = await storage.getUser(adminId);
-      if (!admin || !admin.isAdmin) {
-        return res.status(403).json({ error: "Forbidden" });
-      }
-
       const limit = parseInt(req.query.limit as string) || 100;
       const logins = await storage.getLoginHistory(limit);
       
@@ -252,12 +336,23 @@ export async function registerRoutes(
     }
   });
 
-  // Get user progress
-  app.get("/api/progress/:userId", async (req, res) => {
+  // Get user progress (authenticated, auto-create if not found)
+  app.get("/api/progress/:userId", authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
-      const progress = await storage.getProgress(req.params.userId);
+      const userId = req.params.userId as string;
+      if (req.user?.id !== userId && !req.user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      let progress = await storage.getProgress(userId);
       if (!progress) {
-        return res.status(404).json({ error: "Progress not found" });
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+        progress = await storage.createProgress({
+          userId,
+          unlockedAnimals: ["eurasian_stone_curlew"]
+        });
       }
       res.json({ progress });
     } catch (error: any) {
@@ -265,16 +360,27 @@ export async function registerRoutes(
     }
   });
 
-  // Update user progress
-  app.patch("/api/progress/:userId", async (req, res) => {
+  // Update user progress (authenticated, auto-create if not found)
+  app.patch("/api/progress/:userId", authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
-      const existingProgress = await storage.getProgress(req.params.userId);
+      const userId = req.params.userId as string;
+      if (req.user?.id !== userId && !req.user?.isAdmin) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      let existingProgress = await storage.getProgress(userId);
       if (!existingProgress) {
-        return res.status(404).json({ error: "Progress not found" });
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+        existingProgress = await storage.createProgress({
+          userId,
+          unlockedAnimals: ["eurasian_stone_curlew"]
+        });
       }
       
       const validatedData = updateUserProgressSchema.parse(req.body);
-      const progress = await storage.updateProgress(req.params.userId, validatedData);
+      const progress = await storage.updateProgress(userId, validatedData);
       res.json({ progress });
     } catch (error: any) {
       res.status(400).json({ error: error.message });

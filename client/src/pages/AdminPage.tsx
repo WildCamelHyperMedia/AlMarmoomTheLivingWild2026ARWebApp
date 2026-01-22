@@ -46,7 +46,7 @@ const getAnimalName = (id: string): string => {
 
 export default function AdminPage() {
   const [, setLocation] = useLocation();
-  const { user, logout } = useUser();
+  const { user, logout, getAuthHeaders } = useUser();
   const [users, setUsers] = useState<UserWithProgress[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,9 +64,10 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
+      const headers = getAuthHeaders();
       const [usersRes, analyticsRes] = await Promise.all([
-        fetch("/api/admin/users", { headers: { "x-admin-id": user?.id || "" } }),
-        fetch("/api/admin/analytics", { headers: { "x-admin-id": user?.id || "" } })
+        fetch("/api/admin/users", { headers }),
+        fetch("/api/admin/analytics", { headers })
       ]);
 
       if (usersRes.ok) {

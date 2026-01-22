@@ -98,7 +98,7 @@ export default function AuthPage() {
         throw new Error(data.error || (language === 'en' ? "Failed to create account" : "فشل في إنشاء الحساب"));
       }
 
-      setUser(data.user);
+      setUser(data.user, data.token, data.expiresAt);
       setLocation(data.user.isAdmin ? "/gallery" : "/intro");
     } catch (err: any) {
       setError(err.message);
@@ -131,7 +131,7 @@ export default function AuthPage() {
         throw new Error(data.error || (language === 'en' ? "Invalid email or password" : "البريد الإلكتروني أو كلمة المرور غير صحيحة"));
       }
 
-      setUser(data.user);
+      setUser(data.user, data.token, data.expiresAt);
       setLocation(data.user.isAdmin ? "/gallery" : "/intro");
     } catch (err: any) {
       setError(err.message);
