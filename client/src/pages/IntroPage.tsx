@@ -153,14 +153,6 @@ export default function IntroPage() {
           </AnimatePresence>
         </div>
 
-        {/* Sign Up Button - Always clickable */}
-        <motion.button
-          onClick={() => setLocation("/auth")}
-          className="w-full py-4 rounded-xl font-bold tracking-wide transition-all duration-300 bg-white/10 text-white hover:bg-white/20 active:scale-[0.98] cursor-pointer border border-white/20"
-        >
-          {t("intro.signup")}
-        </motion.button>
-
         {/* Partner Logo */}
         <motion.div 
           initial={{ opacity: 0 }}
