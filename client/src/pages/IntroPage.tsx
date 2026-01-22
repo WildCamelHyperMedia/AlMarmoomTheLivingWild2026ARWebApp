@@ -11,10 +11,12 @@ export default function IntroPage() {
   const { t, language } = useLanguage();
   const { user, isLoading, logout } = useUser();
 
-  // Redirect to auth if not logged in
+  // Redirect to auth if not logged in, or to gallery if admin
   useEffect(() => {
     if (!isLoading && !user) {
       setLocation("/auth");
+    } else if (!isLoading && user?.isAdmin) {
+      setLocation("/gallery");
     }
   }, [user, isLoading, setLocation]);
 
@@ -23,7 +25,7 @@ export default function IntroPage() {
     setLocation("/");
   };
 
-  if (isLoading || !user) {
+  if (isLoading || !user || user.isAdmin) {
     return (
       <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
         <div className="animate-pulse text-white/50">Loading...</div>

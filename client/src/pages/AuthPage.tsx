@@ -99,7 +99,7 @@ export default function AuthPage() {
       }
 
       setUser(data.user);
-      setLocation("/intro");
+      setLocation(data.user.isAdmin ? "/gallery" : "/intro");
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
@@ -132,7 +132,7 @@ export default function AuthPage() {
       }
 
       setUser(data.user);
-      setLocation("/intro");
+      setLocation(data.user.isAdmin ? "/gallery" : "/intro");
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
