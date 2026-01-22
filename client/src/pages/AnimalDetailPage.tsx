@@ -384,10 +384,10 @@ export default function AnimalDetailPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.35 }}
             onClick={() => setIsChatOpen(true)}
-            className="w-14 h-14 bg-[#D4A045] hover:bg-[#c4923e] text-white rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center"
+            className="w-14 h-14 bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center group"
             data-testid="button-open-ai-guide"
           >
-            <MessageCircle className="w-6 h-6" />
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-200" />
           </motion.button>
         </div>
 
