@@ -56,19 +56,6 @@ export default function GalleryPage() {
     }
   }, [user, isLoading, setLocation]);
 
-  const handleLogout = () => {
-    logout();
-    setLocation("/");
-  };
-
-  if (isLoading || !user) {
-    return (
-      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
-        <div className="animate-pulse text-white/50">Loading...</div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (emblaApi) {
       emblaApi.on("select", () => {
@@ -90,6 +77,19 @@ export default function GalleryPage() {
     }
     return result;
   }, [chunkSize]);
+
+  const handleLogout = () => {
+    logout();
+    setLocation("/");
+  };
+
+  if (isLoading || !user) {
+    return (
+      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
+        <div className="animate-pulse text-white/50">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] w-full bg-background text-white pb-20 relative overflow-y-auto flex flex-col">
