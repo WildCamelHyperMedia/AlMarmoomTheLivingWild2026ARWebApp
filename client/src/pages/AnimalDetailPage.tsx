@@ -204,7 +204,7 @@ export default function AnimalDetailPage() {
             <iframe
               src={animal.arUrl || "https://web.zappar.com/example-project"} 
               className="w-full h-full border-0"
-              allow="camera; gyroscope; accelerometer; magnetometer; xr-spatial-tracking; microphone"
+              allow="camera; gyroscope; accelerometer; magnetometer; xr-spatial-tracking; microphone; web-share"
               allowFullScreen
             ></iframe>
           </div>
