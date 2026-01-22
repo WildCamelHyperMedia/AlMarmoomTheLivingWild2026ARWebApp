@@ -111,18 +111,21 @@ export default function AdminPage() {
   const regularUsers = users.filter(u => !u.isAdmin);
 
   return (
-    <div className="min-h-screen bg-background text-white flex">
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-[#3E2D24] rounded-lg"
-      >
-        {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+    <div className="min-h-[100dvh] bg-background text-white flex flex-col md:flex-row">
+      {/* Mobile Header */}
+      <div className="md:hidden sticky top-0 z-50 bg-[#2A1F1A] border-b border-white/10 px-4 py-3 flex items-center gap-3">
+        <button 
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 bg-[#3E2D24] rounded-lg"
+        >
+          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+        <h1 className="text-lg font-bold text-[#D4A045]">Admin Dashboard</h1>
+      </div>
 
       {/* Sidebar */}
-      <div className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-[#2A1F1A] transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-        <div className="flex flex-col h-full">
+      <div className={`fixed md:sticky md:top-0 inset-y-0 left-0 z-40 w-64 bg-[#2A1F1A] md:h-screen md:flex-shrink-0 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="flex flex-col h-full overflow-y-auto">
           {/* Logo */}
           <div className="p-6 border-b border-white/10">
             <h1 className="text-xl font-bold text-[#D4A045]">Al Marmoom</h1>
@@ -178,8 +181,8 @@ export default function AdminPage() {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 md:ml-0">
-        <div className="p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="flex-1 overflow-y-auto touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="p-4 md:p-8 max-w-7xl mx-auto pb-20">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-pulse text-white/50">Loading...</div>
@@ -279,13 +282,39 @@ export default function AdminPage() {
               {currentView === "users" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold">Registered Users</h2>
+                    <h2 className="text-xl md:text-2xl font-bold">Registered Users</h2>
                     <span className="bg-[#3E2D24] px-3 py-1 rounded-full text-sm">
                       {regularUsers.length} users
                     </span>
                   </div>
 
-                  <div className="bg-[#3E2D24]/60 rounded-xl overflow-hidden">
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-3">
+                    {regularUsers.map((user) => (
+                      <div key={user.id} className="bg-[#3E2D24]/60 rounded-xl p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-bold">{user.name}</p>
+                            <p className="text-sm text-white/60">{user.email}</p>
+                            <p className="text-xs text-white/40">{user.phone}</p>
+                          </div>
+                          <span className="bg-[#D4A045]/20 text-[#D4A045] px-3 py-1 rounded-full text-sm font-bold">
+                            {user.videosWatched} videos
+                          </span>
+                        </div>
+                        <div className="flex gap-4 text-xs text-white/50 pt-2 border-t border-white/10">
+                          <span>{user.loginCount} logins</span>
+                          <span>Joined {formatShortDate(user.createdAt)}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {regularUsers.length === 0 && (
+                      <div className="text-center py-12 text-white/60 bg-[#3E2D24]/60 rounded-xl">No users yet</div>
+                    )}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block bg-[#3E2D24]/60 rounded-xl overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
@@ -330,9 +359,26 @@ export default function AdminPage() {
               {/* Login History View */}
               {currentView === "history" && analytics && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">Login History</h2>
+                  <h2 className="text-xl md:text-2xl font-bold">Login History</h2>
 
-                  <div className="bg-[#3E2D24]/60 rounded-xl overflow-hidden">
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-2">
+                    {analytics.recentLogins.map((login) => (
+                      <div key={login.id} className="bg-[#3E2D24]/60 rounded-lg p-3 flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">{login.userName}</p>
+                          <p className="text-xs text-white/50">{login.userEmail}</p>
+                        </div>
+                        <p className="text-xs text-white/60">{formatDate(login.loginAt)}</p>
+                      </div>
+                    ))}
+                    {analytics.recentLogins.length === 0 && (
+                      <div className="text-center py-12 text-white/60 bg-[#3E2D24]/60 rounded-xl">No login history yet</div>
+                    )}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block bg-[#3E2D24]/60 rounded-xl overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>

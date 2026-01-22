@@ -93,10 +93,11 @@
     @apply border-border;
   }
   html, body {
-    @apply h-[100dvh] w-screen overflow-hidden overscroll-none;
+    @apply h-[100dvh] w-screen overscroll-none;
+    -webkit-overflow-scrolling: touch;
   }
   #root {
-    @apply h-full w-full;
+    @apply h-full w-full overflow-auto;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
