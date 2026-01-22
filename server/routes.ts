@@ -95,7 +95,7 @@ export async function registerRoutes(
       
       await storage.createProgress({
         userId: user.id,
-        unlockedAnimals: ["eurasian_stone_curlew"]
+        unlockedAnimals: ["little_grebe"]
       });
 
       // Log signup as first login
@@ -357,7 +357,7 @@ export async function registerRoutes(
         }
         progress = await storage.createProgress({
           userId,
-          unlockedAnimals: ["eurasian_stone_curlew"]
+          unlockedAnimals: ["little_grebe"]
         });
       }
       res.json({ progress });
@@ -381,7 +381,7 @@ export async function registerRoutes(
         }
         existingProgress = await storage.createProgress({
           userId,
-          unlockedAnimals: ["eurasian_stone_curlew"]
+          unlockedAnimals: ["little_grebe"]
         });
       }
       
