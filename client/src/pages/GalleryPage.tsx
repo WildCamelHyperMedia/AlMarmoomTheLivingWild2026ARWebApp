@@ -8,39 +8,14 @@ import { animals } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 
-function useResponsiveChunkSize() {
-  const [chunkSize, setChunkSize] = useState(6);
-
-  useEffect(() => {
-    const updateChunkSize = () => {
-      const height = window.innerHeight;
-      const width = window.innerWidth;
-      
-      if (height < 700) {
-        setChunkSize(6);
-      } else if (height < 850) {
-        setChunkSize(9);
-      } else if (width >= 768) {
-        setChunkSize(12);
-      } else {
-        setChunkSize(9);
-      }
-    };
-
-    updateChunkSize();
-    window.addEventListener("resize", updateChunkSize);
-    return () => window.removeEventListener("resize", updateChunkSize);
-  }, []);
-
-  return chunkSize;
-}
+const ANIMALS_PER_PAGE = 9;
 
 export default function GalleryPage() {
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
   const { user, logout, isLoading } = useUser();
   const { isUnlocked, watchedCount } = useProgress();
-  const chunkSize = useResponsiveChunkSize();
+  const chunkSize = ANIMALS_PER_PAGE;
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
     duration: 20,
