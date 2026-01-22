@@ -157,7 +157,7 @@ export default function AuthPage() {
       setSignupStep(1);
       setError("");
     } else {
-      window.history.back();
+      setLocation("/");
     }
   };
 
