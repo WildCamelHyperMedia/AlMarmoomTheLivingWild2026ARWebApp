@@ -11,7 +11,7 @@ interface LanguageContextType {
 
 const translations = {
   en: {
-    "app.title": "Al Marmoom",
+    "app.title": "The Living Wild",
     "signup.header": "SIGN UP",
     "signup.title": "SIGN UP TO WIN\nA SIGNED PHOTO BOOK BY\nALI BIN THALITH.",
     "signup.fullName": "Full Name",
@@ -57,7 +57,7 @@ const translations = {
     "gallery.watched": "Videos Watched"
   },
   ar: {
-    "app.title": "المرموم",
+    "app.title": "الحياة البرية",
     "signup.header": "سجل الآن",
     "signup.title": "سجل لفرصة الفوز\nبكتاب صور موقع من\nعلي بن ثالث.",
     "signup.fullName": "الاسم الكامل",

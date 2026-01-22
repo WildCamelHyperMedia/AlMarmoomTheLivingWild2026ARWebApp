@@ -41,9 +41,9 @@ export default function LandingPage() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-12 flex flex-col items-center gap-4"
         >
-          <img src="/logo.png" alt="Al Marmoom" className="w-64 h-auto" />
-          <h2 className="font-sans text-sm tracking-widest uppercase text-white/80 mt-2">
-            Drive-Through Photography Exhibition
+          <img src="/logo.png" alt="The Living Wild" className="w-64 h-auto" />
+          <h2 className="font-sans text-lg tracking-widest uppercase text-white/90 mt-2 font-semibold">
+            The Living Wild
           </h2>
           <p className="font-sans text-xs tracking-wider text-white/60 mt-1">
             Al Marmoom Desert Conservation Reserve
