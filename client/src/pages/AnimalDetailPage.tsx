@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX } from "lucide-react";
-import { Link, useRoute } from "wouter";
+import { Link, useRoute, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
 import { useState, useRef, useEffect } from "react";
 import { useProgress } from "@/lib/progress";
+import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
 
 const voiceoverMap: Record<string, { en: string; ar: string }> = {
@@ -16,8 +17,25 @@ const voiceoverMap: Record<string, { en: string; ar: string }> = {
 
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
+  const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
+  const { user, isLoading: userLoading } = useUser();
   const { unlockNext, watchedCount } = useProgress();
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!userLoading && !user) {
+      setLocation("/auth");
+    }
+  }, [user, userLoading, setLocation]);
+
+  if (userLoading || !user) {
+    return (
+      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
+        <div className="animate-pulse text-white/50">Loading...</div>
+      </div>
+    );
+  }
   const animal = animals.find((a) => a.id === params?.id);
   // Auto-play if video exists
   const [isPlaying, setIsPlaying] = useState(!!animal?.video);

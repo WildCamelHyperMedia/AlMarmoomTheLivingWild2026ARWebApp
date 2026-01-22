@@ -3,11 +3,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
+import { useUser } from "@/lib/user";
 import posterImage from "@assets/generated_images/portrait_of_ali_bin_thalith_in_traditional_emirati_clothing.png";
 
 export default function IntroPage() {
   const [, setLocation] = useLocation();
   const { t } = useLanguage();
+  const { user, isLoading } = useUser();
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setLocation("/auth");
+    }
+  }, [user, isLoading, setLocation]);
+
+  if (isLoading || !user) {
+    return (
+      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
+        <div className="animate-pulse text-white/50">Loading...</div>
+      </div>
+    );
+  }
   const [isPlaying, setIsPlaying] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);

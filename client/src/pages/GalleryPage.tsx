@@ -38,7 +38,7 @@ function useResponsiveChunkSize() {
 export default function GalleryPage() {
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
-  const { user, logout } = useUser();
+  const { user, logout, isLoading } = useUser();
   const { isUnlocked, watchedCount } = useProgress();
   const chunkSize = useResponsiveChunkSize();
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -49,10 +49,25 @@ export default function GalleryPage() {
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setLocation("/auth");
+    }
+  }, [user, isLoading, setLocation]);
+
   const handleLogout = () => {
     logout();
     setLocation("/");
   };
+
+  if (isLoading || !user) {
+    return (
+      <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
+        <div className="animate-pulse text-white/50">Loading...</div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (emblaApi) {

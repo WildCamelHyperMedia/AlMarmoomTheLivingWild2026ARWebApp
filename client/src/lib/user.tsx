@@ -16,6 +16,8 @@ interface UserContextType {
   isLoading: boolean;
 }
 
+const SESSION_DURATION = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -24,6 +26,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
+    const loginTime = localStorage.getItem("loginTime");
+    
+    // Check if session has expired (6 hours)
+    if (loginTime) {
+      const elapsed = Date.now() - parseInt(loginTime);
+      if (elapsed > SESSION_DURATION) {
+        localStorage.removeItem("userId");
+        localStorage.removeItem("loginTime");
+        setIsLoading(false);
+        return;
+      }
+    }
     
     if (savedUserId) {
       fetch(`/api/auth/user/${savedUserId}`)
@@ -37,6 +51,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           localStorage.removeItem("userId");
+          localStorage.removeItem("loginTime");
           setIsLoading(false);
         });
     } else {
@@ -44,18 +59,37 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Check session expiry periodically
+  useEffect(() => {
+    const checkSession = () => {
+      const loginTime = localStorage.getItem("loginTime");
+      if (loginTime) {
+        const elapsed = Date.now() - parseInt(loginTime);
+        if (elapsed > SESSION_DURATION) {
+          logout();
+        }
+      }
+    };
+
+    const interval = setInterval(checkSession, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, []);
+
   const setUser = (user: SafeUser | null) => {
     setUserState(user);
     if (user) {
       localStorage.setItem("userId", user.id);
+      localStorage.setItem("loginTime", Date.now().toString());
     } else {
       localStorage.removeItem("userId");
+      localStorage.removeItem("loginTime");
     }
   };
 
   const logout = () => {
     setUserState(null);
     localStorage.removeItem("userId");
+    localStorage.removeItem("loginTime");
   };
 
   return (
