@@ -124,10 +124,10 @@ export default function AdminPage() {
       </div>
 
       {/* Sidebar */}
-      <div className={`fixed md:sticky md:top-0 inset-y-0 left-0 z-40 w-64 bg-[#2A1F1A] md:h-screen md:flex-shrink-0 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <div className={`fixed md:sticky top-[52px] md:top-0 bottom-0 left-0 z-40 w-64 bg-[#2A1F1A] md:h-screen md:flex-shrink-0 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="flex flex-col h-full overflow-y-auto">
-          {/* Logo */}
-          <div className="p-6 border-b border-white/10">
+          {/* Logo - hidden on mobile since we have header */}
+          <div className="hidden md:block p-6 border-b border-white/10">
             <h1 className="text-xl font-bold text-[#D4A045]">Al Marmoom</h1>
             <p className="text-xs text-white/50 mt-1">Admin Dashboard</p>
           </div>
@@ -175,7 +175,7 @@ export default function AdminPage() {
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+          className="fixed top-[52px] inset-x-0 bottom-0 bg-black/50 z-30 md:hidden" 
           onClick={() => setSidebarOpen(false)} 
         />
       )}
