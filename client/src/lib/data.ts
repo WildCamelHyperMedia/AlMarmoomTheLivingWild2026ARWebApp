@@ -23,6 +23,11 @@ export const animals: Animal[] = [
     scientificName: "ARDEA ALBA"
   },
   {
+    id: "desert_hare",
+    image: "/animals/All Animals - Pictures/4-Desert Hare.jpg",
+    scientificName: "LEPUS CAPENSIS"
+  },
+  {
     id: "hoopoe",
     image: "/animals/All Animals - Pictures/6-Hoopoe.jpg",
     scientificName: "UPUPA EPOPS"
