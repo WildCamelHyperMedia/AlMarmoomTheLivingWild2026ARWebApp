@@ -45,12 +45,8 @@ export default function IntroPage() {
 
   const handleStartJourney = () => {
     if (canProceed) {
-      // If already logged in, go to gallery; otherwise go to auth
-      if (user) {
-        setLocation("/gallery");
-      } else {
-        setLocation("/auth");
-      }
+      // Go directly to gallery - guests can explore freely
+      setLocation("/gallery");
     }
   };
 
