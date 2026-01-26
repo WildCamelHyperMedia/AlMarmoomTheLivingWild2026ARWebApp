@@ -168,7 +168,7 @@ export default function AnimalDetailPage() {
     }
   }, [isArOpen]);
 
-  if (userLoading || !user) {
+  if (userLoading) {
     return (
       <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
         <div className="animate-pulse text-white/50">Loading...</div>
