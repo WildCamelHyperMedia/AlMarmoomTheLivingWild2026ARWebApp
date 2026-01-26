@@ -120,6 +120,68 @@ export async function registerRoutes(
     }
   });
 
+  // Guest signup - simplified registration with name and email only
+  app.post("/api/auth/guest-signup", async (req, res) => {
+    try {
+      const { name, email, unlockedAnimals } = req.body;
+      
+      if (!name || !email) {
+        return res.status(400).json({ error: "Name and email are required" });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      // Generate a random password for the guest account
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      const user = await storage.createUser({
+        name,
+        email,
+        phone: "",
+        password: hashedPassword
+      });
+      
+      // Use the guest's existing progress if provided, otherwise start fresh
+      const initialProgress = Array.isArray(unlockedAnimals) && unlockedAnimals.length > 0 
+        ? unlockedAnimals 
+        : ["little_grebe"];
+      
+      await storage.createProgress({
+        userId: user.id,
+        unlockedAnimals: initialProgress
+      });
+
+      // Log signup as first login
+      await storage.createLoginHistory({
+        userId: user.id,
+        userAgent: req.headers["user-agent"] || null,
+        ipAddress: req.ip || req.socket.remoteAddress || null
+      });
+
+      // Create session token
+      const token = generateToken();
+      await storage.createSession({
+        userId: user.id,
+        token,
+        expiresAt: getExpiryDate()
+      });
+
+      const { password: _, ...safeUser } = user;
+      res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
   // Login user
   app.post("/api/auth/login", async (req, res) => {
     try {

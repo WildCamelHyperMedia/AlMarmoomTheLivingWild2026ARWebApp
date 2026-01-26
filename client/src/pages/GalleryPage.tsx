@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Lock, LogOut, Shield } from "lucide-react";
+import { ArrowLeft, Lock, LogOut, Shield, Bookmark } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
@@ -7,8 +7,10 @@ import { useState, useEffect, useMemo } from "react";
 import { animals } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
+import SaveProgressModal from "@/components/SaveProgressModal";
 
 const ANIMALS_PER_PAGE = 8;
+const PROMPT_SAVE_AFTER = 3;
 
 export default function GalleryPage() {
   const [, setLocation] = useLocation();
@@ -23,13 +25,18 @@ export default function GalleryPage() {
     dragFree: false
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [hasPromptedSave, setHasPromptedSave] = useState(() => {
+    return localStorage.getItem("hasPromptedSave") === "true";
+  });
 
-  // Redirect to auth if not logged in
   useEffect(() => {
-    if (!isLoading && !user) {
-      setLocation("/auth");
+    if (!user && !hasPromptedSave && watchedCount >= PROMPT_SAVE_AFTER) {
+      setShowSaveModal(true);
+      setHasPromptedSave(true);
+      localStorage.setItem("hasPromptedSave", "true");
     }
-  }, [user, isLoading, setLocation]);
+  }, [watchedCount, user, hasPromptedSave]);
 
   useEffect(() => {
     if (emblaApi) {
@@ -55,10 +62,15 @@ export default function GalleryPage() {
 
   const handleLogout = () => {
     logout();
+    localStorage.removeItem("hasPromptedSave");
     setLocation("/");
   };
 
-  if (isLoading || !user) {
+  const handleSaveSuccess = () => {
+    setShowSaveModal(false);
+  };
+
+  if (isLoading) {
     return (
       <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
         <div className="animate-pulse text-white/50">Loading...</div>
@@ -95,6 +107,18 @@ export default function GalleryPage() {
               title={language === 'en' ? 'Admin Dashboard' : 'لوحة الإدارة'}
             >
               <Shield className="h-5 w-5 text-[#D4A045]" />
+            </button>
+          )}
+          {!user && (
+            <button 
+              onClick={() => setShowSaveModal(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
+              data-testid="button-save-progress-header"
+            >
+              <Bookmark className="h-4 w-4 text-primary" />
+              <span className="text-xs text-primary font-medium">
+                {language === 'en' ? 'Save' : 'حفظ'}
+              </span>
             </button>
           )}
           {user && (
@@ -204,6 +228,11 @@ export default function GalleryPage() {
         ))}
       </div>
 
+      <SaveProgressModal 
+        isOpen={showSaveModal} 
+        onClose={() => setShowSaveModal(false)} 
+        onSuccess={handleSaveSuccess}
+      />
     </div>
   );
 }
