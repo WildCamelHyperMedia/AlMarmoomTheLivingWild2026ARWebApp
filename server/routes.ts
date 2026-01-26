@@ -120,13 +120,27 @@ export async function registerRoutes(
     }
   });
 
+  // Valid animal IDs for server-side validation
+  const VALID_ANIMAL_IDS = [
+    "little_grebe", "frog_headed_lizard", "western_great_egret", "desert_hare",
+    "hoopoe", "ruppells_fox", "iraqi_sandgrouse", "water_rail", "green_bee_eater",
+    "desert_monitor", "purple_sunbird", "blue_throated_wagtail", "gerbillus_cheesmani",
+    "yellow_wagtail", "sandfish_lizard", "spiny_tailed_lizard", "little_owl",
+    "arabian_oryx", "houbara_bustard", "dorcas_gazelle", "eurasian_stone_curlew",
+    "white_tailed_lapwing", "desert_eagle_owl", "hedgehog"
+  ];
+
   // Guest signup - simplified registration with name and email only
   app.post("/api/auth/guest-signup", async (req, res) => {
     try {
       const { name, email, unlockedAnimals } = req.body;
       
-      if (!name || !email) {
-        return res.status(400).json({ error: "Name and email are required" });
+      if (!name || typeof name !== "string" || name.trim().length < 1) {
+        return res.status(400).json({ error: "Name is required" });
+      }
+      
+      if (!email || typeof email !== "string") {
+        return res.status(400).json({ error: "Email is required" });
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -144,16 +158,28 @@ export async function registerRoutes(
       const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
       const user = await storage.createUser({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
         phone: "",
         password: hashedPassword
       });
       
-      // Use the guest's existing progress if provided, otherwise start fresh
-      const initialProgress = Array.isArray(unlockedAnimals) && unlockedAnimals.length > 0 
-        ? unlockedAnimals 
-        : ["little_grebe"];
+      // Validate and sanitize unlockedAnimals from client
+      let initialProgress: string[] = ["little_grebe"];
+      if (Array.isArray(unlockedAnimals) && unlockedAnimals.length > 0) {
+        // Filter to only valid animal IDs and limit to max possible
+        const validProgress = unlockedAnimals
+          .filter((id): id is string => typeof id === "string" && VALID_ANIMAL_IDS.includes(id))
+          .slice(0, VALID_ANIMAL_IDS.length);
+        
+        // Ensure at least the first animal is included
+        if (validProgress.length > 0) {
+          if (!validProgress.includes("little_grebe")) {
+            validProgress.unshift("little_grebe");
+          }
+          initialProgress = validProgress;
+        }
+      }
       
       await storage.createProgress({
         userId: user.id,

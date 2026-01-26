@@ -50,15 +50,21 @@ export default function AnimalDetailPage() {
     }
   }, [animal?.video]);
 
-  // Redirect to auth if not logged in
-  useEffect(() => {
-    if (!userLoading && !user) {
-      setLocation("/auth");
-    }
-  }, [user, userLoading, setLocation]);
-
+  
   const sendChatMessage = async () => {
     if (!chatInput.trim() || isAiLoading || !animal) return;
+    
+    // Guests can't use AI guide - need to save progress first
+    if (!user) {
+      setChatMessages(prev => [...prev, 
+        { role: "user", content: chatInput.trim() },
+        { role: "assistant", content: language === 'en' 
+          ? "Please save your progress first to use the AI Wildlife Guide." 
+          : "يرجى حفظ تقدمك أولاً لاستخدام مرشد الحياة البرية." }
+      ]);
+      setChatInput("");
+      return;
+    }
     
     const userMessage = chatInput.trim();
     setChatInput("");
@@ -66,7 +72,7 @@ export default function AnimalDetailPage() {
     setIsAiLoading(true);
     
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("authToken");
       const response = await fetch("/api/animal-guide", {
         method: "POST",
         headers: {
