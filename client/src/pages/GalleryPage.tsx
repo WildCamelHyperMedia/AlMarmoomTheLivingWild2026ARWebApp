@@ -52,7 +52,7 @@ export default function GalleryPage() {
     logout();
     localStorage.removeItem("watchedVideos");
     localStorage.removeItem("points");
-    setLocation("/");
+    setLocation("/language");
   };
 
   const handleSaveSuccess = () => {

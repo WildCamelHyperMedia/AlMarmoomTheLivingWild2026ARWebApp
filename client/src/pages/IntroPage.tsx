@@ -35,7 +35,7 @@ export default function IntroPage() {
 
   const handleLogout = () => {
     logout();
-    setLocation("/");
+    setLocation("/language");
   };
 
   const handleSignUp = () => {
@@ -89,7 +89,7 @@ export default function IntroPage() {
       >
         <div className="flex items-start gap-3">
           <button 
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation("/language")}
             className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
             data-testid="button-back-to-language"
             title={language === 'en' ? 'Change Language' : 'تغيير اللغة'}

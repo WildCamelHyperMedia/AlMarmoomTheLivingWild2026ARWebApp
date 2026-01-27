@@ -57,7 +57,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!user?.isAdmin) {
-      setLocation("/");
+      setLocation("/language");
       return;
     }
     fetchData();
@@ -89,7 +89,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     logout();
-    setLocation("/");
+    setLocation("/language");
   };
 
   const exportUsersToCSV = () => {

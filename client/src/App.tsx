@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import BootScreen from "@/pages/BootScreen";
 import LandingPage from "@/pages/LandingPage";
 import GalleryPage from "@/pages/GalleryPage";
 import AuthPage from "@/pages/AuthPage";
@@ -17,7 +18,8 @@ import { ProgressProvider } from "@/lib/progress";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
+      <Route path="/" component={BootScreen} />
+      <Route path="/language" component={LandingPage} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/intro" component={IntroPage} />
       <Route path="/gallery" component={GalleryPage} />
