@@ -186,7 +186,7 @@ export default function AnimalDetailPage() {
       </div>
 
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 p-6">
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
         <Link href="/gallery">
           <button 
             className={`p-2 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
@@ -196,16 +196,21 @@ export default function AnimalDetailPage() {
           </button>
         </Link>
         
-        {/* Watch progress indicator */}
-        {isPlaying && !hasRecordedWatch && (
-          <div className="bg-black/50 backdrop-blur-md rounded-full px-3 py-1">
-            <span className="text-xs text-white/70">
+        {/* Watch progress indicator - centered */}
+        {isPlaying && !hasRecordedWatch ? (
+          <div className="bg-black/50 backdrop-blur-md rounded-full px-4 py-2">
+            <span className="text-sm text-white/90 font-medium">
               {watchTime < MIN_WATCH_TIME 
                 ? `${MIN_WATCH_TIME - watchTime}s ${language === 'en' ? 'to earn points' : 'لكسب النقاط'}`
                 : language === 'en' ? 'Points earned!' : 'تم كسب النقاط!'}
             </span>
           </div>
+        ) : (
+          <div className="w-10" />
         )}
+
+        {/* Placeholder for right side balance when not playing */}
+        <div className="w-10" />
       </div>
 
       {/* Play Button Overlay */}
