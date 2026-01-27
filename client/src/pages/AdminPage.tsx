@@ -16,7 +16,8 @@ interface UserWithProgress {
   isAdmin: boolean;
   createdAt: string;
   videosWatched: number;
-  unlockedAnimals: string[];
+  watchedVideos: string[];
+  points: number;
   lastActivity: string;
   loginCount: number;
   lastLogin: string | null;
@@ -98,7 +99,7 @@ export default function AdminPage() {
       user.email,
       user.phone,
       user.videosWatched.toString(),
-      (user.unlockedAnimals || []).map(id => getAnimalName(id)).join('; '),
+      (user.watchedVideos || []).map(id => getAnimalName(id)).join('; '),
       user.loginCount.toString(),
       new Date(user.createdAt).toLocaleDateString(),
       user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : '-'
@@ -152,7 +153,7 @@ export default function AdminPage() {
   const mostEngagedAnimal = useMemo(() => {
     const animalCounts: Record<string, number> = {};
     regularUsers.forEach(user => {
-      (user.unlockedAnimals || []).forEach(animalId => {
+      (user.watchedVideos || []).forEach((animalId: string) => {
         animalCounts[animalId] = (animalCounts[animalId] || 0) + 1;
       });
     });
@@ -381,7 +382,7 @@ export default function AdminPage() {
                             <p className="text-xs text-white/40">{user.phone}</p>
                           </div>
                           <button 
-                            onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.unlockedAnimals || [] })}
+                            onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.watchedVideos || [] })}
                             className="bg-[#D4A045]/20 text-[#D4A045] px-3 py-1 rounded-full text-sm font-bold hover:bg-[#D4A045]/30 transition-colors"
                           >
                             {user.videosWatched} videos
@@ -421,7 +422,7 @@ export default function AdminPage() {
                               <td className="p-4 text-white/80">{user.phone}</td>
                               <td className="p-4">
                                 <button 
-                                  onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.unlockedAnimals || [] })}
+                                  onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.watchedVideos || [] })}
                                   className="bg-[#D4A045]/20 text-[#D4A045] px-2 py-1 rounded-full text-sm hover:bg-[#D4A045]/30 transition-colors cursor-pointer"
                                 >
                                   {user.videosWatched}
