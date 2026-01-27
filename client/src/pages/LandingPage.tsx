@@ -18,7 +18,7 @@ export default function LandingPage() {
       <div className="absolute inset-0 z-0 flex items-center justify-center">
         <video
           src="/videos/landing-video.mp4"
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover"
           autoPlay
           muted
           loop
