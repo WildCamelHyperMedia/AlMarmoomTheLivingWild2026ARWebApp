@@ -95,7 +95,9 @@ export async function registerRoutes(
       
       await storage.createProgress({
         userId: user.id,
-        unlockedAnimals: ["little_grebe"]
+        unlockedAnimals: [],
+        watchedVideos: [],
+        points: 0
       });
 
       // Log signup as first login
@@ -133,7 +135,7 @@ export async function registerRoutes(
   // Guest signup - simplified registration with name and email only
   app.post("/api/auth/guest-signup", async (req, res) => {
     try {
-      const { name, email, unlockedAnimals } = req.body;
+      const { name, email, watchedVideos, points } = req.body;
       
       if (!name || typeof name !== "string" || name.trim().length < 1) {
         return res.status(400).json({ error: "Name is required" });
@@ -164,26 +166,29 @@ export async function registerRoutes(
         password: hashedPassword
       });
       
-      // Validate and sanitize unlockedAnimals from client
-      let initialProgress: string[] = ["little_grebe"];
-      if (Array.isArray(unlockedAnimals) && unlockedAnimals.length > 0) {
-        // Filter to only valid animal IDs and limit to max possible
-        const validProgress = unlockedAnimals
+      // Validate and sanitize watchedVideos and points from client
+      let validWatchedVideos: string[] = [];
+      let validPoints = 0;
+      
+      if (Array.isArray(watchedVideos) && watchedVideos.length > 0) {
+        validWatchedVideos = watchedVideos
           .filter((id): id is string => typeof id === "string" && VALID_ANIMAL_IDS.includes(id))
           .slice(0, VALID_ANIMAL_IDS.length);
-        
-        // Ensure at least the first animal is included
-        if (validProgress.length > 0) {
-          if (!validProgress.includes("little_grebe")) {
-            validProgress.unshift("little_grebe");
-          }
-          initialProgress = validProgress;
-        }
+        // Calculate points based on valid watched videos (10 points each)
+        validPoints = validWatchedVideos.length * 10;
+      }
+      
+      // Override points if provided and valid, but cap at max possible
+      if (typeof points === "number" && points >= 0) {
+        const maxPoints = VALID_ANIMAL_IDS.length * 10;
+        validPoints = Math.min(points, maxPoints);
       }
       
       await storage.createProgress({
         userId: user.id,
-        unlockedAnimals: initialProgress
+        unlockedAnimals: [],
+        watchedVideos: validWatchedVideos,
+        points: validPoints
       });
 
       // Log signup as first login
@@ -322,8 +327,9 @@ export async function registerRoutes(
           const { password: _, ...safeUser } = user;
           return {
             ...safeUser,
-            videosWatched: progress?.unlockedAnimals?.length || 0,
-            unlockedAnimals: progress?.unlockedAnimals || [],
+            videosWatched: progress?.watchedVideos?.length || 0,
+            watchedVideos: progress?.watchedVideos || [],
+            points: progress?.points || 0,
             lastActivity: progress?.lastUpdated || user.createdAt,
             loginCount: logins.length,
             lastLogin: logins[0]?.loginAt || null
@@ -347,7 +353,8 @@ export async function registerRoutes(
 
       // Calculate stats
       const totalUsers = users.filter(u => !u.isAdmin).length;
-      const totalVideosWatched = allProgress.reduce((acc, p) => acc + (p.unlockedAnimals?.length || 0), 0);
+      const totalVideosWatched = allProgress.reduce((acc, p) => acc + (p.watchedVideos?.length || 0), 0);
+      const totalPoints = allProgress.reduce((acc, p) => acc + (p.points || 0), 0);
       const avgVideosPerUser = totalUsers > 0 ? totalVideosWatched / totalUsers : 0;
       
       // Users signed up today
@@ -360,7 +367,7 @@ export async function registerRoutes(
       weekAgo.setDate(weekAgo.getDate() - 7);
       const signupsThisWeek = users.filter(u => new Date(u.createdAt) >= weekAgo).length;
 
-      // Leaderboard - top 10 users by videos watched
+      // Leaderboard - top 10 users by points
       const usersWithVideos = await Promise.all(
         users.filter(u => !u.isAdmin).map(async (user) => {
           const progress = await storage.getProgress(user.id);
@@ -368,13 +375,14 @@ export async function registerRoutes(
             id: user.id,
             name: user.name,
             email: user.email,
-            videosWatched: progress?.unlockedAnimals?.length || 0
+            videosWatched: progress?.watchedVideos?.length || 0,
+            points: progress?.points || 0
           };
         })
       );
       
       const leaderboard = usersWithVideos
-        .sort((a, b) => b.videosWatched - a.videosWatched)
+        .sort((a, b) => b.points - a.points)
         .slice(0, 10);
 
       // Get user names for recent logins
@@ -393,6 +401,7 @@ export async function registerRoutes(
         stats: {
           totalUsers,
           totalVideosWatched,
+          totalPoints,
           avgVideosPerUser: Math.round(avgVideosPerUser * 10) / 10,
           signupsToday,
           signupsThisWeek,
@@ -445,7 +454,9 @@ export async function registerRoutes(
         }
         progress = await storage.createProgress({
           userId,
-          unlockedAnimals: ["little_grebe"]
+          unlockedAnimals: [],
+          watchedVideos: [],
+          points: 0
         });
       }
       res.json({ progress });
@@ -469,7 +480,9 @@ export async function registerRoutes(
         }
         existingProgress = await storage.createProgress({
           userId,
-          unlockedAnimals: ["little_grebe"]
+          unlockedAnimals: [],
+          watchedVideos: [],
+          points: 0
         });
       }
       

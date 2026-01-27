@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X, Camera, Volume2, VolumeX, MessageCircle, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX, MessageCircle, Send, Loader2 } from "lucide-react";
 import { Link, useRoute, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
+import SaveProgressModal from "@/components/SaveProgressModal";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -20,12 +21,14 @@ const voiceoverMap: Record<string, { en: string; ar: string }> = {
   }
 };
 
+const MIN_WATCH_TIME = 10; // seconds
+
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
   const { user, isLoading: userLoading } = useUser();
-  const { unlockNext, watchedCount } = useProgress();
+  const { recordVideoWatch, hasWatched, points } = useProgress();
 
   const animal = animals.find((a) => a.id === params?.id);
   
@@ -33,15 +36,57 @@ export default function AnimalDetailPage() {
   const [isArOpen, setIsArOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
-  const [showNotification, setShowNotification] = useState<"keepGoing" | "entered" | null>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [watchTime, setWatchTime] = useState(0);
+  const [hasRecordedWatch, setHasRecordedWatch] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
+  const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Check if already watched on mount
+  useEffect(() => {
+    if (animal && hasWatched(animal.id)) {
+      setHasRecordedWatch(true);
+    }
+  }, [animal, hasWatched]);
+
+  // Track watch time when playing
+  useEffect(() => {
+    if (isPlaying && !hasRecordedWatch && animal) {
+      watchTimerRef.current = setInterval(() => {
+        setWatchTime(prev => {
+          const newTime = prev + 1;
+          // Record watch when minimum time reached
+          if (newTime >= MIN_WATCH_TIME && !hasRecordedWatch) {
+            recordVideoWatch(animal.id).then((recorded) => {
+              if (recorded) {
+                setHasRecordedWatch(true);
+                // Prompt guest to save progress
+                if (!user) {
+                  setTimeout(() => {
+                    setShowSaveModal(true);
+                  }, 500);
+                }
+              }
+            });
+          }
+          return newTime;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (watchTimerRef.current) {
+        clearInterval(watchTimerRef.current);
+      }
+    };
+  }, [isPlaying, hasRecordedWatch, animal, user, recordVideoWatch]);
 
   // Auto-play video when animal has video
   useEffect(() => {
@@ -50,7 +95,6 @@ export default function AnimalDetailPage() {
     }
   }, [animal?.video]);
 
-  
   const sendChatMessage = async () => {
     if (!chatInput.trim() || isAiLoading || !animal) return;
     
@@ -107,20 +151,6 @@ export default function AnimalDetailPage() {
 
   // Handle video completion
   const handleVideoEnded = () => {
-    if (animal) {
-      unlockNext(animal.id);
-      
-      // Check milestones (using watchedCount + 1 because the update in context might not be reflected immediately in this render cycle)
-      // Actually, relying on the prop updated value is safer in a useEffect, but for simplicity:
-      // We know we just watched one.
-      const newCount = watchedCount + 1;
-      
-      if (newCount === 1) {
-        setShowNotification("keepGoing");
-      } else if (newCount === 10) {
-        setShowNotification("entered");
-      }
-    }
     setIsPlaying(false);
   };
 
@@ -197,12 +227,12 @@ export default function AnimalDetailPage() {
             ref={videoRef}
             src={animal.video} 
             autoPlay 
-            controls={false} // Hide default controls for seamless look
+            controls={false}
             playsInline
             loop={false}
             muted={isMuted}
             onEnded={handleVideoEnded}
-            onClick={() => setIsPlaying(false)} // Click to stop/pause
+            onClick={() => setIsPlaying(false)}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -224,6 +254,17 @@ export default function AnimalDetailPage() {
             <ArrowLeft className="h-6 w-6 text-white" />
           </button>
         </Link>
+        
+        {/* Watch progress indicator */}
+        {isPlaying && !hasRecordedWatch && (
+          <div className="bg-black/50 backdrop-blur-md rounded-full px-3 py-1">
+            <span className="text-xs text-white/70">
+              {watchTime < MIN_WATCH_TIME 
+                ? `${MIN_WATCH_TIME - watchTime}s ${language === 'en' ? 'to earn points' : 'لكسب النقاط'}`
+                : language === 'en' ? 'Points earned!' : 'تم كسب النقاط!'}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Play Button Overlay */}
@@ -312,41 +353,6 @@ export default function AnimalDetailPage() {
           </div>
         </div>
       )}
-
-      {/* Notification Modal */}
-      <AnimatePresence>
-        {showNotification && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setShowNotification(null)}
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative bg-[#3E2D24] border border-white/10 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl"
-            >
-              <h3 className="font-serif text-2xl font-bold text-[#D4A045] mb-4">
-                {t(`notification.${showNotification}.title`)}
-              </h3>
-              <p className="text-white/80 leading-relaxed mb-8">
-                {t(`notification.${showNotification}.message`)}
-              </p>
-              <button
-                onClick={() => setShowNotification(null)}
-                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98]"
-                data-testid="button-continue-journey"
-              >
-                {t("notification.button")}
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* Bottom Content */}
       <div className="absolute bottom-0 left-0 right-0 z-30 p-6 flex flex-col gap-6">
@@ -503,6 +509,12 @@ export default function AnimalDetailPage() {
         )}
       </AnimatePresence>
 
+      {/* Save Progress Modal */}
+      <SaveProgressModal 
+        isOpen={showSaveModal} 
+        onClose={() => setShowSaveModal(false)} 
+        onSuccess={() => setShowSaveModal(false)}
+      />
     </div>
   );
 }

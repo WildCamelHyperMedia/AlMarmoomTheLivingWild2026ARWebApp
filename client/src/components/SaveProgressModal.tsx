@@ -15,7 +15,7 @@ interface SaveProgressModalProps {
 export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SaveProgressModalProps) {
   const { language, dir } = useLanguage();
   const { setUser } = useUser();
-  const { unlockedAnimals } = useProgress();
+  const { watchedVideos, points } = useProgress();
   
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [error, setError] = useState("");
@@ -43,7 +43,8 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
         body: JSON.stringify({ 
           name: formData.name, 
           email: formData.email,
-          unlockedAnimals: unlockedAnimals
+          watchedVideos: watchedVideos,
+          points: points
         })
       });
 
@@ -54,8 +55,8 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
       }
 
       setUser(data.user, data.token, data.expiresAt);
-      localStorage.removeItem("unlockedAnimals");
-      localStorage.removeItem("watchedCount");
+      localStorage.removeItem("watchedVideos");
+      localStorage.removeItem("points");
       onSuccess();
     } catch (err: any) {
       setError(err.message);

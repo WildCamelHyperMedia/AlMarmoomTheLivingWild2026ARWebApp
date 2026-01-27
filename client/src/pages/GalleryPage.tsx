@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Lock, LogOut, Shield, Bookmark } from "lucide-react";
+import { ArrowLeft, LogOut, Shield, Bookmark, Star } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
@@ -10,13 +10,12 @@ import { useUser } from "@/lib/user";
 import SaveProgressModal from "@/components/SaveProgressModal";
 
 const ANIMALS_PER_PAGE = 8;
-const PROMPT_SAVE_AFTER = 3;
 
 export default function GalleryPage() {
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
   const { user, logout, isLoading } = useUser();
-  const { isUnlocked, watchedCount } = useProgress();
+  const { watchedVideos, points } = useProgress();
   const chunkSize = ANIMALS_PER_PAGE;
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
@@ -26,17 +25,6 @@ export default function GalleryPage() {
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [hasPromptedSave, setHasPromptedSave] = useState(() => {
-    return localStorage.getItem("hasPromptedSave") === "true";
-  });
-
-  useEffect(() => {
-    if (!user && !hasPromptedSave && watchedCount >= PROMPT_SAVE_AFTER) {
-      setShowSaveModal(true);
-      setHasPromptedSave(true);
-      localStorage.setItem("hasPromptedSave", "true");
-    }
-  }, [watchedCount, user, hasPromptedSave]);
 
   useEffect(() => {
     if (emblaApi) {
@@ -62,7 +50,8 @@ export default function GalleryPage() {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem("hasPromptedSave");
+    localStorage.removeItem("watchedVideos");
+    localStorage.removeItem("points");
     setLocation("/");
   };
 
@@ -155,15 +144,13 @@ export default function GalleryPage() {
         
         <div className="flex flex-col items-end">
           <span className="text-[10px] text-white/50 font-sans tracking-widest uppercase mb-1">
-            {t("gallery.watched")}
+            {language === 'en' ? 'Points' : 'النقاط'}
           </span>
           <div className="flex items-baseline gap-1">
-             <span className="font-serif text-2xl font-bold text-primary">
-               {watchedCount}
-             </span>
-             <span className="text-sm text-white/50">
-               / {animals.length}
-             </span>
+            <Star className="w-4 h-4 text-primary fill-primary" />
+            <span className="font-serif text-2xl font-bold text-primary">
+              {points}
+            </span>
           </div>
         </div>
       </motion.div>
@@ -175,46 +162,31 @@ export default function GalleryPage() {
             <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative overflow-y-auto" key={pageIndex}>
               <div className="grid grid-cols-2 gap-6 pb-4">
                 {chunk.map((animal) => {
-                  const unlocked = isUnlocked(animal.id);
+                  const watched = watchedVideos.includes(animal.id);
                   
                   return (
                     <div key={animal.id} className="relative">
-                      {unlocked ? (
-                        <Link href={`/animal/${animal.id}`}>
-                          <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
-                            <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
-                              <img 
-                                src={animal.image} 
-                                alt={t(`animals.${animal.id}`)}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
-                                loading={pageIndex === 0 ? "eager" : "lazy"}
-                                decoding="async"
-                              />
-                            </div>
-                            <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
-                              {t(`animals.${animal.id}`)}
-                            </span>
-                          </div>
-                        </Link>
-                      ) : (
-                        <div className="flex flex-col items-center gap-3 text-center">
-                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-primary/20 bg-black/40">
+                      <Link href={`/animal/${animal.id}`}>
+                        <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
+                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
                             <img 
                               src={animal.image} 
                               alt={t(`animals.${animal.id}`)}
-                              className="w-full h-full object-cover blur-[2px] brightness-[0.4] sepia-[0.3]"
-                              loading="lazy"
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
+                              loading={pageIndex === 0 ? "eager" : "lazy"}
+                              decoding="async"
                             />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-primary/10" />
-                              <Lock className="w-8 h-8 text-[#D4A045] drop-shadow-[0_0_8px_rgba(212,160,69,0.6)]" />
-                            </div>
+                            {watched && (
+                              <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
+                                <Star className="w-3 h-3 text-white fill-white" />
+                              </div>
+                            )}
                           </div>
-                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-primary/40 h-8 flex items-center justify-center">
+                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
                             {t(`animals.${animal.id}`)}
                           </span>
                         </div>
-                      )}
+                      </Link>
                     </div>
                   );
                 })}
