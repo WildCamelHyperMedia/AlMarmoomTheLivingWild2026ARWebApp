@@ -227,7 +227,16 @@ export default function AnimalDetailPage() {
 
       {/* Stop/Close Button for Video */}
       {isPlaying && (
-        <div className="absolute top-6 right-6 z-50 flex items-center gap-4">
+        <div className="absolute top-6 right-6 z-50 flex flex-col items-end gap-3">
+           {/* Close Button */}
+           <button 
+              onClick={() => setIsPlaying(false)}
+              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
+              data-testid="button-stop-video"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
            {/* Volume Controls */}
            <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-2 pr-4">
              <button 
@@ -235,7 +244,7 @@ export default function AnimalDetailPage() {
                 className="p-1 rounded-full text-white hover:bg-white/10 transition-colors"
                 data-testid="button-toggle-mute"
               >
-                {isMuted || volume === 0 ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+                {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
               </button>
               
               <input
@@ -248,18 +257,10 @@ export default function AnimalDetailPage() {
                   setVolume(parseFloat(e.target.value));
                   setIsMuted(false);
                 }}
-                className="w-24 accent-white h-1 bg-white/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                className="w-20 accent-white h-1 bg-white/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
                 data-testid="input-volume"
               />
            </div>
-
-           <button 
-              onClick={() => setIsPlaying(false)}
-              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
-              data-testid="button-stop-video"
-            >
-              <X className="w-6 h-6" />
-            </button>
         </div>
       )}
 
