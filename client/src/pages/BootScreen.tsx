@@ -29,7 +29,7 @@ export default function BootScreen() {
     >
       <video
         src="/videos/boot-screen.mp4"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         autoPlay
         muted
         playsInline
