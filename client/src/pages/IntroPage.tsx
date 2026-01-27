@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, LogOut } from "lucide-react";
+import { Play, LogOut, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -77,9 +77,19 @@ export default function IntroPage() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full mb-8 z-10 flex justify-between items-start"
       >
-        <div className={dir === 'rtl' ? 'text-right' : 'text-left'}>
-          <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">{t("intro.by")}</h2>
-          <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">{t("intro.photographer")}</h1>
+        <div className="flex items-start gap-3">
+          <button 
+            onClick={() => setLocation("/")}
+            className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+            data-testid="button-back-to-language"
+            title={language === 'en' ? 'Change Language' : 'تغيير اللغة'}
+          >
+            <ArrowLeft className="h-5 w-5 text-white/60 hover:text-white" />
+          </button>
+          <div className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+            <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">{t("intro.by")}</h2>
+            <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">{t("intro.photographer")}</h1>
+          </div>
         </div>
         {user && (
           <button 
