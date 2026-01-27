@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX, MessageCircle, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX } from "lucide-react";
 import { Link, useRoute, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
@@ -8,11 +8,6 @@ import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
 import SaveProgressModal from "@/components/SaveProgressModal";
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
 
 const voiceoverMap: Record<string, { en: string; ar: string }> = {
   eurasian_stone_curlew: {
@@ -44,12 +39,6 @@ export default function AnimalDetailPage() {
   const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentAnimalIdRef = useRef<string | null>(null);
   
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState("");
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
   // Reset state when animal changes
   useEffect(() => {
     if (animal && animal.id !== currentAnimalIdRef.current) {
@@ -100,60 +89,6 @@ export default function AnimalDetailPage() {
       setIsPlaying(true);
     }
   }, [animal?.video]);
-
-  const sendChatMessage = async () => {
-    if (!chatInput.trim() || isAiLoading || !animal) return;
-    
-    // Guests can't use AI guide - need to save progress first
-    if (!user) {
-      setChatMessages(prev => [...prev, 
-        { role: "user", content: chatInput.trim() },
-        { role: "assistant", content: language === 'en' 
-          ? "Please save your progress first to use the AI Wildlife Guide." 
-          : "يرجى حفظ تقدمك أولاً لاستخدام مرشد الحياة البرية." }
-      ]);
-      setChatInput("");
-      return;
-    }
-    
-    const userMessage = chatInput.trim();
-    setChatInput("");
-    setChatMessages(prev => [...prev, { role: "user", content: userMessage }]);
-    setIsAiLoading(true);
-    
-    try {
-      const token = localStorage.getItem("authToken");
-      const response = await fetch("/api/animal-guide", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          animalId: animal.id,
-          animalName: t(`animals.${animal.id}`),
-          scientificName: animal.scientificName,
-          question: userMessage,
-          language
-        })
-      });
-      
-      if (!response.ok) throw new Error("Failed to get response");
-      
-      const data = await response.json();
-      setChatMessages(prev => [...prev, { role: "assistant", content: data.answer }]);
-    } catch (error) {
-      setChatMessages(prev => [...prev, { role: "assistant", content: t("aiGuide.error") }]);
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
 
   // Handle video completion
   const handleVideoEnded = () => {
@@ -396,124 +331,9 @@ export default function AnimalDetailPage() {
             <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
           </motion.button>
           
-          {/* AI Guide Button */}
-          <motion.button 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            onClick={() => setIsChatOpen(true)}
-            className="w-14 h-14 bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center group"
-            data-testid="button-open-ai-guide"
-          >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-200" />
-          </motion.button>
         </div>
 
       </div>
-
-      {/* AI Wildlife Guide Chat Panel */}
-      <AnimatePresence>
-        {isChatOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: "100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[60] flex flex-col bg-[#2A1F1A]"
-          >
-            {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-[#3E2D24]">
-              <h2 className="font-serif text-lg font-bold text-[#D4A045]">
-                {t("aiGuide.title")}
-              </h2>
-              <button 
-                onClick={() => setIsChatOpen(false)}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                data-testid="button-close-ai-guide"
-              >
-                <X className="w-5 h-5 text-white" />
-              </button>
-            </div>
-            
-            {/* Animal Info */}
-            <div className="flex items-center gap-4 p-4 bg-black/20 border-b border-white/5">
-              <img 
-                src={animal.image} 
-                alt={t(`animals.${animal.id}`)}
-                className="w-12 h-12 rounded-xl object-cover"
-              />
-              <div>
-                <p className="text-white font-medium">{t(`animals.${animal.id}`)}</p>
-                <p className="text-white/50 text-xs italic">{animal.scientificName}</p>
-              </div>
-            </div>
-            
-            {/* Chat Messages */}
-            <div 
-              ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4"
-            >
-              {chatMessages.length === 0 && (
-                <div className="text-center text-white/40 py-8">
-                  <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">{t("aiGuide.placeholder")}</p>
-                </div>
-              )}
-              
-              {chatMessages.map((msg, idx) => (
-                <div 
-                  key={idx}
-                  className={`flex ${msg.role === 'user' ? (dir === 'rtl' ? 'justify-start' : 'justify-end') : (dir === 'rtl' ? 'justify-end' : 'justify-start')}`}
-                >
-                  <div 
-                    className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-                      msg.role === 'user' 
-                        ? 'bg-[#D4A045] text-white' 
-                        : 'bg-[#3E2D24] text-white/90 border border-white/10'
-                    }`}
-                    data-testid={`chat-message-${msg.role}-${idx}`}
-                  >
-                    <p className="text-sm leading-relaxed">{msg.content}</p>
-                  </div>
-                </div>
-              ))}
-              
-              {isAiLoading && (
-                <div className={`flex ${dir === 'rtl' ? 'justify-end' : 'justify-start'}`}>
-                  <div className="bg-[#3E2D24] text-white/70 px-4 py-3 rounded-2xl border border-white/10 flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">{t("aiGuide.thinking")}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Chat Input */}
-            <div className="p-4 border-t border-white/10 bg-[#3E2D24]">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
-                  placeholder={t("aiGuide.placeholder")}
-                  className="flex-1 bg-black/30 text-white placeholder-white/40 px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-[#D4A045]/50"
-                  data-testid="input-ai-question"
-                  disabled={isAiLoading}
-                />
-                <button
-                  onClick={sendChatMessage}
-                  disabled={isAiLoading || !chatInput.trim()}
-                  className="w-12 h-12 bg-[#D4A045] hover:bg-[#c4923e] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all flex items-center justify-center"
-                  data-testid="button-send-ai-question"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Save Progress Modal */}
       <SaveProgressModal 
