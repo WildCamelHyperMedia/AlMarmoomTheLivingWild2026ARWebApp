@@ -174,13 +174,13 @@ export async function registerRoutes(
         validWatchedVideos = watchedVideos
           .filter((id): id is string => typeof id === "string" && VALID_ANIMAL_IDS.includes(id))
           .slice(0, VALID_ANIMAL_IDS.length);
-        // Calculate points based on valid watched videos (10 points each)
-        validPoints = validWatchedVideos.length * 10;
+        // Calculate points based on valid watched videos (1 point each)
+        validPoints = validWatchedVideos.length * 1;
       }
       
       // Override points if provided and valid, but cap at max possible
       if (typeof points === "number" && points >= 0) {
-        const maxPoints = VALID_ANIMAL_IDS.length * 10;
+        const maxPoints = VALID_ANIMAL_IDS.length * 1;
         validPoints = Math.min(points, maxPoints);
       }
       
@@ -593,8 +593,8 @@ export async function registerRoutes(
           (id): id is string => typeof id === "string" && VALID_ANIMAL_IDS.includes(id)
         );
         validatedData.watchedVideos = validWatchedVideos;
-        // Derive points: 10 points per watched video
-        serverDerivedPoints = validWatchedVideos.length * 10;
+        // Derive points: 1 point per watched video
+        serverDerivedPoints = validWatchedVideos.length * 1;
       }
       
       // Override client points with server-derived points

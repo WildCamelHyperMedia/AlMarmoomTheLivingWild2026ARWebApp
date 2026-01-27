@@ -11,7 +11,7 @@ interface ProgressContextType {
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
-const POINTS_PER_VIDEO = 10;
+const POINTS_PER_VIDEO = 1;
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: userLoading, getAuthHeaders } = useUser();
