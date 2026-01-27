@@ -78,11 +78,8 @@ export default function LandingPage() {
             <ArrowRight className="h-5 w-5 text-white/70 group-hover:translate-x-1 group-hover:text-primary transition-all" />
           </button>
 
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <p className="text-[10px] text-white/30 tracking-widest uppercase">
-              Al Marmoom Desert Conservation Reserve
-            </p>
-            <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-8 w-auto opacity-70 grayscale hover:grayscale-0 transition-all" />
+          <div className="mt-8 flex flex-col items-center">
+            <img src="/sponsors-logo.png" alt="Al Marmoom & Dubai Culture" className="h-16 w-auto opacity-90" />
           </div>
         </motion.div>
       </div>
