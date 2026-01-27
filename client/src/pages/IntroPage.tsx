@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, LogOut, ArrowLeft } from "lucide-react";
+import { Play, LogOut, ArrowLeft, Gift, Camera, Book, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -14,6 +14,7 @@ export default function IntroPage() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [showPrizePopup, setShowPrizePopup] = useState(false);
 
   // If already logged in and admin, go to gallery
   useEffect(() => {
@@ -45,9 +46,13 @@ export default function IntroPage() {
 
   const handleStartJourney = () => {
     if (canProceed) {
-      // Go directly to gallery - guests can explore freely
-      setLocation("/gallery");
+      setShowPrizePopup(true);
     }
+  };
+
+  const handleContinueToGallery = () => {
+    setShowPrizePopup(false);
+    setLocation("/gallery");
   };
 
   // If admin, show loading while redirecting
@@ -216,6 +221,100 @@ export default function IntroPage() {
           <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-6 w-auto opacity-60 grayscale" />
         </motion.div>
       </div>
+
+      {/* Prize Popup Modal */}
+      <AnimatePresence>
+        {showPrizePopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              className="bg-gradient-to-b from-[#3E2D24] to-[#2C1810] rounded-3xl p-8 max-w-sm w-full border border-[#D4A045]/30 shadow-2xl relative overflow-hidden"
+            >
+              {/* Decorative sparkles */}
+              <div className="absolute top-4 right-4">
+                <Sparkles className="w-6 h-6 text-[#D4A045] animate-pulse" />
+              </div>
+              <div className="absolute bottom-20 left-4">
+                <Sparkles className="w-4 h-4 text-[#D4A045]/50 animate-pulse" style={{ animationDelay: '0.5s' }} />
+              </div>
+              
+              {/* Title */}
+              <motion.div 
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-center mb-6"
+              >
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#D4A045]/20 mb-4">
+                  <Gift className="w-8 h-8 text-[#D4A045]" />
+                </div>
+                <h2 className="text-3xl font-bold text-[#D4A045] font-serif tracking-wide">
+                  {t("intro.popup.title")}
+                </h2>
+              </motion.div>
+
+              {/* Message */}
+              <motion.p 
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-white/80 text-center leading-relaxed mb-6"
+              >
+                {t("intro.popup.message")}
+              </motion.p>
+
+              {/* Prize List */}
+              <motion.div 
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-3 mb-8"
+              >
+                <div className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+                  <div className="w-10 h-10 rounded-full bg-[#D4A045]/20 flex items-center justify-center">
+                    <Camera className="w-5 h-5 text-[#D4A045]" />
+                  </div>
+                  <span className="text-white font-medium">{t("intro.popup.prize1")}</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+                  <div className="w-10 h-10 rounded-full bg-[#D4A045]/20 flex items-center justify-center">
+                    <Book className="w-5 h-5 text-[#D4A045]" />
+                  </div>
+                  <span className="text-white font-medium">{t("intro.popup.prize2")}</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+                  <div className="w-10 h-10 rounded-full bg-[#D4A045]/20 flex items-center justify-center">
+                    <Camera className="w-5 h-5 text-[#D4A045]" />
+                  </div>
+                  <span className="text-white font-medium">{t("intro.popup.prize3")}</span>
+                </div>
+              </motion.div>
+
+              {/* Continue Button */}
+              <motion.button
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                onClick={handleContinueToGallery}
+                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg text-lg tracking-wide"
+                data-testid="button-continue-to-gallery"
+              >
+                {t("intro.popup.continue")}
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
