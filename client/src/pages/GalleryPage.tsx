@@ -81,11 +81,13 @@ export default function GalleryPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between p-6 z-10 relative">
-        <Link href="/intro">
-          <button className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}>
-            <ArrowLeft className="h-6 w-6 text-white" />
-          </button>
-        </Link>
+        <button 
+          onClick={() => setLocation("/intro")}
+          className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+          data-testid="button-back"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </button>
         
         <div className="flex items-center gap-2">
           {user?.isAdmin && (
