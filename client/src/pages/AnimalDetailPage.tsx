@@ -28,7 +28,7 @@ export default function AnimalDetailPage() {
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
   const { user, isLoading: userLoading } = useUser();
-  const { recordVideoWatch, hasWatched, points } = useProgress();
+  const { recordVideoWatch, hasWatched } = useProgress();
 
   const animal = animals.find((a) => a.id === params?.id);
   
@@ -42,6 +42,7 @@ export default function AnimalDetailPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const currentAnimalIdRef = useRef<string | null>(null);
   
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -49,35 +50,40 @@ export default function AnimalDetailPage() {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Check if already watched on mount
+  // Reset state when animal changes
   useEffect(() => {
-    if (animal && hasWatched(animal.id)) {
-      setHasRecordedWatch(true);
+    if (animal && animal.id !== currentAnimalIdRef.current) {
+      currentAnimalIdRef.current = animal.id;
+      setWatchTime(0);
+      setHasRecordedWatch(hasWatched(animal.id));
     }
   }, [animal, hasWatched]);
 
-  // Track watch time when playing
+  // Track watch time - only when video is actually playing (not paused)
   useEffect(() => {
     if (isPlaying && !hasRecordedWatch && animal) {
       watchTimerRef.current = setInterval(() => {
-        setWatchTime(prev => {
-          const newTime = prev + 1;
-          // Record watch when minimum time reached
-          if (newTime >= MIN_WATCH_TIME && !hasRecordedWatch) {
-            recordVideoWatch(animal.id).then((recorded) => {
-              if (recorded) {
-                setHasRecordedWatch(true);
-                // Prompt guest to save progress
-                if (!user) {
-                  setTimeout(() => {
-                    setShowSaveModal(true);
-                  }, 500);
+        // Only count time if video is not paused
+        if (videoRef.current && !videoRef.current.paused) {
+          setWatchTime(prev => {
+            const newTime = prev + 1;
+            // Record watch when minimum time reached
+            if (newTime >= MIN_WATCH_TIME && !hasRecordedWatch) {
+              recordVideoWatch(animal.id).then((recorded) => {
+                if (recorded) {
+                  setHasRecordedWatch(true);
+                  // Prompt guest to save progress
+                  if (!user) {
+                    setTimeout(() => {
+                      setShowSaveModal(true);
+                    }, 500);
+                  }
                 }
-              }
-            });
-          }
-          return newTime;
-        });
+              });
+            }
+            return newTime;
+          });
+        }
       }, 1000);
     }
     

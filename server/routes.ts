@@ -487,6 +487,23 @@ export async function registerRoutes(
       }
       
       const validatedData = updateUserProgressSchema.parse(req.body);
+      
+      // Server-side points validation: derive points from watchedVideos
+      // Ignore client-provided points to prevent tampering
+      let serverDerivedPoints = existingProgress.points;
+      if (validatedData.watchedVideos) {
+        // Filter to only valid animal IDs
+        const validWatchedVideos = validatedData.watchedVideos.filter(
+          (id): id is string => typeof id === "string" && VALID_ANIMAL_IDS.includes(id)
+        );
+        validatedData.watchedVideos = validWatchedVideos;
+        // Derive points: 10 points per watched video
+        serverDerivedPoints = validWatchedVideos.length * 10;
+      }
+      
+      // Override client points with server-derived points
+      validatedData.points = serverDerivedPoints;
+      
       const progress = await storage.updateProgress(userId, validatedData);
       res.json({ progress });
     } catch (error: any) {

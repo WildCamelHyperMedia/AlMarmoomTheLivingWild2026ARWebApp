@@ -31,8 +31,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           return res.json();
         })
         .then(data => {
-          setWatchedVideos(data.progress.watchedVideos || []);
-          setPoints(data.progress.points || 0);
+          const videos = data.progress.watchedVideos || [];
+          setWatchedVideos(videos);
+          // Derive points from watchedVideos for consistency
+          setPoints(videos.length * POINTS_PER_VIDEO);
           setIsLoading(false);
         })
         .catch(() => {
@@ -41,10 +43,16 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           setIsLoading(false);
         });
     } else {
-      const saved = localStorage.getItem("watchedVideos");
-      const savedPoints = localStorage.getItem("points");
-      setWatchedVideos(saved ? JSON.parse(saved) : []);
-      setPoints(savedPoints ? parseInt(savedPoints) : 0);
+      try {
+        const saved = localStorage.getItem("watchedVideos");
+        const videos = saved ? JSON.parse(saved) : [];
+        setWatchedVideos(Array.isArray(videos) ? videos : []);
+        // Derive points from watchedVideos for consistency
+        setPoints(Array.isArray(videos) ? videos.length * POINTS_PER_VIDEO : 0);
+      } catch {
+        setWatchedVideos([]);
+        setPoints(0);
+      }
       setIsLoading(false);
     }
   }, [user, userLoading]);
