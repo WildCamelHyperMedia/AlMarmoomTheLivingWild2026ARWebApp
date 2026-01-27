@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -29,11 +29,13 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type LoginInput = z.infer<typeof loginSchema>;
 
-// User progress table for tracking unlocked animals
+// User progress table for tracking watched videos and points
 export const userProgress = pgTable("user_progress", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   unlockedAnimals: text("unlocked_animals").array().notNull().default(sql`ARRAY[]::text[]`),
+  watchedVideos: text("watched_videos").array().notNull().default(sql`ARRAY[]::text[]`),
+  points: integer("points").notNull().default(0),
   lastUpdated: timestamp("last_updated").notNull().defaultNow(),
 });
 
@@ -44,6 +46,8 @@ export const insertUserProgressSchema = createInsertSchema(userProgress).omit({
 
 export const updateUserProgressSchema = createInsertSchema(userProgress).pick({
   unlockedAnimals: true,
+  watchedVideos: true,
+  points: true,
 });
 
 export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
