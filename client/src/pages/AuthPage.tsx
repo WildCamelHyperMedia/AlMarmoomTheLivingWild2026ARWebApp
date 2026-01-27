@@ -1,48 +1,31 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ChevronDown, Eye, EyeOff, Globe } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Globe, User, Mail } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-const countryCodes = [
-  { code: "+971", country: "UAE", flag: "🇦🇪" },
-  { code: "+966", country: "KSA", flag: "🇸🇦" },
-  { code: "+974", country: "Qatar", flag: "🇶🇦" },
-  { code: "+973", country: "Bahrain", flag: "🇧🇭" },
-  { code: "+968", country: "Oman", flag: "🇴🇲" },
-  { code: "+965", country: "Kuwait", flag: "🇰🇼" },
-  { code: "+20", country: "Egypt", flag: "🇪🇬" },
-  { code: "+962", country: "Jordan", flag: "🇯🇴" },
-  { code: "+91", country: "India", flag: "🇮🇳" },
-  { code: "+44", country: "UK", flag: "🇬🇧" },
-  { code: "+1", country: "USA", flag: "🇺🇸" },
-];
-
-type AuthMode = "signup" | "login";
-
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { t, language, dir, setLanguage } = useLanguage();
+  const { language, dir, setLanguage } = useLanguage();
   const { setUser } = useUser();
-  
-  const [mode, setMode] = useState<AuthMode>("signup");
   
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    phone: "",
-    password: ""
+    email: ""
   });
-  const [countryCode, setCountryCode] = useState("+971");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = async () => {
-    if (!formData.name || !formData.email || !formData.phone || !formData.password) {
-      setError(language === 'en' ? "Please fill in all fields" : "يرجى ملء جميع الحقول");
+  const handleRegister = async () => {
+    if (!formData.name.trim()) {
+      setError(language === 'en' ? "Please enter your name" : "يرجى إدخال اسمك");
+      return;
+    }
+    
+    if (!formData.email.trim()) {
+      setError(language === 'en' ? "Please enter your email" : "يرجى إدخال بريدك الإلكتروني");
       return;
     }
     
@@ -52,31 +35,25 @@ export default function AuthPage() {
       return;
     }
     
-    if (formData.password.length < 4) {
-      setError(language === 'en' ? "Password must be at least 4 characters" : "يجب أن تكون كلمة المرور 4 أحرف على الأقل");
-      return;
-    }
-    
-    const fullPhone = `${countryCode}${formData.phone}`;
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch("/api/auth/guest-signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          name: formData.name, 
-          email: formData.email,
-          phone: fullPhone,
-          password: formData.password
+          name: formData.name.trim(), 
+          email: formData.email.trim().toLowerCase(),
+          watchedVideos: [],
+          points: 0
         })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || (language === 'en' ? "Failed to create account" : "فشل في إنشاء الحساب"));
+        throw new Error(data.error || (language === 'en' ? "Failed to register" : "فشل في التسجيل"));
       }
 
       setUser(data.user, data.token, data.expiresAt);
@@ -85,54 +62,14 @@ export default function AuthPage() {
       setError(err.message);
       setIsLoading(false);
     }
-  };
-
-  const handleLogin = async () => {
-    if (!formData.email || !formData.password) {
-      setError(language === 'en' ? "Please fill in all fields" : "يرجى ملء جميع الحقول");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email: formData.email,
-          password: formData.password
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || (language === 'en' ? "Invalid email or password" : "البريد الإلكتروني أو كلمة المرور غير صحيحة"));
-      }
-
-      setUser(data.user, data.token, data.expiresAt);
-      setLocation("/gallery");
-    } catch (err: any) {
-      setError(err.message);
-      setIsLoading(false);
-    }
-  };
-
-  const toggleMode = () => {
-    setMode(mode === "signup" ? "login" : "signup");
-    setError("");
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      password: ""
-    });
   };
 
   const handleBack = () => {
     setLocation("/intro");
+  };
+
+  const handleSkip = () => {
+    setLocation("/gallery");
   };
 
   return (
@@ -165,195 +102,99 @@ export default function AuthPage() {
         </button>
       </div>
 
-      <AnimatePresence mode="wait">
-        {mode === "signup" ? (
-          <motion.div 
-            key="signup"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
+      >
+        {/* Header */}
+        <div className="text-center mb-10">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1, type: "spring" }}
+            className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(212,160,69,0.4)]"
           >
-            <div className="text-center mb-6">
-              <h1 className="font-bold text-3xl md:text-4xl tracking-tight mb-2 font-sans">
-                {language === 'en' ? 'Create Account' : 'إنشاء حساب'}
-              </h1>
-              <p className="text-white/60 text-sm">
-                {language === 'en' ? 'Join The Living Wild experience' : 'انضم إلى تجربة الحياة البرية'}
-              </p>
-            </div>
-
-            <div className="w-full space-y-3 mb-4">
-              <Input 
-                type="text" 
-                placeholder={language === 'en' ? "Full Name" : "الاسم الكامل"}
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                dir={dir}
-                data-testid="input-name"
-              />
-
-              <Input 
-                type="email" 
-                placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                dir="ltr"
-                data-testid="input-email"
-              />
-
-              <div className="flex gap-2">
-                <div className="relative">
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    className="appearance-none bg-[#3E2D24]/80 border-none text-white h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm pl-4 pr-10 cursor-pointer"
-                    data-testid="select-country-code"
-                  >
-                    {countryCodes.map((c) => (
-                      <option key={c.code} value={c.code} className="bg-[#3E2D24]">
-                        {c.flag} {c.code}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-                </div>
-                <Input 
-                  type="tel" 
-                  placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="flex-1 bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                  dir="ltr"
-                  data-testid="input-phone"
-                />
-              </div>
-
-              <div className="relative">
-                <Input 
-                  type={showPassword ? "text" : "password"}
-                  placeholder={language === 'en' ? "Password (min 4 characters)" : "كلمة المرور (4 أحرف على الأقل)"}
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-12 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4 pr-12"
-                  dir="ltr"
-                  data-testid="input-password"
-                />
-                <button 
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                  data-testid="button-toggle-password"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              
-              {error && (
-                <p className="text-red-400 text-sm text-center" data-testid="text-error">{error}</p>
-              )}
-            </div>
-
-            <button 
-              onClick={handleSignup}
-              disabled={isLoading}
-              className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-3 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="button-signup"
-            >
-              {isLoading ? (language === 'en' ? 'Creating account...' : 'جاري إنشاء الحساب...') : (language === 'en' ? 'Create Account' : 'إنشاء حساب')}
-            </button>
-
-            <p className="text-center text-[10px] text-white/50 leading-relaxed mb-3">
-              {language === 'en' 
-                ? 'By signing up, you agree to our Terms of Service and Privacy Policy' 
-                : 'بالتسجيل، فإنك توافق على شروط الخدمة وسياسة الخصوصية'}
-            </p>
-
-            <button 
-              onClick={toggleMode}
-              className="text-white/60 text-sm hover:text-white transition-colors"
-              data-testid="button-toggle-login"
-            >
-              {language === 'en' ? 'Already have an account? ' : 'لديك حساب بالفعل؟ '}
-              <span className="text-[#D4A045] font-semibold">{language === 'en' ? 'Login' : 'تسجيل الدخول'}</span>
-            </button>
+            <User className="w-10 h-10 text-white" />
           </motion.div>
-        ) : (
-          <motion.div 
-            key="login"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
-          >
-            <div className="text-center mb-8">
-              <h1 className="font-bold text-4xl md:text-5xl tracking-tight mb-4 font-sans">
-                {language === 'en' ? 'Welcome Back' : 'مرحباً بعودتك'}
-              </h1>
-              <p className="text-white/60 text-sm">
-                {language === 'en' ? 'Login to continue your journey' : 'سجّل الدخول لمتابعة رحلتك'}
-              </p>
-            </div>
+          <h1 className="font-bold text-3xl md:text-4xl tracking-tight mb-2 font-sans">
+            {language === 'en' ? 'Join the Experience' : 'انضم إلى التجربة'}
+          </h1>
+          <p className="text-white/60 text-sm">
+            {language === 'en' ? 'Enter your details to track your progress' : 'أدخل بياناتك لتتبع تقدمك'}
+          </p>
+        </div>
 
-            <div className="flex-1"></div>
+        {/* Form */}
+        <div className="w-full space-y-4 mb-6">
+          <div className="relative">
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+            <Input 
+              type="text" 
+              placeholder={language === 'en' ? "Your Name" : "اسمك"}
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4 text-lg"
+              dir={dir}
+              data-testid="input-name"
+            />
+          </div>
 
-            <div className="w-full space-y-4 mb-6">
-              <Input 
-                type="email" 
-                placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4"
-                dir="ltr"
-                data-testid="input-login-email"
-              />
-
-              <div className="relative">
-                <Input 
-                  type={showPassword ? "text" : "password"}
-                  placeholder={language === 'en' ? "Password" : "كلمة المرور"}
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/60 h-14 rounded-xl focus:ring-1 focus:ring-primary/50 backdrop-blur-sm px-4 pr-12"
-                  dir="ltr"
-                  data-testid="input-login-password"
-                />
-                <button 
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              
-              {error && (
-                <p className="text-red-400 text-sm text-center" data-testid="text-error">{error}</p>
-              )}
-            </div>
-
-            <button 
-              onClick={handleLogin}
-              disabled={isLoading}
-              className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] mb-4 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="button-login"
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+            <Input 
+              type="email" 
+              placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4 text-lg"
+              dir="ltr"
+              data-testid="input-email"
+            />
+          </div>
+          
+          {error && (
+            <motion.p 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-4 rounded-xl" 
+              data-testid="text-error"
             >
-              {isLoading ? (language === 'en' ? 'Logging in...' : 'جاري تسجيل الدخول...') : (language === 'en' ? 'Login' : 'تسجيل الدخول')}
-            </button>
+              {error}
+            </motion.p>
+          )}
+        </div>
 
-            <button 
-              onClick={toggleMode}
-              className="text-white/60 text-sm hover:text-white transition-colors"
-              data-testid="button-toggle-signup"
-            >
-              {language === 'en' ? "Don't have an account? " : 'ليس لديك حساب؟ '}
-              <span className="text-[#D4A045] font-semibold">{language === 'en' ? 'Sign Up' : 'سجّل الآن'}</span>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Register Button */}
+        <motion.button 
+          whileTap={{ scale: 0.98 }}
+          onClick={handleRegister}
+          disabled={isLoading}
+          className="w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 rounded-2xl transition-all mb-4 shadow-[0_4px_30px_rgba(212,160,69,0.4)] hover:shadow-[0_4px_40px_rgba(212,160,69,0.6)] disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+          data-testid="button-register"
+        >
+          {isLoading 
+            ? (language === 'en' ? 'Registering...' : 'جاري التسجيل...') 
+            : (language === 'en' ? 'Register' : 'تسجيل')
+          }
+        </motion.button>
+
+        {/* Skip Link */}
+        <button 
+          onClick={handleSkip}
+          className="text-white/40 hover:text-white/70 text-sm transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/40"
+          data-testid="button-skip"
+        >
+          {language === 'en' ? 'Skip for now' : 'تخطي الآن'}
+        </button>
+
+        {/* Info text */}
+        <p className="text-center text-[11px] text-white/40 leading-relaxed mt-8 max-w-xs">
+          {language === 'en' 
+            ? 'Registration helps you save progress and compete for prizes. No password needed!' 
+            : 'التسجيل يساعدك على حفظ تقدمك والمنافسة على الجوائز. لا حاجة لكلمة مرور!'}
+        </p>
+      </motion.div>
     </div>
   );
 }
