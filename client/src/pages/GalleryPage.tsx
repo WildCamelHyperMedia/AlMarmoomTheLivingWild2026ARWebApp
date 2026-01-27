@@ -110,16 +110,26 @@ export default function GalleryPage() {
             </button>
           )}
           {!user && (
-            <button 
-              onClick={() => setShowSaveModal(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
-              data-testid="button-save-progress-header"
-            >
-              <Bookmark className="h-4 w-4 text-primary" />
-              <span className="text-xs text-primary font-medium">
-                {language === 'en' ? 'Save' : 'حفظ'}
-              </span>
-            </button>
+            <>
+              <button 
+                onClick={() => setShowSaveModal(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
+                data-testid="button-save-progress-header"
+              >
+                <Bookmark className="h-4 w-4 text-primary" />
+                <span className="text-xs text-primary font-medium">
+                  {language === 'en' ? 'Save' : 'حفظ'}
+                </span>
+              </button>
+              <button 
+                onClick={() => setLocation("/auth")}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                data-testid="button-login"
+                title={language === 'en' ? 'Login' : 'تسجيل الدخول'}
+              >
+                <Shield className="h-5 w-5 text-white/40 hover:text-white/60" />
+              </button>
+            </>
           )}
           {user && (
             <button 
