@@ -1,22 +1,31 @@
-import { motion } from "framer-motion";
-import { ArrowLeft, Globe, User, Mail } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Globe, User, Mail, Lock, Shield } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
+type AuthMode = "register" | "login" | "admin";
+
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const { language, dir, setLanguage } = useLanguage();
   const { setUser } = useUser();
   
+  const [mode, setMode] = useState<AuthMode>("register");
   const [formData, setFormData] = useState({
     name: "",
-    email: ""
+    email: "",
+    password: ""
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const resetForm = () => {
+    setFormData({ name: "", email: "", password: "" });
+    setError("");
+  };
 
   const handleRegister = async () => {
     if (!formData.name.trim()) {
@@ -64,6 +73,88 @@ export default function AuthPage() {
     }
   };
 
+  const handleLogin = async () => {
+    if (!formData.name.trim()) {
+      setError(language === 'en' ? "Please enter your name" : "يرجى إدخال اسمك");
+      return;
+    }
+    
+    if (!formData.email.trim()) {
+      setError(language === 'en' ? "Please enter your email" : "يرجى إدخال بريدك الإلكتروني");
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError(language === 'en' ? "Please enter a valid email" : "يرجى إدخال بريد إلكتروني صحيح");
+      return;
+    }
+    
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/user-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: formData.name.trim(), 
+          email: formData.email.trim().toLowerCase()
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || (language === 'en' ? "Login failed" : "فشل تسجيل الدخول"));
+      }
+
+      setUser(data.user, data.token, data.expiresAt);
+      setLocation("/gallery");
+    } catch (err: any) {
+      setError(err.message);
+      setIsLoading(false);
+    }
+  };
+
+  const handleAdminLogin = async () => {
+    if (!formData.email.trim()) {
+      setError(language === 'en' ? "Please enter email" : "يرجى إدخال البريد الإلكتروني");
+      return;
+    }
+    
+    if (!formData.password) {
+      setError(language === 'en' ? "Please enter password" : "يرجى إدخال كلمة المرور");
+      return;
+    }
+    
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email: formData.email.trim().toLowerCase(),
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || (language === 'en' ? "Invalid credentials" : "بيانات غير صحيحة"));
+      }
+
+      setUser(data.user, data.token, data.expiresAt);
+      setLocation("/admin");
+    } catch (err: any) {
+      setError(err.message);
+      setIsLoading(false);
+    }
+  };
+
   const handleBack = () => {
     setLocation("/intro");
   };
@@ -72,8 +163,13 @@ export default function AuthPage() {
     setLocation("/gallery");
   };
 
+  const switchMode = (newMode: AuthMode) => {
+    setMode(newMode);
+    resetForm();
+  };
+
   return (
-    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-8 relative overflow-hidden">
+    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-6 relative overflow-hidden">
       
       {/* Desert Dunes Background */}
       <div 
@@ -84,7 +180,8 @@ export default function AuthPage() {
       {/* Background Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background pointer-events-none" />
 
-      <div className="w-full flex justify-between items-center mb-8 z-10">
+      {/* Header */}
+      <div className="w-full flex justify-between items-center mb-6 z-10">
         <button 
           onClick={handleBack}
           className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
@@ -102,99 +199,314 @@ export default function AuthPage() {
         </button>
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
-      >
-        {/* Header */}
-        <div className="text-center mb-10">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.1, type: "spring" }}
-            className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(212,160,69,0.4)]"
+      {/* Mode Tabs */}
+      <div className="w-full max-w-sm z-10 mb-6">
+        <div className="flex bg-[#3E2D24]/50 rounded-2xl p-1 backdrop-blur-sm">
+          <button
+            onClick={() => switchMode("register")}
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              mode === "register" 
+                ? "bg-[#D4A045] text-white shadow-lg" 
+                : "text-white/60 hover:text-white/80"
+            }`}
+            data-testid="tab-register"
           >
-            <User className="w-10 h-10 text-white" />
-          </motion.div>
-          <h1 className="font-bold text-3xl md:text-4xl tracking-tight mb-2 font-sans">
-            {language === 'en' ? 'Join the Experience' : 'انضم إلى التجربة'}
-          </h1>
-          <p className="text-white/60 text-sm">
-            {language === 'en' ? 'Enter your details to track your progress' : 'أدخل بياناتك لتتبع تقدمك'}
-          </p>
+            {language === 'en' ? 'Register' : 'تسجيل جديد'}
+          </button>
+          <button
+            onClick={() => switchMode("login")}
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              mode === "login" 
+                ? "bg-[#D4A045] text-white shadow-lg" 
+                : "text-white/60 hover:text-white/80"
+            }`}
+            data-testid="tab-login"
+          >
+            {language === 'en' ? 'Login' : 'تسجيل الدخول'}
+          </button>
         </div>
+      </div>
 
-        {/* Form */}
-        <div className="w-full space-y-4 mb-6">
-          <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-            <Input 
-              type="text" 
-              placeholder={language === 'en' ? "Your Name" : "اسمك"}
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4 text-lg"
-              dir={dir}
-              data-testid="input-name"
-            />
-          </div>
+      <AnimatePresence mode="wait">
+        {/* Register Form */}
+        {mode === "register" && (
+          <motion.div 
+            key="register"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
+          >
+            <div className="text-center mb-8">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: "spring" }}
+                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(212,160,69,0.4)]"
+              >
+                <User className="w-8 h-8 text-white" />
+              </motion.div>
+              <h1 className="font-bold text-2xl tracking-tight mb-1">
+                {language === 'en' ? 'Create Account' : 'إنشاء حساب'}
+              </h1>
+              <p className="text-white/50 text-sm">
+                {language === 'en' ? 'Track your progress and win prizes' : 'تتبع تقدمك واربح جوائز'}
+              </p>
+            </div>
 
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-            <Input 
-              type="email" 
-              placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4 text-lg"
-              dir="ltr"
-              data-testid="input-email"
-            />
-          </div>
-          
-          {error && (
-            <motion.p 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-4 rounded-xl" 
-              data-testid="text-error"
+            <div className="w-full space-y-3 mb-4">
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="text" 
+                  placeholder={language === 'en' ? "Your Name" : "اسمك"}
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  dir={dir}
+                  data-testid="input-name"
+                />
+              </div>
+
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="email" 
+                  placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  dir="ltr"
+                  data-testid="input-email"
+                />
+              </div>
+              
+              {error && (
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-4 rounded-xl" 
+                  data-testid="text-error"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </div>
+
+            <motion.button 
+              whileTap={{ scale: 0.98 }}
+              onClick={handleRegister}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(212,160,69,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-register"
             >
-              {error}
-            </motion.p>
-          )}
-        </div>
+              {isLoading 
+                ? (language === 'en' ? 'Registering...' : 'جاري التسجيل...') 
+                : (language === 'en' ? 'Register' : 'تسجيل')
+              }
+            </motion.button>
 
-        {/* Register Button */}
-        <motion.button 
-          whileTap={{ scale: 0.98 }}
-          onClick={handleRegister}
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 rounded-2xl transition-all mb-4 shadow-[0_4px_30px_rgba(212,160,69,0.4)] hover:shadow-[0_4px_40px_rgba(212,160,69,0.6)] disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-          data-testid="button-register"
+            <button 
+              onClick={handleSkip}
+              className="text-white/40 hover:text-white/70 text-sm transition-colors"
+              data-testid="button-skip"
+            >
+              {language === 'en' ? 'Skip for now' : 'تخطي الآن'}
+            </button>
+          </motion.div>
+        )}
+
+        {/* Login Form */}
+        {mode === "login" && (
+          <motion.div 
+            key="login"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
+          >
+            <div className="text-center mb-8">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: "spring" }}
+                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(212,160,69,0.4)]"
+              >
+                <User className="w-8 h-8 text-white" />
+              </motion.div>
+              <h1 className="font-bold text-2xl tracking-tight mb-1">
+                {language === 'en' ? 'Welcome Back' : 'مرحباً بعودتك'}
+              </h1>
+              <p className="text-white/50 text-sm">
+                {language === 'en' ? 'Enter your name and email to continue' : 'أدخل اسمك وبريدك للمتابعة'}
+              </p>
+            </div>
+
+            <div className="w-full space-y-3 mb-4">
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="text" 
+                  placeholder={language === 'en' ? "Your Name" : "اسمك"}
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  dir={dir}
+                  data-testid="input-login-name"
+                />
+              </div>
+
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="email" 
+                  placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  dir="ltr"
+                  data-testid="input-login-email"
+                />
+              </div>
+              
+              {error && (
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-4 rounded-xl" 
+                  data-testid="text-error"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </div>
+
+            <motion.button 
+              whileTap={{ scale: 0.98 }}
+              onClick={handleLogin}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(212,160,69,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-login"
+            >
+              {isLoading 
+                ? (language === 'en' ? 'Logging in...' : 'جاري الدخول...') 
+                : (language === 'en' ? 'Login' : 'دخول')
+              }
+            </motion.button>
+
+            <button 
+              onClick={handleSkip}
+              className="text-white/40 hover:text-white/70 text-sm transition-colors"
+              data-testid="button-skip"
+            >
+              {language === 'en' ? 'Skip for now' : 'تخطي الآن'}
+            </button>
+          </motion.div>
+        )}
+
+        {/* Admin Login Form */}
+        {mode === "admin" && (
+          <motion.div 
+            key="admin"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="w-full max-w-sm flex-1 flex flex-col items-center z-10"
+          >
+            <div className="text-center mb-8">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: "spring" }}
+                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#6B7280] to-[#374151] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(107,114,128,0.4)]"
+              >
+                <Shield className="w-8 h-8 text-white" />
+              </motion.div>
+              <h1 className="font-bold text-2xl tracking-tight mb-1">
+                {language === 'en' ? 'Admin Login' : 'دخول المدير'}
+              </h1>
+              <p className="text-white/50 text-sm">
+                {language === 'en' ? 'Staff access only' : 'للموظفين فقط'}
+              </p>
+            </div>
+
+            <div className="w-full space-y-3 mb-4">
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="email" 
+                  placeholder={language === 'en' ? "Admin Email" : "بريد المدير"}
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-white/20 backdrop-blur-sm pl-12 pr-4"
+                  dir="ltr"
+                  data-testid="input-admin-email"
+                />
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="password" 
+                  placeholder={language === 'en' ? "Password" : "كلمة المرور"}
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-white/20 backdrop-blur-sm pl-12 pr-4"
+                  dir="ltr"
+                  data-testid="input-admin-password"
+                />
+              </div>
+              
+              {error && (
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-sm text-center bg-red-500/10 py-2 px-4 rounded-xl" 
+                  data-testid="text-error"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </div>
+
+            <motion.button 
+              whileTap={{ scale: 0.98 }}
+              onClick={handleAdminLogin}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-[#6B7280] to-[#374151] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-admin-login"
+            >
+              {isLoading 
+                ? (language === 'en' ? 'Logging in...' : 'جاري الدخول...') 
+                : (language === 'en' ? 'Admin Login' : 'دخول المدير')
+              }
+            </motion.button>
+
+            <button 
+              onClick={() => switchMode("register")}
+              className="text-white/40 hover:text-white/70 text-sm transition-colors"
+              data-testid="button-back-to-user"
+            >
+              {language === 'en' ? 'Back to user login' : 'العودة لتسجيل المستخدم'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Admin Staff Button - Bottom */}
+      {mode !== "admin" && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          onClick={() => switchMode("admin")}
+          className="z-10 mt-auto mb-4 flex items-center gap-2 text-white/30 hover:text-white/50 text-xs transition-colors"
+          data-testid="button-admin-access"
         >
-          {isLoading 
-            ? (language === 'en' ? 'Registering...' : 'جاري التسجيل...') 
-            : (language === 'en' ? 'Register' : 'تسجيل')
-          }
+          <Shield className="w-4 h-4" />
+          {language === 'en' ? 'Staff Login' : 'دخول الموظفين'}
         </motion.button>
-
-        {/* Skip Link */}
-        <button 
-          onClick={handleSkip}
-          className="text-white/40 hover:text-white/70 text-sm transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/40"
-          data-testid="button-skip"
-        >
-          {language === 'en' ? 'Skip for now' : 'تخطي الآن'}
-        </button>
-
-        {/* Info text */}
-        <p className="text-center text-[11px] text-white/40 leading-relaxed mt-8 max-w-xs">
-          {language === 'en' 
-            ? 'Registration helps you save progress and compete for prizes. No password needed!' 
-            : 'التسجيل يساعدك على حفظ تقدمك والمنافسة على الجوائز. لا حاجة لكلمة مرور!'}
-        </p>
-      </motion.div>
+      )}
     </div>
   );
 }

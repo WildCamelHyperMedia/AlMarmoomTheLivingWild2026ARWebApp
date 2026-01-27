@@ -213,7 +213,103 @@ export async function registerRoutes(
     }
   });
 
-  // Login user
+  // User login by name + email (no password needed for regular users)
+  app.post("/api/auth/user-login", async (req, res) => {
+    try {
+      const { name, email } = req.body;
+      
+      if (!name || typeof name !== "string" || name.trim().length < 1) {
+        return res.status(400).json({ error: "Name is required" });
+      }
+      
+      if (!email || typeof email !== "string") {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      const user = await storage.getUserByEmail(email.trim().toLowerCase());
+      if (!user) {
+        return res.status(401).json({ error: "No account found with this email" });
+      }
+
+      // Verify name matches (case insensitive)
+      if (user.name.toLowerCase() !== name.trim().toLowerCase()) {
+        return res.status(401).json({ error: "Name does not match our records" });
+      }
+
+      // Don't allow admin login through this endpoint
+      if (user.isAdmin) {
+        return res.status(401).json({ error: "Admin users must use admin login" });
+      }
+
+      // Log login
+      await storage.createLoginHistory({
+        userId: user.id,
+        userAgent: req.headers["user-agent"] || null,
+        ipAddress: req.ip || req.socket.remoteAddress || null
+      });
+
+      // Create session token
+      const token = generateToken();
+      await storage.createSession({
+        userId: user.id,
+        token,
+        expiresAt: getExpiryDate()
+      });
+
+      const { password: _, ...safeUser } = user;
+      res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Admin login (requires email + password)
+  app.post("/api/auth/admin-login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user || !user.isAdmin) {
+        return res.status(401).json({ error: "Invalid admin credentials" });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "Invalid admin credentials" });
+      }
+
+      // Log login
+      await storage.createLoginHistory({
+        userId: user.id,
+        userAgent: req.headers["user-agent"] || null,
+        ipAddress: req.ip || req.socket.remoteAddress || null
+      });
+
+      // Create session token
+      const token = generateToken();
+      await storage.createSession({
+        userId: user.id,
+        token,
+        expiresAt: getExpiryDate()
+      });
+
+      const { password: _, ...safeUser } = user;
+      res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Login user (legacy - keep for compatibility)
   app.post("/api/auth/login", async (req, res) => {
     try {
       const result = loginSchema.safeParse(req.body);
