@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function BootScreen() {
   const [, setLocation] = useLocation();
@@ -22,36 +22,18 @@ export default function BootScreen() {
   }, [setLocation]);
 
   return (
-    <AnimatePresence>
-      {!fadeOut ? (
-        <motion.div 
-          className="fixed inset-0 bg-black z-50"
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <video
-            src="/videos/boot-screen.mp4"
-            className="h-full w-full object-cover"
-            autoPlay
-            muted
-            playsInline
-          />
-        </motion.div>
-      ) : (
-        <motion.div 
-          className="fixed inset-0 bg-black z-50"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <video
-            src="/videos/boot-screen.mp4"
-            className="h-full w-full object-cover"
-            muted
-            playsInline
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <motion.div 
+      className="fixed inset-0 bg-black z-50 flex items-center justify-center overflow-hidden"
+      animate={{ opacity: fadeOut ? 0 : 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <video
+        src="/videos/boot-screen.mp4"
+        className="w-full h-full object-contain"
+        autoPlay
+        muted
+        playsInline
+      />
+    </motion.div>
   );
 }

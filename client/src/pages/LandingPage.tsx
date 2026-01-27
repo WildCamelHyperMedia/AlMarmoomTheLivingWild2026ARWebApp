@@ -14,11 +14,11 @@ export default function LandingPage() {
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-black text-white">
-      {/* Background Video */}
-      <div className="absolute inset-0 z-0">
+      {/* Background Video - optimized for all screen sizes */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
         <video
           src="/videos/landing-video.mp4"
-          className="h-full w-full object-cover"
+          className="w-full h-full object-contain"
           autoPlay
           muted
           loop
