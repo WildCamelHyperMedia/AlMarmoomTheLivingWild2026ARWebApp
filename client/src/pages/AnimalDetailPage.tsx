@@ -186,7 +186,7 @@ export default function AnimalDetailPage() {
       </div>
 
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 p-6">
         <Link href="/gallery">
           <button 
             className={`p-2 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
