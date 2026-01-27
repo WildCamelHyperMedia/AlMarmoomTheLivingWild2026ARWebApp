@@ -13,9 +13,15 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-black text-white">
+    <div className="relative h-[100dvh] w-full overflow-hidden text-white">
+      {/* Background Image to cover black areas */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/bg-texture.png')" }}
+      />
+      
       {/* Background Video - optimized for all screen sizes */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center">
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
         <video
           src="/videos/landing-video.mp4"
           className="w-full h-full object-contain"
@@ -24,7 +30,7 @@ export default function LandingPage() {
           loop
           playsInline
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
       </div>
 
       {/* Content */}
