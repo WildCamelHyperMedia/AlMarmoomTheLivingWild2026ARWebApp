@@ -185,32 +185,61 @@ export default function AnimalDetailPage() {
         )}
       </div>
 
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
-        <Link href="/gallery">
-          <button 
-            className={`p-2 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
-            data-testid="button-back-to-gallery"
-          >
-            <ArrowLeft className="h-6 w-6 text-white" />
-          </button>
-        </Link>
-        
-        {/* Watch progress indicator - centered */}
-        {isPlaying && !hasRecordedWatch ? (
-          <div className="bg-black/50 backdrop-blur-md rounded-full px-4 py-2">
-            <span className="text-sm text-white/90 font-medium">
-              {watchTime < MIN_WATCH_TIME 
-                ? `${MIN_WATCH_TIME - watchTime}s ${language === 'en' ? 'to earn points' : 'لكسب النقاط'}`
-                : language === 'en' ? 'Points earned!' : 'تم كسب النقاط!'}
-            </span>
+      {/* Header - Unified Control Bar */}
+      <div className="absolute top-0 left-0 right-0 z-50 p-4">
+        <div className="flex items-center justify-between">
+          {/* Left: Back Button */}
+          <Link href="/gallery">
+            <button 
+              className={`w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+              data-testid="button-back-to-gallery"
+            >
+              <ArrowLeft className="h-5 w-5 text-white" />
+            </button>
+          </Link>
+          
+          {/* Center: Points Indicator */}
+          <div className="flex-1 flex justify-center px-4">
+            {isPlaying && !hasRecordedWatch && (
+              <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-2">
+                <span className="text-sm text-white font-medium">
+                  {watchTime < MIN_WATCH_TIME 
+                    ? `${MIN_WATCH_TIME - watchTime}s ${language === 'en' ? 'to earn points' : 'لكسب النقاط'}`
+                    : language === 'en' ? 'Points earned!' : 'تم كسب النقاط!'}
+                </span>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="w-10" />
-        )}
 
-        {/* Placeholder for right side balance when not playing */}
-        <div className="w-10" />
+          {/* Right: Close & Volume (when playing) or placeholder */}
+          <div className="flex items-center gap-2">
+            {isPlaying ? (
+              <>
+                {/* Volume Button with Popup */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-colors text-white"
+                    data-testid="button-toggle-mute"
+                  >
+                    {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </button>
+                </div>
+                
+                {/* Close Button */}
+                <button 
+                  onClick={() => setIsPlaying(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-colors text-white"
+                  data-testid="button-stop-video"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </>
+            ) : (
+              <div className="w-10 h-10" />
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Play Button Overlay */}
@@ -227,46 +256,6 @@ export default function AnimalDetailPage() {
           >
             <Play className="fill-white ml-1 w-8 h-8 group-hover:scale-110 transition-transform" />
           </motion.button>
-        </div>
-      )}
-
-      {/* Stop/Close Button for Video */}
-      {isPlaying && (
-        <div className="absolute top-6 right-6 z-50 flex flex-col items-end gap-3">
-           {/* Close Button */}
-           <button 
-              onClick={() => setIsPlaying(false)}
-              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors"
-              data-testid="button-stop-video"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-           {/* Volume Controls - Compact Vertical */}
-           <div className="flex flex-col items-center bg-black/50 backdrop-blur-md rounded-full p-2">
-             <div className="h-16 flex items-center justify-center">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={isMuted ? 0 : volume}
-                onChange={(e) => {
-                  setVolume(parseFloat(e.target.value));
-                  setIsMuted(false);
-                }}
-                className="w-12 accent-white h-1 bg-white/30 rounded-full appearance-none cursor-pointer -rotate-90 origin-center [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
-                data-testid="input-volume"
-              />
-             </div>
-             <button 
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-1.5 rounded-full text-white hover:bg-white/10 transition-colors"
-                data-testid="button-toggle-mute"
-              >
-                {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
-           </div>
         </div>
       )}
 
