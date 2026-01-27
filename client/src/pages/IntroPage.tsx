@@ -8,7 +8,7 @@ import posterImage from "@assets/generated_images/portrait_of_ali_bin_thalith_in
 
 export default function IntroPage() {
   const [, setLocation] = useLocation();
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { user, isLoading, logout } = useUser();
   
   const [isPlaying, setIsPlaying] = useState(true);
@@ -77,9 +77,9 @@ export default function IntroPage() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full mb-8 z-10 flex justify-between items-start"
       >
-        <div className="text-left">
-          <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">Intro By</h2>
-          <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">Ali Bin Thalith</h1>
+        <div className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+          <h2 className="text-white/60 text-xs tracking-widest uppercase font-sans mb-1">{t("intro.by")}</h2>
+          <h1 className="text-white text-lg tracking-wider uppercase font-serif font-bold">{t("intro.photographer")}</h1>
         </div>
         {user && (
           <button 
