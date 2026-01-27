@@ -50,7 +50,12 @@ export default function IntroPage() {
     }
   };
 
-  const handleContinueToGallery = () => {
+  const handleRegisterNow = () => {
+    setShowPrizePopup(false);
+    setLocation("/auth");
+  };
+
+  const handleSkipToGallery = () => {
     setShowPrizePopup(false);
     setLocation("/gallery");
   };
@@ -300,16 +305,28 @@ export default function IntroPage() {
                 </div>
               </motion.div>
 
-              {/* Continue Button */}
+              {/* Register Button */}
               <motion.button
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                onClick={handleContinueToGallery}
-                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg text-lg tracking-wide"
-                data-testid="button-continue-to-gallery"
+                onClick={handleRegisterNow}
+                className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg text-lg tracking-wide mb-3"
+                data-testid="button-register-now"
               >
-                {t("intro.popup.continue")}
+                {t("intro.popup.register")}
+              </motion.button>
+
+              {/* Skip Button */}
+              <motion.button
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                onClick={handleSkipToGallery}
+                className="w-full text-white/50 hover:text-white/80 font-medium py-2 transition-colors text-sm"
+                data-testid="button-skip-to-gallery"
+              >
+                {t("intro.popup.skip")}
               </motion.button>
             </motion.div>
           </motion.div>
