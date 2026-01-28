@@ -117,13 +117,13 @@ export const animals: Animal[] = [
   },
   {
     id: "houbara_bustard",
-    image: "/animals/All Animals - Pictures/21 Houbara Bustard١.jpg",
+    image: "/animals/All Animals - Pictures/21-Houbara-Bustard.jpg",
     scientificName: "CHLAMYDOTIS UNDULATA",
     arUrl: "https://webxr.run/3oXW15Q3wgyL2"
   },
   {
     id: "dorcas_gazelle",
-    image: "/animals/All Animals - Pictures/22-(Dorcas Gazelle.jpg",
+    image: "/animals/All Animals - Pictures/22-Dorcas-Gazelle.jpg",
     scientificName: "GAZELLA DORCAS",
     arUrl: "https://webxr.run/0Zpa12WOw19wJ"
   },
@@ -136,14 +136,14 @@ export const animals: Animal[] = [
   },
   {
     id: "white_tailed_lapwing",
-    image: "/animals/All Animals - Pictures/25- white tailes lapwing.jpg",
+    image: "/animals/All Animals - Pictures/25-White-Tailed-Lapwing.jpg",
     scientificName: "VANELLUS LEUCURUS",
     video: "/videos/stone_curlew.mp4",
     arUrl: "https://webxr.run/yX7JR9wGGYm2r"
   },
   {
     id: "desert_eagle_owl",
-    image: "/animals/All Animals - Pictures/26- desert eagle owl .jpg",
+    image: "/animals/All Animals - Pictures/26-Desert-Eagle-Owl.jpg",
     scientificName: "BUBO ASCALAPHUS",
     arUrl: "https://webxr.run/nOAvvLXVoYrxk"
   },
