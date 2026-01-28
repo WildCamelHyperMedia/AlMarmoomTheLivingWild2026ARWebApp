@@ -56,36 +56,45 @@
 }
 
 :root {
-  /* Al Marmoom Theme */
-  --background: 14 29% 18%; /* #3A2620 - Dark Brown Base */
-  --foreground: 30 20% 95%; /* Off-white sand */
+  /* Al Marmoom Desert Theme - New Palette */
+  --background: 20 28% 15%; /* #30221b - Treehouse (dark brown) */
+  --foreground: 41 92% 93%; /* #fef3dc - Half Spanish White (cream) */
 
-  --card: 14 29% 22%; /* Slightly lighter than background */
-  --card-foreground: 30 20% 95%;
+  --card: 15 28% 28%; /* #5b3e34 - Millbrook */
+  --card-foreground: 41 92% 93%; /* #fef3dc - Half Spanish White */
 
-  --popover: 14 29% 18%;
-  --popover-foreground: 30 20% 95%;
+  --popover: 20 28% 15%; /* #30221b - Treehouse */
+  --popover-foreground: 41 92% 93%; /* #fef3dc - Half Spanish White */
 
-  --primary: 35 60% 50%; /* Golden Sand Accent */
-  --primary-foreground: 14 29% 18%;
+  --primary: 29 51% 49%; /* #b97d42 - Tussock (golden) */
+  --primary-foreground: 20 28% 15%; /* #30221b - Treehouse */
 
-  --secondary: 14 20% 25%;
-  --secondary-foreground: 30 20% 90%;
+  --secondary: 18 41% 37%; /* #855338 - Potters Clay */
+  --secondary-foreground: 41 92% 93%; /* #fef3dc - Half Spanish White */
 
-  --muted: 14 29% 25%;
-  --muted-foreground: 30 10% 70%;
+  --muted: 15 28% 28%; /* #5b3e34 - Millbrook */
+  --muted-foreground: 27 16% 54%; /* #9d8976 - Pale Oyster */
 
-  --accent: 35 60% 50%;
-  --accent-foreground: 14 29% 18%;
+  --accent: 29 51% 49%; /* #b97d42 - Tussock */
+  --accent-foreground: 20 28% 15%; /* #30221b - Treehouse */
 
   --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive-foreground: 41 92% 93%;
 
-  --border: 14 29% 25%;
-  --input: 14 29% 25%;
-  --ring: 35 60% 50%;
+  --border: 15 28% 28%; /* #5b3e34 - Millbrook */
+  --input: 15 28% 28%; /* #5b3e34 - Millbrook */
+  --ring: 29 51% 49%; /* #b97d42 - Tussock */
 
   --radius: 0.5rem;
+  
+  /* Custom color variables for direct use */
+  --tussock: #b97d42;
+  --treehouse: #30221b;
+  --half-spanish-white: #fef3dc;
+  --akaroa: #d3bea5;
+  --potters-clay: #855338;
+  --pale-oyster: #9d8976;
+  --millbrook: #5b3e34;
 }
 
 @layer base {

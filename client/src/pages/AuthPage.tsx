@@ -201,12 +201,12 @@ export default function AuthPage() {
 
       {/* Mode Tabs */}
       <div className="w-full max-w-sm z-10 mb-6">
-        <div className="flex bg-[#3E2D24]/50 rounded-2xl p-1 backdrop-blur-sm">
+        <div className="flex bg-[#5b3e34]/50 rounded-2xl p-1 backdrop-blur-sm">
           <button
             onClick={() => switchMode("register")}
             className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
               mode === "register" 
-                ? "bg-[#D4A045] text-white shadow-lg" 
+                ? "bg-[#b97d42] text-white shadow-lg" 
                 : "text-white/60 hover:text-white/80"
             }`}
             data-testid="tab-register"
@@ -217,7 +217,7 @@ export default function AuthPage() {
             onClick={() => switchMode("login")}
             className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
               mode === "login" 
-                ? "bg-[#D4A045] text-white shadow-lg" 
+                ? "bg-[#b97d42] text-white shadow-lg" 
                 : "text-white/60 hover:text-white/80"
             }`}
             data-testid="tab-login"
@@ -242,7 +242,7 @@ export default function AuthPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, type: "spring" }}
-                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(212,160,69,0.4)]"
+                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(185,125,66,0.4)]"
               >
                 <User className="w-8 h-8 text-white" />
               </motion.div>
@@ -262,7 +262,7 @@ export default function AuthPage() {
                   placeholder={language === 'en' ? "Your Name" : "اسمك"}
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
                   dir={dir}
                   data-testid="input-name"
                 />
@@ -275,7 +275,7 @@ export default function AuthPage() {
                   placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
                   dir="ltr"
                   data-testid="input-email"
                 />
@@ -297,7 +297,7 @@ export default function AuthPage() {
               whileTap={{ scale: 0.98 }}
               onClick={handleRegister}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(212,160,69,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(185,125,66,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-register"
             >
               {isLoading 
@@ -330,7 +330,7 @@ export default function AuthPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, type: "spring" }}
-                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(212,160,69,0.4)]"
+                className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(185,125,66,0.4)]"
               >
                 <User className="w-8 h-8 text-white" />
               </motion.div>
@@ -350,7 +350,7 @@ export default function AuthPage() {
                   placeholder={language === 'en' ? "Your Name" : "اسمك"}
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
                   dir={dir}
                   data-testid="input-login-name"
                 />
@@ -363,7 +363,7 @@ export default function AuthPage() {
                   placeholder={language === 'en' ? "Email Address" : "البريد الإلكتروني"}
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#D4A045]/50 backdrop-blur-sm pl-12 pr-4"
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
                   dir="ltr"
                   data-testid="input-login-email"
                 />
@@ -385,7 +385,7 @@ export default function AuthPage() {
               whileTap={{ scale: 0.98 }}
               onClick={handleLogin}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(212,160,69,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(185,125,66,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-login"
             >
               {isLoading 
@@ -438,7 +438,7 @@ export default function AuthPage() {
                   placeholder={language === 'en' ? "Admin Email" : "بريد المدير"}
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-white/20 backdrop-blur-sm pl-12 pr-4"
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-white/20 backdrop-blur-sm pl-12 pr-4"
                   dir="ltr"
                   data-testid="input-admin-email"
                 />
@@ -451,7 +451,7 @@ export default function AuthPage() {
                   placeholder={language === 'en' ? "Password" : "كلمة المرور"}
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="bg-[#3E2D24]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-white/20 backdrop-blur-sm pl-12 pr-4"
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-white/20 backdrop-blur-sm pl-12 pr-4"
                   dir="ltr"
                   data-testid="input-admin-password"
                 />

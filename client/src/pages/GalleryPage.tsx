@@ -97,7 +97,7 @@ export default function GalleryPage() {
               data-testid="button-admin"
               title={language === 'en' ? 'Admin Dashboard' : 'لوحة الإدارة'}
             >
-              <Shield className="h-5 w-5 text-[#D4A045]" />
+              <Shield className="h-5 w-5 text-[#b97d42]" />
             </button>
           )}
           {!user && (

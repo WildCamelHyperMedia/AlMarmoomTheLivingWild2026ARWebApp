@@ -134,7 +134,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
             <button 
               onClick={handleSave}
               disabled={isLoading}
-              className="w-full bg-[#D4A045] hover:bg-[#c4923e] text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#b97d42] hover:bg-[#855338] text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-save-progress"
             >
               {isLoading 

@@ -1,0 +1,26 @@
+/* CSS HEX */
+--tussock: #b97d42;
+--treehouse: #30221b;
+--half-spanish-white: #fef3dc;
+--akaroa: #d3bea5;
+--potters-clay: #855338;
+--pale-oyster: #9d8976;
+--millbrook: #5b3e34;
+
+/* SCSS HEX */
+$tussock: #b97d42;
+$treehouse: #30221b;
+$half-spanish-white: #fef3dc;
+$akaroa: #d3bea5;
+$potters-clay: #855338;
+$pale-oyster: #9d8976;
+$millbrook: #5b3e34;
+
+/* SCSS RGB */
+$tussock: rgba(185,125,66,1);
+$treehouse: rgba(48,34,27,1);
+$half-spanish-white: rgba(254,243,220,1);
+$akaroa: rgba(211,190,165,1);
+$potters-clay: rgba(133,83,56,1);
+$pale-oyster: rgba(157,137,118,1);
+$millbrook: rgba(91,62,52,1);

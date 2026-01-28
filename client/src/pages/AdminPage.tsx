@@ -203,7 +203,7 @@ export default function AdminPage() {
                 onClick={() => { setCurrentView(item.id); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   currentView === item.id 
-                    ? "bg-[#D4A045] text-background" 
+                    ? "bg-[#b97d42] text-background" 
                     : "hover:bg-white/10 text-white/80"
                 }`}
               >
@@ -227,8 +227,8 @@ export default function AdminPage() {
           {/* User Info & Logout */}
           <div className="p-4 border-t border-white/10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#D4A045]/20 flex items-center justify-center">
-                <span className="text-[#D4A045] font-bold">{user.name.charAt(0).toUpperCase()}</span>
+              <div className="w-10 h-10 rounded-full bg-[#b97d42]/20 flex items-center justify-center">
+                <span className="text-[#b97d42] font-bold">{user.name.charAt(0).toUpperCase()}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{user.name}</p>
@@ -290,7 +290,7 @@ export default function AdminPage() {
                           return (
                             <div key={i} className="flex-1 flex flex-col items-center gap-1">
                               <div 
-                                className="w-full bg-[#D4A045] rounded-t transition-all hover:bg-[#D4A045]/80"
+                                className="w-full bg-[#b97d42] rounded-t transition-all hover:bg-[#b97d42]/80"
                                 style={{ height: `${Math.max(height, 4)}%` }}
                                 title={`${stat.date}: ${stat.count} logins`}
                               />
@@ -319,7 +319,7 @@ export default function AdminPage() {
                               <p className="font-medium truncate">{user.name}</p>
                               <p className="text-xs text-white/50 truncate">{user.email}</p>
                             </div>
-                            <div className="text-[#D4A045] font-bold">{user.videosWatched}</div>
+                            <div className="text-[#b97d42] font-bold">{user.videosWatched}</div>
                           </div>
                         ))}
                       </div>
@@ -332,7 +332,7 @@ export default function AdminPage() {
                       <h3 className="font-semibold">Recent Logins</h3>
                       <button 
                         onClick={() => setCurrentView("history")}
-                        className="text-sm text-[#D4A045] hover:underline flex items-center gap-1"
+                        className="text-sm text-[#b97d42] hover:underline flex items-center gap-1"
                       >
                         View All <ChevronRight className="w-4 h-4" />
                       </button>
@@ -360,7 +360,7 @@ export default function AdminPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={exportUsersToCSV}
-                        className="flex items-center gap-2 px-3 py-2 bg-[#D4A045] text-background rounded-lg font-medium text-sm hover:bg-[#D4A045]/90 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 bg-[#b97d42] text-background rounded-lg font-medium text-sm hover:bg-[#b97d42]/90 transition-colors"
                       >
                         <Download className="w-4 h-4" />
                         <span className="hidden sm:inline">Export CSV</span>
@@ -383,7 +383,7 @@ export default function AdminPage() {
                           </div>
                           <button 
                             onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.watchedVideos || [] })}
-                            className="bg-[#D4A045]/20 text-[#D4A045] px-3 py-1 rounded-full text-sm font-bold hover:bg-[#D4A045]/30 transition-colors"
+                            className="bg-[#b97d42]/20 text-[#b97d42] px-3 py-1 rounded-full text-sm font-bold hover:bg-[#b97d42]/30 transition-colors"
                           >
                             {user.videosWatched} videos
                           </button>
@@ -423,7 +423,7 @@ export default function AdminPage() {
                               <td className="p-4">
                                 <button 
                                   onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.watchedVideos || [] })}
-                                  className="bg-[#D4A045]/20 text-[#D4A045] px-2 py-1 rounded-full text-sm hover:bg-[#D4A045]/30 transition-colors cursor-pointer"
+                                  className="bg-[#b97d42]/20 text-[#b97d42] px-2 py-1 rounded-full text-sm hover:bg-[#b97d42]/30 transition-colors cursor-pointer"
                                 >
                                   {user.videosWatched}
                                 </button>
@@ -502,14 +502,14 @@ export default function AdminPage() {
 
                   {/* Most Engaged Animal */}
                   {mostEngagedAnimal && (
-                    <div className="bg-gradient-to-r from-[#D4A045]/20 to-[#D4A045]/5 rounded-xl p-4 border border-[#D4A045]/30">
+                    <div className="bg-gradient-to-r from-[#b97d42]/20 to-[#b97d42]/5 rounded-xl p-4 border border-[#b97d42]/30">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#D4A045]/20 flex items-center justify-center">
-                          <Star className="w-6 h-6 text-[#D4A045]" />
+                        <div className="w-12 h-12 rounded-full bg-[#b97d42]/20 flex items-center justify-center">
+                          <Star className="w-6 h-6 text-[#b97d42]" />
                         </div>
                         <div className="flex-1">
                           <p className="text-xs text-white/50 uppercase tracking-wider">Most Engaged Animal</p>
-                          <p className="text-lg font-bold text-[#D4A045]">{mostEngagedAnimal.name}</p>
+                          <p className="text-lg font-bold text-[#b97d42]">{mostEngagedAnimal.name}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold">{mostEngagedAnimal.count}</p>
@@ -598,11 +598,11 @@ export default function AdminPage() {
                                 key={user.id}
                                 className="bg-[#2A1F1A]/80 rounded-lg p-4 text-center hover:bg-[#2A1F1A] transition-colors"
                               >
-                                <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-[#D4A045]/10 flex items-center justify-center">
-                                  <span className="text-[#D4A045] font-bold">{i + 4}</span>
+                                <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-[#b97d42]/10 flex items-center justify-center">
+                                  <span className="text-[#b97d42] font-bold">{i + 4}</span>
                                 </div>
                                 <p className="font-medium truncate text-sm">{user.name}</p>
-                                <p className="text-lg font-bold text-[#D4A045] mt-1">{user.videosWatched}</p>
+                                <p className="text-lg font-bold text-[#b97d42] mt-1">{user.videosWatched}</p>
                                 <p className="text-[10px] text-white/40">videos</p>
                               </div>
                             ))}
@@ -618,7 +618,7 @@ export default function AdminPage() {
                           <div key={user.id} className="flex items-center gap-3 bg-[#2A1F1A] p-4 rounded-lg">
                             <span className="text-xl">{i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
                             <span className="flex-1 font-medium">{user.name}</span>
-                            <span className="text-[#D4A045] font-bold">{user.videosWatched}</span>
+                            <span className="text-[#b97d42] font-bold">{user.videosWatched}</span>
                           </div>
                         ))}
                       </div>
@@ -659,7 +659,7 @@ export default function AdminPage() {
                     key={animalId} 
                     className="flex items-center gap-3 p-3 bg-[#3E2D24]/60 rounded-lg"
                   >
-                    <span className="w-6 h-6 rounded-full bg-[#D4A045]/20 flex items-center justify-center text-xs text-[#D4A045]">
+                    <span className="w-6 h-6 rounded-full bg-[#b97d42]/20 flex items-center justify-center text-xs text-[#b97d42]">
                       {i + 1}
                     </span>
                     <span className="flex-1">{getAnimalName(animalId)}</span>

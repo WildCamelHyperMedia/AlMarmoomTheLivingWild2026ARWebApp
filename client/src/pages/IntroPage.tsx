@@ -237,9 +237,9 @@ export default function IntroPage() {
             className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
           >
             {/* Animated Background */}
-            <div className="absolute inset-0 bg-[#1a0f0a]">
+            <div className="absolute inset-0 bg-[#30221b]">
               <div className="absolute inset-0 bg-[url('/images/desert-dunes.jpg')] bg-cover bg-center opacity-30" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-transparent to-[#1a0f0a]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#30221b] via-transparent to-[#30221b]" />
             </div>
 
             {/* Floating Golden Particles */}
@@ -259,7 +259,7 @@ export default function IntroPage() {
                     delay: i * 0.3,
                     ease: "easeOut"
                   }}
-                  className="absolute w-2 h-2 rounded-full bg-[#D4A045]"
+                  className="absolute w-2 h-2 rounded-full bg-[#b97d42]"
                   style={{ filter: "blur(1px)" }}
                 />
               ))}
@@ -279,13 +279,13 @@ export default function IntroPage() {
                 transition={{ delay: 0.3, type: "spring", damping: 12 }}
                 className="relative mx-auto mb-6"
               >
-                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center shadow-[0_0_60px_rgba(212,160,69,0.5)]">
+                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-[0_0_60px_rgba(185,125,66,0.5)]">
                   <Gift className="w-12 h-12 text-white" />
                 </div>
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 rounded-full border-2 border-dashed border-[#D4A045]/30"
+                  className="absolute inset-0 rounded-full border-2 border-dashed border-[#b97d42]/30"
                   style={{ margin: "-8px" }}
                 />
               </motion.div>
@@ -295,8 +295,8 @@ export default function IntroPage() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-4xl font-bold text-[#D4A045] font-serif mb-4"
-                style={{ textShadow: "0 0 40px rgba(212,160,69,0.6)" }}
+                className="text-4xl font-bold text-[#b97d42] font-serif mb-4"
+                style={{ textShadow: "0 0 40px rgba(185,125,66,0.6)" }}
               >
                 {t("intro.popup.title")}
               </motion.h2>
@@ -321,9 +321,9 @@ export default function IntroPage() {
                 {/* Prize 1 */}
                 <motion.div 
                   whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#D4A045]/20"
+                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#b97d42]/20"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center shadow-lg flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-lg flex-shrink-0">
                     <Camera className="w-6 h-6 text-white" />
                   </div>
                   <span className="text-white font-semibold text-lg">{t("intro.popup.prize1")}</span>
@@ -332,9 +332,9 @@ export default function IntroPage() {
                 {/* Prize 2 */}
                 <motion.div 
                   whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#D4A045]/20"
+                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#b97d42]/20"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center shadow-lg flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-lg flex-shrink-0">
                     <Book className="w-6 h-6 text-white" />
                   </div>
                   <span className="text-white font-semibold text-lg">{t("intro.popup.prize2")}</span>
@@ -343,9 +343,9 @@ export default function IntroPage() {
                 {/* Prize 3 */}
                 <motion.div 
                   whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#D4A045]/20"
+                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#b97d42]/20"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D4A045] to-[#8B6914] flex items-center justify-center shadow-lg flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-lg flex-shrink-0">
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <span className="text-white font-semibold text-lg">{t("intro.popup.prize3")}</span>
@@ -362,7 +362,7 @@ export default function IntroPage() {
                 {/* Register Button with Shine Effect */}
                 <button
                   onClick={handleRegisterNow}
-                  className="relative w-full bg-gradient-to-r from-[#D4A045] to-[#B8860B] text-white font-bold py-4 px-8 rounded-2xl text-lg tracking-wide shadow-[0_4px_30px_rgba(212,160,69,0.4)] hover:shadow-[0_4px_40px_rgba(212,160,69,0.6)] transition-all active:scale-[0.98] overflow-hidden group"
+                  className="relative w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 px-8 rounded-2xl text-lg tracking-wide shadow-[0_4px_30px_rgba(185,125,66,0.4)] hover:shadow-[0_4px_40px_rgba(185,125,66,0.6)] transition-all active:scale-[0.98] overflow-hidden group"
                   data-testid="button-register-now"
                 >
                   <span className="relative z-10">{t("intro.popup.register")}</span>
