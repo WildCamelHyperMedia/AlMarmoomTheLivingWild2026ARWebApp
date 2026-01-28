@@ -147,7 +147,6 @@ export default function IntroPage() {
                     src="/videos/ali-intro.mp4"
                     className="w-full h-full object-cover"
                     autoPlay
-                    muted
                     playsInline
                     onEnded={() => setCanProceed(true)}
                 />
