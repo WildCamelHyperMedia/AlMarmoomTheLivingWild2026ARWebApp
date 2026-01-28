@@ -49,6 +49,16 @@ Preferred communication style: Simple, everyday language.
 - **Features**: Bilingual responses (English/Arabic), context-aware animal information
 - **Environment Variables**: `AI_INTEGRATIONS_OPENAI_API_KEY`, `AI_INTEGRATIONS_OPENAI_BASE_URL` (auto-configured by Replit)
 
+### QR Unlock System (BETA)
+- **Scanner**: html5-qrcode library for camera-based QR code scanning
+- **QR Code Generation**: qrcode library for generating unique QR codes per animal
+- **Validation**: Server-side whitelist validation against shared/qrCodes.ts
+- **Endpoint**: POST `/api/unlock-animal` - validates QR code and unlocks animal
+- **QR Code Format**: `TLW-{animalId}-{token}` (e.g., TLW-desert_hare-DH2024-MJ7P3C8Z)
+- **QR Assets**: Generated QR codes stored in `/client/public/qr-codes/`
+- **HTML Preview**: `/qr-codes.html` - printable page with all 24 animal QR codes
+- **Gallery Integration**: Locked animals shown with grayscale/blur, unlock prompt redirects to scanner
+
 ### Key Design Patterns
 - **Shared Types**: Schema definitions in `/shared/schema.ts` are used by both frontend and backend for type consistency
 - **Storage Abstraction**: `IStorage` interface in `server/storage.ts` allows for different storage implementations
