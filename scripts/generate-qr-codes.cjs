@@ -2,8 +2,8 @@ const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
-// Base URL for the deployed app - update this to match your deployment URL
-const BASE_URL = process.env.BASE_URL || 'https://the-living-wild.replit.app';
+// Base URL for the deployed app - using custom domain
+const BASE_URL = process.env.BASE_URL || 'http://app.almarmoomthelivingwild.ae';
 
 // QR signature generation (must match shared/qrSignature.ts)
 const QR_SECRET = "TLW-2024-ALMARMOOM-RESERVE";
