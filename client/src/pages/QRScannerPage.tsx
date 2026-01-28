@@ -88,20 +88,68 @@ export default function QRScannerPage() {
     }
   };
 
+  // Extract animal ID and signature from URL format or legacy token format
+  const extractQRData = (code: string): { animalId: string | null; signature: string | null; isUrl: boolean } => {
+    // Check if it's a URL format (e.g., https://app.replit.app/animal/desert_hare?qr=unlock&sig=XXXX)
+    try {
+      const url = new URL(code);
+      const pathMatch = url.pathname.match(/\/animal\/([a-z_]+)/);
+      if (pathMatch && pathMatch[1]) {
+        const signature = url.searchParams.get('sig');
+        return { animalId: pathMatch[1], signature, isUrl: true };
+      }
+    } catch {
+      // Not a URL, try legacy token format
+    }
+    
+    // Legacy token format: TLW-{animalId}-{token}
+    const validation = validateQRCode(code);
+    if (validation.valid && validation.animalId) {
+      return { animalId: validation.animalId, signature: null, isUrl: false };
+    }
+    
+    return { animalId: null, signature: null, isUrl: false };
+  };
+
   const handleQRCode = async (code: string) => {
     try {
+      // Extract animal ID and signature from either URL or token format
+      const { animalId, signature, isUrl } = extractQRData(code);
+      
+      if (!animalId) {
+        setResult({
+          success: false,
+          message: t("invalidCode")
+        });
+        return;
+      }
+      
+      // Verify animal exists
+      const animal = animals.find(a => a.id === animalId);
+      if (!animal) {
+        setResult({
+          success: false,
+          message: t("invalidCode")
+        });
+        return;
+      }
+      
       if (user) {
         // Logged-in user: use server API
-        const response = await apiRequest("POST", "/api/unlock-animal", { qrCode: code });
+        // For URL-based QR codes, send signature; for legacy, send qrCode
+        const payload = isUrl && signature 
+          ? { animalId, signature }
+          : { qrCode: code };
+        
+        const response = await apiRequest("POST", "/api/unlock-animal", payload);
         const data = await response.json();
         
         if (data.success) {
-          const animal = animals.find(a => a.id === data.animalId);
           await refreshProgress();
           setResult({
             success: true,
             animalId: data.animalId,
-            animalName: animal?.id || data.animalId,
+            animalName: animal.id,
             alreadyUnlocked: data.alreadyUnlocked
           });
         } else {
@@ -111,32 +159,42 @@ export default function QRScannerPage() {
           });
         }
       } else {
-        // Guest user: validate locally and store in localStorage
-        const validation = validateQRCode(code);
-        if (validation.valid && validation.animalId) {
-          const storedUnlocked = localStorage.getItem("unlockedAnimals");
-          const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
-          const alreadyUnlocked = unlocked.includes(validation.animalId);
-          
-          if (!alreadyUnlocked) {
-            unlocked.push(validation.animalId);
-            localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
-          }
-          
-          await refreshProgress();
-          const animal = animals.find(a => a.id === validation.animalId);
-          setResult({
-            success: true,
-            animalId: validation.animalId,
-            animalName: animal?.id || validation.animalId,
-            alreadyUnlocked
-          });
-        } else {
+        // Guest user: validate via public API first, then store in localStorage
+        const payload = isUrl && signature 
+          ? { animalId, signature }
+          : { qrCode: code };
+        
+        const validateResponse = await fetch("/api/validate-qr", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const validation = await validateResponse.json();
+        
+        if (!validation.valid) {
           setResult({
             success: false,
-            message: t("invalidCode")
+            message: validation.message || t("invalidCode")
           });
+          return;
         }
+        
+        const storedUnlocked = localStorage.getItem("unlockedAnimals");
+        const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
+        const alreadyUnlocked = unlocked.includes(animalId);
+        
+        if (!alreadyUnlocked) {
+          unlocked.push(animalId);
+          localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
+        }
+        
+        await refreshProgress();
+        setResult({
+          success: true,
+          animalId,
+          animalName: animal.id,
+          alreadyUnlocked
+        });
       }
     } catch (err) {
       console.error("Unlock error:", err);

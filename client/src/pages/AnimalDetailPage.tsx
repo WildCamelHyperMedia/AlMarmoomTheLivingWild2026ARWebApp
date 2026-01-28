@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX } from "lucide-react";
-import { Link, useRoute, useLocation } from "wouter";
+import { Link, useRoute, useLocation, useSearch } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
 import { useState, useRef, useEffect } from "react";
@@ -8,6 +8,7 @@ import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
 import SaveProgressModal from "@/components/SaveProgressModal";
+import { apiRequest } from "@/lib/queryClient";
 
 const voiceoverMap: Record<string, { en: string; ar: string }> = {
   eurasian_stone_curlew: {
@@ -21,9 +22,10 @@ const MIN_WATCH_TIME = 10; // seconds
 export default function AnimalDetailPage() {
   const [, params] = useRoute("/animal/:id");
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const { t, dir, language } = useLanguage();
   const { user, isLoading: userLoading } = useUser();
-  const { recordVideoWatch, hasWatched } = useProgress();
+  const { recordVideoWatch, hasWatched, refreshProgress } = useProgress();
 
   const animal = animals.find((a) => a.id === params?.id);
   
@@ -34,10 +36,61 @@ export default function AnimalDetailPage() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [watchTime, setWatchTime] = useState(0);
   const [hasRecordedWatch, setHasRecordedWatch] = useState(false);
+  const [qrUnlockProcessed, setQrUnlockProcessed] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentAnimalIdRef = useRef<string | null>(null);
+  
+  // Auto-unlock when accessed via QR code URL (?qr=unlock&sig=XXXX)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(searchString);
+    const isQrUnlock = urlParams.get('qr') === 'unlock';
+    const signature = urlParams.get('sig');
+    
+    if (isQrUnlock && signature && animal && !qrUnlockProcessed) {
+      setQrUnlockProcessed(true);
+      
+      const performUnlock = async () => {
+        try {
+          if (user) {
+            // Logged-in user: use server API with signature
+            await apiRequest("POST", "/api/unlock-animal", { 
+              animalId: animal.id,
+              signature: signature 
+            });
+            await refreshProgress();
+          } else {
+            // Guest user: validate via public API endpoint first
+            const validateResponse = await fetch("/api/validate-qr", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ animalId: animal.id, signature })
+            });
+            const validation = await validateResponse.json();
+            
+            if (validation.valid) {
+              const storedUnlocked = localStorage.getItem("unlockedAnimals");
+              const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
+              if (!unlocked.includes(animal.id)) {
+                unlocked.push(animal.id);
+                localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
+                await refreshProgress();
+              }
+            } else {
+              console.error("Invalid QR code:", validation.message);
+            }
+          }
+          // Remove the qr param from URL to prevent re-processing
+          setLocation(`/animal/${animal.id}`, { replace: true });
+        } catch (err) {
+          console.error("Auto-unlock error:", err);
+        }
+      };
+      
+      performUnlock();
+    }
+  }, [searchString, animal, user, qrUnlockProcessed, refreshProgress, setLocation]);
   
   // Reset state when animal changes
   useEffect(() => {
@@ -45,6 +98,7 @@ export default function AnimalDetailPage() {
       currentAnimalIdRef.current = animal.id;
       setWatchTime(0);
       setHasRecordedWatch(hasWatched(animal.id));
+      setQrUnlockProcessed(false);
     }
   }, [animal, hasWatched]);
 

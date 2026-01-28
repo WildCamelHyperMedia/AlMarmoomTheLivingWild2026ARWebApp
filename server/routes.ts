@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, updateUserProgressSchema, loginSchema, animalGuideRequestSchema } from "@shared/schema";
 import { animalQRCodes, validateQRCode } from "@shared/qrCodes";
+import { validateQRSignature } from "@shared/qrSignature";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import OpenAI from "openai";
@@ -608,23 +609,62 @@ export async function registerRoutes(
     }
   });
 
+  // Public QR validation endpoint for guests (BETA)
+  app.post("/api/validate-qr", async (req, res) => {
+    try {
+      const { animalId, signature, qrCode } = req.body;
+      
+      // Support both URL-based (animalId + signature) and legacy (qrCode) formats
+      if (animalId && signature) {
+        if (!validateQRSignature(animalId, signature)) {
+          return res.json({ valid: false, message: "Invalid QR signature" });
+        }
+        if (!VALID_ANIMAL_IDS.includes(animalId)) {
+          return res.json({ valid: false, message: "Unknown animal" });
+        }
+        return res.json({ valid: true, animalId });
+      } else if (qrCode) {
+        const validation = validateQRCode(qrCode);
+        if (!validation.valid || !validation.animalId) {
+          return res.json({ valid: false, message: "Invalid QR code" });
+        }
+        return res.json({ valid: true, animalId: validation.animalId });
+      }
+      
+      return res.json({ valid: false, message: "Invalid request" });
+    } catch (error: any) {
+      console.error("QR validation error:", error);
+      res.status(500).json({ valid: false, message: "Validation failed" });
+    }
+  });
+
   // QR Code unlock animal endpoint (BETA)
   app.post("/api/unlock-animal", authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
-      const { qrCode } = req.body;
-      if (!qrCode || typeof qrCode !== "string") {
-        return res.status(400).json({ success: false, message: "Invalid QR code" });
-      }
-
-      // Validate QR code against whitelist
-      const validation = validateQRCode(qrCode);
-      if (!validation.valid || !validation.animalId) {
-        return res.status(400).json({ success: false, message: "Invalid or unrecognized QR code" });
-      }
-
-      const animalId = validation.animalId;
+      const { qrCode, animalId: directAnimalId, signature } = req.body;
       
-      // Double-check animal exists in VALID_ANIMAL_IDS
+      let animalId: string | undefined;
+      
+      // Support both direct animalId with signature and legacy qrCode formats
+      if (directAnimalId && typeof directAnimalId === "string" && signature && typeof signature === "string") {
+        // Direct animal ID with signature (from URL-based QR codes)
+        // Validate the signature to ensure this came from a valid QR code
+        if (!validateQRSignature(directAnimalId, signature)) {
+          return res.status(400).json({ success: false, message: "Invalid QR signature" });
+        }
+        animalId = directAnimalId;
+      } else if (qrCode && typeof qrCode === "string") {
+        // Legacy QR code format - validate against whitelist
+        const validation = validateQRCode(qrCode);
+        if (!validation.valid || !validation.animalId) {
+          return res.status(400).json({ success: false, message: "Invalid or unrecognized QR code" });
+        }
+        animalId = validation.animalId;
+      } else {
+        return res.status(400).json({ success: false, message: "Valid QR code or signed animal ID required" });
+      }
+      
+      // Validate animal exists in VALID_ANIMAL_IDS
       if (!VALID_ANIMAL_IDS.includes(animalId)) {
         return res.status(400).json({ success: false, message: "Unknown animal" });
       }
