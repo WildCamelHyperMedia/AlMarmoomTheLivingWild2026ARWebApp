@@ -158,8 +158,8 @@ export default function AnimalDetailPage() {
       {/* Hidden voiceover audio element */}
       <audio ref={voiceoverRef} />
       
-      {/* Background Media (Full Screen) */}
-      <div className="absolute inset-0 z-0">
+      {/* Background Media (with space for bottom content) */}
+      <div className="absolute inset-0 bottom-[220px] z-0">
         {/* Render either video or image as background */}
         {isPlaying && currentVideo ? (
           <video 
@@ -183,11 +183,10 @@ export default function AnimalDetailPage() {
             onError={(e) => { e.currentTarget.src = animal.image; }}
           />
         )}
-        
-        {/* Gradient overlays on top of video/image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
       </div>
+      
+      {/* Dark background for bottom area */}
+      <div className="absolute bottom-0 left-0 right-0 h-[220px] bg-gradient-to-t from-black via-black/95 to-transparent z-5" />
 
       {/* Header - Unified Control Bar */}
       <div className="absolute top-0 left-0 right-0 z-50 p-4">
