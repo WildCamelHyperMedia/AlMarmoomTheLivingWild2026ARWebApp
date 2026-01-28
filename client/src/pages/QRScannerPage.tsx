@@ -8,6 +8,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { animals } from "@/lib/data";
 import { apiRequest } from "@/lib/queryClient";
 import { useProgress } from "@/lib/progress";
+import { validateQRCode } from "@shared/qrCodes";
 
 interface UnlockResult {
   success: boolean;
@@ -89,23 +90,53 @@ export default function QRScannerPage() {
 
   const handleQRCode = async (code: string) => {
     try {
-      const response = await apiRequest("POST", "/api/unlock-animal", { qrCode: code });
-      const data = await response.json();
-      
-      if (data.success) {
-        const animal = animals.find(a => a.id === data.animalId);
-        await refreshProgress();
-        setResult({
-          success: true,
-          animalId: data.animalId,
-          animalName: animal?.id || data.animalId,
-          alreadyUnlocked: data.alreadyUnlocked
-        });
+      if (user) {
+        // Logged-in user: use server API
+        const response = await apiRequest("POST", "/api/unlock-animal", { qrCode: code });
+        const data = await response.json();
+        
+        if (data.success) {
+          const animal = animals.find(a => a.id === data.animalId);
+          await refreshProgress();
+          setResult({
+            success: true,
+            animalId: data.animalId,
+            animalName: animal?.id || data.animalId,
+            alreadyUnlocked: data.alreadyUnlocked
+          });
+        } else {
+          setResult({
+            success: false,
+            message: data.message || t("invalidCode")
+          });
+        }
       } else {
-        setResult({
-          success: false,
-          message: data.message || t("invalidCode")
-        });
+        // Guest user: validate locally and store in localStorage
+        const validation = validateQRCode(code);
+        if (validation.valid && validation.animalId) {
+          const storedUnlocked = localStorage.getItem("unlockedAnimals");
+          const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
+          const alreadyUnlocked = unlocked.includes(validation.animalId);
+          
+          if (!alreadyUnlocked) {
+            unlocked.push(validation.animalId);
+            localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
+          }
+          
+          await refreshProgress();
+          const animal = animals.find(a => a.id === validation.animalId);
+          setResult({
+            success: true,
+            animalId: validation.animalId,
+            animalName: animal?.id || validation.animalId,
+            alreadyUnlocked
+          });
+        } else {
+          setResult({
+            success: false,
+            message: t("invalidCode")
+          });
+        }
       }
     } catch (err) {
       console.error("Unlock error:", err);
@@ -121,22 +152,6 @@ export default function QRScannerPage() {
       stopScanner();
     };
   }, []);
-
-  if (!user) {
-    return (
-      <div className="h-[100dvh] w-full bg-background flex flex-col items-center justify-center p-6" dir={dir}>
-        <XCircle className="h-16 w-16 text-red-400 mb-4" />
-        <p className="text-white text-center mb-4">{t("loginRequired")}</p>
-        <button
-          onClick={() => setLocation("/auth")}
-          className="px-6 py-3 bg-[#b97d42] text-white rounded-lg"
-          data-testid="button-login"
-        >
-          {language === 'en' ? 'Login' : 'تسجيل الدخول'}
-        </button>
-      </div>
-    );
-  }
 
   return (
     <motion.div
