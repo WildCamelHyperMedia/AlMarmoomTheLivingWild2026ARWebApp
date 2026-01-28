@@ -227,161 +227,120 @@ export default function IntroPage() {
         </motion.div>
       </div>
 
-      {/* Prize Popup Modal - Full Screen Takeover */}
+      {/* Prize Popup Modal - Elegant Card Design */}
       <AnimatePresence>
         {showPrizePopup && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+            className="fixed inset-0 z-50 flex items-center justify-center p-6"
           >
-            {/* Animated Background */}
-            <div className="absolute inset-0 bg-[#30221b]">
-              <div className="absolute inset-0 bg-[url('/images/desert-dunes.jpg')] bg-cover bg-center opacity-30" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#30221b] via-transparent to-[#30221b]" />
-            </div>
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={handleSkipToGallery}
+            />
 
-            {/* Floating Golden Particles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ y: "100vh", x: `${Math.random() * 100}vw`, opacity: 0 }}
-                  animate={{ 
-                    y: "-20vh", 
-                    opacity: [0, 1, 1, 0],
-                    scale: [0.5, 1, 0.5]
-                  }}
-                  transition={{ 
-                    duration: 4 + Math.random() * 3,
-                    repeat: Infinity,
-                    delay: i * 0.3,
-                    ease: "easeOut"
-                  }}
-                  className="absolute w-2 h-2 rounded-full bg-[#b97d42]"
-                  style={{ filter: "blur(1px)" }}
-                />
-              ))}
-            </div>
-
-            {/* Content */}
+            {/* Card */}
             <motion.div 
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring", damping: 20 }}
-              className="relative z-10 text-center px-8 max-w-md"
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-sm bg-[#fef3dc] rounded-3xl overflow-hidden shadow-2xl"
             >
-              {/* Animated Trophy/Gift Icon */}
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.3, type: "spring", damping: 12 }}
-                className="relative mx-auto mb-6"
-              >
-                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-[0_0_60px_rgba(185,125,66,0.5)]">
-                  <Gift className="w-12 h-12 text-white" />
-                </div>
+              {/* Decorative Top Bar */}
+              <div className="h-2 bg-gradient-to-r from-[#b97d42] via-[#d3bea5] to-[#b97d42]" />
+              
+              {/* Content */}
+              <div className="p-8 text-center">
+                {/* Icon */}
                 <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 rounded-full border-2 border-dashed border-[#b97d42]/30"
-                  style={{ margin: "-8px" }}
-                />
-              </motion.div>
-
-              {/* Title with Glow */}
-              <motion.h2
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-4xl font-bold text-[#b97d42] font-serif mb-4"
-                style={{ textShadow: "0 0 40px rgba(185,125,66,0.6)" }}
-              >
-                {t("intro.popup.title")}
-              </motion.h2>
-
-              {/* Message */}
-              <motion.p
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-white/90 text-base leading-relaxed mb-8"
-              >
-                {t("intro.popup.message")}
-              </motion.p>
-
-              {/* Prize Cards - Horizontal Scroll on Mobile */}
-              <motion.div
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="flex flex-col gap-3 mb-8"
-              >
-                {/* Prize 1 */}
-                <motion.div 
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#b97d42]/20"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", damping: 12 }}
+                  className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#30221b] flex items-center justify-center shadow-lg"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-lg flex-shrink-0">
-                    <Camera className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-white font-semibold text-lg">{t("intro.popup.prize1")}</span>
+                  <Gift className="w-10 h-10 text-[#b97d42]" />
                 </motion.div>
 
-                {/* Prize 2 */}
-                <motion.div 
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#b97d42]/20"
+                {/* Title */}
+                <motion.h2
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-2xl font-bold text-[#30221b] font-serif mb-3"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-lg flex-shrink-0">
-                    <Book className="w-6 h-6 text-white" />
+                  {t("intro.popup.title")}
+                </motion.h2>
+
+                {/* Message */}
+                <motion.p
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-[#5b3e34] text-sm leading-relaxed mb-6"
+                >
+                  {t("intro.popup.message")}
+                </motion.p>
+
+                {/* Prize List */}
+                <motion.div
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-3 mb-8"
+                >
+                  {/* Prize 1 */}
+                  <div className="flex items-center gap-3 bg-[#30221b] rounded-xl p-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#b97d42] flex items-center justify-center flex-shrink-0">
+                      <Camera className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-[#fef3dc] font-medium text-left">{t("intro.popup.prize1")}</span>
                   </div>
-                  <span className="text-white font-semibold text-lg">{t("intro.popup.prize2")}</span>
+
+                  {/* Prize 2 */}
+                  <div className="flex items-center gap-3 bg-[#30221b] rounded-xl p-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#b97d42] flex items-center justify-center flex-shrink-0">
+                      <Book className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-[#fef3dc] font-medium text-left">{t("intro.popup.prize2")}</span>
+                  </div>
+
+                  {/* Prize 3 */}
+                  <div className="flex items-center gap-3 bg-[#30221b] rounded-xl p-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#b97d42] flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-[#fef3dc] font-medium text-left">{t("intro.popup.prize3")}</span>
+                  </div>
                 </motion.div>
 
-                {/* Prize 3 */}
-                <motion.div 
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-4 bg-gradient-to-r from-white/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-[#b97d42]/20"
+                {/* Buttons */}
+                <motion.div
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="space-y-3"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center shadow-lg flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-white font-semibold text-lg">{t("intro.popup.prize3")}</span>
+                  <button
+                    onClick={handleRegisterNow}
+                    className="w-full bg-[#b97d42] hover:bg-[#855338] text-white font-bold py-4 rounded-xl text-lg transition-all active:scale-[0.98] shadow-lg"
+                    data-testid="button-register-now"
+                  >
+                    {t("intro.popup.register")}
+                  </button>
+
+                  <button
+                    onClick={handleSkipToGallery}
+                    className="w-full text-[#5b3e34] hover:text-[#30221b] font-medium py-2 transition-colors"
+                    data-testid="button-skip-to-gallery"
+                  >
+                    {t("intro.popup.skip")}
+                  </button>
                 </motion.div>
-              </motion.div>
-
-              {/* Buttons */}
-              <motion.div
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="space-y-3"
-              >
-                {/* Register Button with Shine Effect */}
-                <button
-                  onClick={handleRegisterNow}
-                  className="relative w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 px-8 rounded-2xl text-lg tracking-wide shadow-[0_4px_30px_rgba(185,125,66,0.4)] hover:shadow-[0_4px_40px_rgba(185,125,66,0.6)] transition-all active:scale-[0.98] overflow-hidden group"
-                  data-testid="button-register-now"
-                >
-                  <span className="relative z-10">{t("intro.popup.register")}</span>
-                  <motion.div
-                    animate={{ x: ["−100%", "200%"] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
-                  />
-                </button>
-
-                {/* Skip Link */}
-                <button
-                  onClick={handleSkipToGallery}
-                  className="w-full text-white/40 hover:text-white/70 font-medium py-3 transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/40"
-                  data-testid="button-skip-to-gallery"
-                >
-                  {t("intro.popup.skip")}
-                </button>
-              </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         )}
