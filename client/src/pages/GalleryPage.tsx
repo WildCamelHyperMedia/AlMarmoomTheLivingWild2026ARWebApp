@@ -90,15 +90,6 @@ export default function GalleryPage() {
         </button>
         
         <div className="flex items-center gap-2">
-          {/* QR Scanner Button - BETA */}
-          <button 
-            onClick={() => setLocation("/scan")}
-            className="p-2 rounded-full bg-[#b97d42]/20 hover:bg-[#b97d42]/30 transition-colors"
-            data-testid="button-qr-scan"
-            title={language === 'en' ? 'Scan QR Code' : 'امسح رمز QR'}
-          >
-            <QrCode className="h-5 w-5 text-[#b97d42]" />
-          </button>
           {user?.isAdmin && (
             <button 
               onClick={() => setLocation("/admin")}
@@ -233,13 +224,27 @@ export default function GalleryPage() {
         </div>
       </div>
 
+      {/* QR Scanner Button - Large Bottom Center */}
+      <div className="flex justify-center py-4 relative z-20 shrink-0">
+        <button
+          onClick={() => setLocation("/scan")}
+          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#b97d42] to-[#855338] hover:from-[#a06d35] hover:to-[#6d4530] text-white rounded-full shadow-lg shadow-[#b97d42]/30 transition-all duration-300 transform hover:scale-105 active:scale-95"
+          data-testid="button-qr-scan"
+        >
+          <QrCode className="h-6 w-6" />
+          <span className="font-semibold text-base">
+            {language === 'en' ? 'Scan to Unlock Animals' : 'امسح لفتح الحيوانات'}
+          </span>
+        </button>
+      </div>
+
       {/* Pagination Dots */}
-      <div className="flex justify-center gap-3 py-4 relative z-20 shrink-0">
+      <div className="flex justify-center gap-3 py-2 relative z-20 shrink-0">
         {chunks.map((_, index) => (
           <button
             key={index}
             onClick={() => emblaApi && emblaApi.scrollTo(index)}
-            className={`w-4 h-4 rounded-full transition-all duration-300 cursor-pointer border border-transparent hover:border-white/50 ${
+            className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer border border-transparent hover:border-white/50 ${
               index === selectedIndex ? "bg-white scale-110" : "bg-white/20 hover:bg-white/40"
             }`}
             aria-label={`Go to page ${index + 1}`}
