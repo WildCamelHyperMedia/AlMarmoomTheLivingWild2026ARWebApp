@@ -278,8 +278,10 @@ export default function AnimalDetailPage() {
             <iframe
               src={animal.arUrl || "https://web.zappar.com/example-project"} 
               className="w-full h-full border-0"
-              allow="camera; gyroscope; accelerometer; magnetometer; xr-spatial-tracking; microphone; web-share"
+              allow="camera *; microphone *; gyroscope *; accelerometer *; magnetometer *; xr-spatial-tracking *; fullscreen *; autoplay *; web-share *; display-capture *"
               allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads"
             ></iframe>
           </div>
           
