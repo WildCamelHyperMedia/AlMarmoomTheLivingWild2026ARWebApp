@@ -10,6 +10,7 @@ import AuthPage from "@/pages/AuthPage";
 import IntroPage from "@/pages/IntroPage";
 import AnimalDetailPage from "@/pages/AnimalDetailPage";
 import AdminPage from "@/pages/AdminPage";
+import QRScannerPage from "@/pages/QRScannerPage";
 import { LanguageProvider } from "@/lib/language";
 import { UserProvider } from "@/lib/user";
 import { ProgressProvider } from "@/lib/progress";
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/gallery" component={GalleryPage} />
       <Route path="/animal/:id" component={AnimalDetailPage} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/scan" component={QRScannerPage} />
       <Route component={NotFound} />
     </Switch>
   );

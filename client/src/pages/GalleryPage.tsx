@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, LogOut, Shield, Bookmark, Star } from "lucide-react";
+import { ArrowLeft, LogOut, Shield, Bookmark, Star, QrCode, Lock } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
@@ -15,7 +15,7 @@ export default function GalleryPage() {
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
   const { user, logout, isLoading } = useUser();
-  const { watchedVideos, points } = useProgress();
+  const { watchedVideos, points, isUnlocked } = useProgress();
   const chunkSize = ANIMALS_PER_PAGE;
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
@@ -90,6 +90,15 @@ export default function GalleryPage() {
         </button>
         
         <div className="flex items-center gap-2">
+          {/* QR Scanner Button - BETA */}
+          <button 
+            onClick={() => setLocation("/scan")}
+            className="p-2 rounded-full bg-[#b97d42]/20 hover:bg-[#b97d42]/30 transition-colors"
+            data-testid="button-qr-scan"
+            title={language === 'en' ? 'Scan QR Code' : 'امسح رمز QR'}
+          >
+            <QrCode className="h-5 w-5 text-[#b97d42]" />
+          </button>
           {user?.isAdmin && (
             <button 
               onClick={() => setLocation("/admin")}
@@ -165,31 +174,56 @@ export default function GalleryPage() {
               <div className="grid grid-cols-2 gap-6 pb-4">
                 {chunk.map((animal) => {
                   const watched = watchedVideos.includes(animal.id);
+                  const unlocked = isUnlocked(animal.id);
                   
                   return (
                     <div key={animal.id} className="relative">
-                      <Link href={`/animal/${animal.id}`}>
-                        <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
-                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
+                      {unlocked ? (
+                        <Link href={`/animal/${animal.id}`}>
+                          <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
+                            <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
+                              <img 
+                                src={animal.optimizedImage} 
+                                alt={t(`animals.${animal.id}`)}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
+                                loading={pageIndex === 0 ? "eager" : "lazy"}
+                                decoding="async"
+                                onError={(e) => { e.currentTarget.src = animal.image; }}
+                              />
+                              {watched && (
+                                <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
+                                  <Star className="w-3 h-3 text-white fill-white" />
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
+                              {t(`animals.${animal.id}`)}
+                            </span>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div 
+                          className="flex flex-col items-center gap-3 text-center cursor-pointer group"
+                          onClick={() => setLocation("/scan")}
+                        >
+                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg">
                             <img 
                               src={animal.optimizedImage} 
                               alt={t(`animals.${animal.id}`)}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
+                              className="w-full h-full object-cover grayscale blur-sm opacity-50"
                               loading={pageIndex === 0 ? "eager" : "lazy"}
                               decoding="async"
                               onError={(e) => { e.currentTarget.src = animal.image; }}
                             />
-                            {watched && (
-                              <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
-                                <Star className="w-3 h-3 text-white fill-white" />
-                              </div>
-                            )}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                              <Lock className="w-8 h-8 text-white/70" />
+                            </div>
                           </div>
-                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
-                            {t(`animals.${animal.id}`)}
+                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center">
+                            {language === 'en' ? 'Scan to Unlock' : 'امسح للفتح'}
                           </span>
                         </div>
-                      </Link>
+                      )}
                     </div>
                   );
                 })}

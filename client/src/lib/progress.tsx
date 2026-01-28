@@ -3,9 +3,12 @@ import { useUser } from "./user";
 
 interface ProgressContextType {
   watchedVideos: string[];
+  unlockedAnimals: string[];
   points: number;
   recordVideoWatch: (animalId: string) => Promise<boolean>;
   hasWatched: (animalId: string) => boolean;
+  isUnlocked: (animalId: string) => boolean;
+  refreshProgress: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -16,46 +19,55 @@ const POINTS_PER_VIDEO = 1;
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: userLoading, getAuthHeaders } = useUser();
   const [watchedVideos, setWatchedVideos] = useState<string[]>([]);
+  const [unlockedAnimals, setUnlockedAnimals] = useState<string[]>([]);
   const [points, setPoints] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (userLoading) return;
-    
-    if (user) {
-      fetch(`/api/progress/${user.id}`, {
-        headers: getAuthHeaders()
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Progress not found");
-          return res.json();
-        })
-        .then(data => {
-          const videos = data.progress.watchedVideos || [];
-          setWatchedVideos(videos);
-          // Derive points from watchedVideos for consistency
-          setPoints(videos.length * POINTS_PER_VIDEO);
-          setIsLoading(false);
-        })
-        .catch(() => {
-          setWatchedVideos([]);
-          setPoints(0);
-          setIsLoading(false);
-        });
-    } else {
+  const fetchProgress = async () => {
+    if (!user) {
       try {
         const saved = localStorage.getItem("watchedVideos");
         const videos = saved ? JSON.parse(saved) : [];
         setWatchedVideos(Array.isArray(videos) ? videos : []);
-        // Derive points from watchedVideos for consistency
         setPoints(Array.isArray(videos) ? videos.length * POINTS_PER_VIDEO : 0);
+        const savedUnlocked = localStorage.getItem("unlockedAnimals");
+        setUnlockedAnimals(savedUnlocked ? JSON.parse(savedUnlocked) : []);
       } catch {
         setWatchedVideos([]);
+        setUnlockedAnimals([]);
         setPoints(0);
       }
       setIsLoading(false);
+      return;
     }
+
+    try {
+      const res = await fetch(`/api/progress/${user.id}`, {
+        headers: getAuthHeaders()
+      });
+      if (!res.ok) throw new Error("Progress not found");
+      const data = await res.json();
+      const videos = data.progress.watchedVideos || [];
+      const unlocked = data.progress.unlockedAnimals || [];
+      setWatchedVideos(videos);
+      setUnlockedAnimals(unlocked);
+      setPoints(videos.length * POINTS_PER_VIDEO);
+    } catch {
+      setWatchedVideos([]);
+      setUnlockedAnimals([]);
+      setPoints(0);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (userLoading) return;
+    fetchProgress();
   }, [user, userLoading]);
+
+  const refreshProgress = async () => {
+    await fetchProgress();
+  };
 
   const recordVideoWatch = async (animalId: string): Promise<boolean> => {
     if (watchedVideos.includes(animalId)) {
@@ -93,8 +105,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     return watchedVideos.includes(animalId);
   };
 
+  const isUnlocked = (animalId: string) => {
+    return unlockedAnimals.includes(animalId);
+  };
+
   return (
-    <ProgressContext.Provider value={{ watchedVideos, points, recordVideoWatch, hasWatched, isLoading }}>
+    <ProgressContext.Provider value={{ watchedVideos, unlockedAnimals, points, recordVideoWatch, hasWatched, isUnlocked, refreshProgress, isLoading }}>
       {children}
     </ProgressContext.Provider>
   );

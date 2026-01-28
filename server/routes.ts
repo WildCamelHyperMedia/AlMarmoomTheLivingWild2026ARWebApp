@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, updateUserProgressSchema, loginSchema, animalGuideRequestSchema } from "@shared/schema";
+import { animalQRCodes, validateQRCode } from "@shared/qrCodes";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import OpenAI from "openai";
@@ -604,6 +605,63 @@ export async function registerRoutes(
       res.json({ progress });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  });
+
+  // QR Code unlock animal endpoint (BETA)
+  app.post("/api/unlock-animal", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { qrCode } = req.body;
+      if (!qrCode || typeof qrCode !== "string") {
+        return res.status(400).json({ success: false, message: "Invalid QR code" });
+      }
+
+      // Validate QR code against whitelist
+      const validation = validateQRCode(qrCode);
+      if (!validation.valid || !validation.animalId) {
+        return res.status(400).json({ success: false, message: "Invalid or unrecognized QR code" });
+      }
+
+      const animalId = validation.animalId;
+      
+      // Double-check animal exists in VALID_ANIMAL_IDS
+      if (!VALID_ANIMAL_IDS.includes(animalId)) {
+        return res.status(400).json({ success: false, message: "Unknown animal" });
+      }
+
+      const userId = req.user!.id;
+      let progress = await storage.getProgress(userId);
+      
+      if (!progress) {
+        progress = await storage.createProgress({
+          userId,
+          unlockedAnimals: [],
+          watchedVideos: [],
+          points: 0
+        });
+      }
+
+      const currentUnlocked = progress.unlockedAnimals || [];
+      const alreadyUnlocked = currentUnlocked.includes(animalId);
+
+      if (!alreadyUnlocked) {
+        const updatedAnimals = [...currentUnlocked, animalId];
+        await storage.updateProgress(userId, {
+          unlockedAnimals: updatedAnimals,
+          watchedVideos: progress.watchedVideos,
+          points: progress.points
+        });
+      }
+
+      res.json({ 
+        success: true, 
+        animalId, 
+        alreadyUnlocked,
+        message: alreadyUnlocked ? "Animal already unlocked" : "Animal unlocked successfully"
+      });
+    } catch (error: any) {
+      console.error("Unlock animal error:", error);
+      res.status(500).json({ success: false, message: "Failed to unlock animal" });
     }
   });
 
