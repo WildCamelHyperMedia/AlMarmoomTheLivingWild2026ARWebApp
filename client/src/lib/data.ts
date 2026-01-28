@@ -3,7 +3,8 @@ export interface Animal {
   image: string;
   optimizedImage: string;
   scientificName: string;
-  video?: string;
+  videoEn?: string;
+  videoAr?: string;
   arUrl?: string;
 }
 
@@ -20,7 +21,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/2-Frog-headed Lizard 1.jpg",
     optimizedImage: "/animals/optimized/2-Frog-headed Lizard 1.webp",
     scientificName: "PHRYNOCEPHALUS ARABICUS",
-    video: "/videos/frog_headed_lizard_en.mp4",
+    videoEn: "/videos/frog_headed_lizard_en.mp4",
     arUrl: "https://webxr.run/xE00Z77wlw9Eo"
   },
   {
@@ -28,7 +29,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/3-Western Great Egrettif.jpg",
     optimizedImage: "/animals/optimized/3-Western Great Egrettif.webp",
     scientificName: "ARDEA ALBA",
-    video: "/videos/western_great_egret_en.mp4",
+    videoEn: "/videos/western_great_egret_en.mp4",
+    videoAr: "/videos/western_great_egret_ar.mp4",
     arUrl: "https://webxr.run/oybX5Q3zNVgp4"
   },
   {
@@ -36,7 +38,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/4-Desert Hare.jpg",
     optimizedImage: "/animals/optimized/4-Desert Hare.webp",
     scientificName: "LEPUS CAPENSIS",
-    video: "/videos/desert_hare_en.mp4",
+    videoEn: "/videos/desert_hare_en.mp4",
+    videoAr: "/videos/desert_hare_ar.mp4",
     arUrl: "https://webxr.run/rY7xL333AGY9b"
   },
   {
@@ -44,7 +47,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/6-Hoopoe.jpg",
     optimizedImage: "/animals/optimized/6-Hoopoe.webp",
     scientificName: "UPUPA EPOPS",
-    video: "/videos/hoopoe_en.mp4",
+    videoEn: "/videos/hoopoe_en.mp4",
+    videoAr: "/videos/hoopoe_ar.mp4",
     arUrl: "https://webxr.run/ozPgmb63dzWLz"
   },
   {
@@ -52,7 +56,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/7-Ruppell's Fox 1.jpg",
     optimizedImage: "/animals/optimized/7-Ruppell's Fox 1.webp",
     scientificName: "VULPES RUEPPELLII",
-    video: "/videos/ruppells_fox_en.mp4",
+    videoEn: "/videos/ruppells_fox_en.mp4",
+    videoAr: "/videos/ruppells_fox_ar.mp4",
     arUrl: "https://webxr.run/dy93Mv6RpVAdZ"
   },
   {
@@ -60,7 +65,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/8-Iraqi Sandgrouse-.jpg",
     optimizedImage: "/animals/optimized/8-Iraqi Sandgrouse-.webp",
     scientificName: "PTEROCLES ALCHATA",
-    video: "/videos/iraqi_sandgrouse_en.mp4",
+    videoEn: "/videos/iraqi_sandgrouse_en.mp4",
+    videoAr: "/videos/iraqi_sandgrouse_ar.mp4",
     arUrl: "https://webxr.run/L1vYz8MRDEo3o"
   },
   {
@@ -68,7 +74,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/9-Water Rail.jpg",
     optimizedImage: "/animals/optimized/9-Water Rail.webp",
     scientificName: "RALLUS AQUATICUS",
-    video: "/videos/water_rail_en.mp4",
+    videoEn: "/videos/water_rail_en.mp4",
+    videoAr: "/videos/water_rail_ar.mp4",
     arUrl: "https://webxr.run/VEaw1xxyogpx"
   },
   {
@@ -76,7 +83,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/29-Green Bee-Eater.png",
     optimizedImage: "/animals/optimized/29-Green Bee-Eater.webp",
     scientificName: "MEROPS ORIENTALIS",
-    video: "/videos/green_bee_eater_en.mp4",
+    videoEn: "/videos/green_bee_eater_en.mp4",
+    videoAr: "/videos/green_bee_eater_ar.mp4",
     arUrl: "https://webxr.run/V2RzPLOVNW5gM"
   },
   {
@@ -84,7 +92,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/11-Desert Monitor.jpg",
     optimizedImage: "/animals/optimized/11-Desert Monitor.webp",
     scientificName: "VARANUS GRISEUS",
-    video: "/videos/desert_monitor_en.mp4",
+    videoEn: "/videos/desert_monitor_en.mp4",
+    videoAr: "/videos/desert_monitor_ar.mp4",
     arUrl: "https://webxr.run/XEwGM8pkkknQx"
   },
   {
@@ -92,7 +101,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/13-Purple Sunbird.jpg",
     optimizedImage: "/animals/optimized/13-Purple Sunbird.webp",
     scientificName: "CINNYRIS ASIATICUS",
-    video: "/videos/purple_sunbird_en.mp4",
+    videoEn: "/videos/purple_sunbird_en.mp4",
+    videoAr: "/videos/purple_sunbird_ar.mp4",
     arUrl: "https://webxr.run/OQ8MwdW5GxYNX"
   },
   {
@@ -100,7 +110,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/14-Blue-throated Wagtail.jpg",
     optimizedImage: "/animals/optimized/14-Blue-throated Wagtail.webp",
     scientificName: "MOTACILLA FLAVA",
-    video: "/videos/blue_throated_wagtail_en.mp4",
+    videoEn: "/videos/blue_throated_wagtail_en.mp4",
+    videoAr: "/videos/blue_throated_wagtail_ar.mp4",
     arUrl: "https://webxr.run/yy7oO5Ed68Jka"
   },
   {
@@ -108,7 +119,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/15-Gerbillus cheesmani.jpg",
     optimizedImage: "/animals/optimized/15-Gerbillus cheesmani.webp",
     scientificName: "GERBILLUS CHEESMANI",
-    video: "/videos/gerbillus_cheesmani_en.mp4",
+    videoEn: "/videos/gerbillus_cheesmani_en.mp4",
+    videoAr: "/videos/gerbillus_cheesmani_ar.mp4",
     arUrl: "https://webxr.run/wGVQ3vEyVplJ4"
   },
   {
@@ -116,7 +128,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/16-The Yellow Wagtails.jpg",
     optimizedImage: "/animals/optimized/16-The Yellow Wagtails.webp",
     scientificName: "MOTACILLA FLAVA",
-    video: "/videos/yellow_wagtail_en.mp4",
+    videoEn: "/videos/yellow_wagtail_en.mp4",
+    videoAr: "/videos/yellow_wagtail_ar.mp4",
     arUrl: "https://webxr.run/GY6y69QaOvvD"
   },
   {
@@ -166,7 +179,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
     optimizedImage: "/animals/optimized/24-Eurasian Stone-curlew.webp",
     scientificName: "BURHINUS OEDICNEMUS",
-    video: "/videos/stone_curlew.mp4",
+    videoEn: "/videos/stone_curlew.mp4",
+    videoAr: "/videos/stone_curlew.mp4",
     arUrl: "https://webxr.run/06LeM1AzARYJP"
   },
   {
@@ -174,7 +188,8 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/25-White-Tailed-Lapwing.jpg",
     optimizedImage: "/animals/optimized/25-White-Tailed-Lapwing.webp",
     scientificName: "VANELLUS LEUCURUS",
-    video: "/videos/stone_curlew.mp4",
+    videoEn: "/videos/stone_curlew.mp4",
+    videoAr: "/videos/stone_curlew.mp4",
     arUrl: "https://webxr.run/yX7JR9wGGYm2r"
   },
   {

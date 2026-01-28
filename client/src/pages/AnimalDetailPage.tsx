@@ -84,11 +84,12 @@ export default function AnimalDetailPage() {
   }, [isPlaying, hasRecordedWatch, animal, user, recordVideoWatch]);
 
   // Auto-play video when animal has video
+  const currentVideo = animal ? (language === 'ar' ? animal.videoAr : animal.videoEn) : undefined;
   useEffect(() => {
-    if (animal?.video) {
+    if (currentVideo) {
       setIsPlaying(true);
     }
-  }, [animal?.video]);
+  }, [currentVideo]);
 
   // Handle video completion
   const handleVideoEnded = () => {
@@ -163,10 +164,10 @@ export default function AnimalDetailPage() {
         <div className="absolute inset-0 bg-black/20 z-10" />
         
         {/* Render either video or image as background */}
-        {isPlaying && animal.video ? (
+        {isPlaying && currentVideo ? (
           <video 
             ref={videoRef}
-            src={animal.video} 
+            src={currentVideo} 
             autoPlay 
             controls={false}
             playsInline
