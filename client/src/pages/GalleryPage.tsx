@@ -172,11 +172,12 @@ export default function GalleryPage() {
                         <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
                           <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
                             <img 
-                              src={animal.image} 
+                              src={animal.optimizedImage} 
                               alt={t(`animals.${animal.id}`)}
                               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 will-change-transform"
                               loading={pageIndex === 0 ? "eager" : "lazy"}
                               decoding="async"
+                              onError={(e) => { e.currentTarget.src = animal.image; }}
                             />
                             {watched && (
                               <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
