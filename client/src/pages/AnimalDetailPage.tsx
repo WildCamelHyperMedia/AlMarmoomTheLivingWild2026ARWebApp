@@ -160,9 +160,6 @@ export default function AnimalDetailPage() {
       
       {/* Background Media (Full Screen) */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-        <div className="absolute inset-0 bg-black/20 z-10" />
-        
         {/* Render either video or image as background */}
         {isPlaying && currentVideo ? (
           <video 
@@ -175,7 +172,8 @@ export default function AnimalDetailPage() {
             muted={isMuted}
             onEnded={handleVideoEnded}
             onClick={() => setIsPlaying(false)}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover absolute inset-0 z-0"
+            poster={animal.optimizedImage}
           />
         ) : (
           <img 
@@ -185,6 +183,10 @@ export default function AnimalDetailPage() {
             onError={(e) => { e.currentTarget.src = animal.image; }}
           />
         )}
+        
+        {/* Gradient overlays on top of video/image */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
       </div>
 
       {/* Header - Unified Control Bar */}
