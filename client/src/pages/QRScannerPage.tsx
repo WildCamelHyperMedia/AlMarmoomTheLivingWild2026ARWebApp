@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Camera, CheckCircle, XCircle, Scan } from "lucide-react";
+import { ArrowLeft, Camera, CheckCircle, XCircle, Scan, ZoomIn, ZoomOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -27,6 +27,9 @@ export default function QRScannerPage() {
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<UnlockResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [zoomRange, setZoomRange] = useState({ min: 1, max: 1 });
+  const [supportsZoom, setSupportsZoom] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -44,8 +47,22 @@ export default function QRScannerPage() {
       backToGallery: { en: "Back to Gallery", ar: "العودة للمعرض" },
       cameraError: { en: "Camera access denied. Please enable camera permissions.", ar: "تم رفض الوصول للكاميرا. يرجى تفعيل إذن الكاميرا." },
       loginRequired: { en: "Please login to unlock animals", ar: "يرجى تسجيل الدخول لإلغاء قفل الحيوانات" },
+      zoom: { en: "Zoom", ar: "تكبير" },
     };
     return translations[key]?.[language] || key;
+  };
+
+  const applyZoom = async (zoomLevel: number) => {
+    if (!scannerRef.current || !supportsZoom) return;
+    
+    try {
+      await scannerRef.current.applyVideoConstraints({
+        advanced: [{ zoom: zoomLevel } as any]
+      });
+      setZoom(zoomLevel);
+    } catch (err) {
+      console.error("Failed to apply zoom:", err);
+    }
   };
 
   const stopScanner = async () => {
@@ -86,6 +103,22 @@ export default function QRScannerPage() {
         },
         () => {}
       );
+      
+      // Check for zoom capability after starting scanner
+      try {
+        const capabilities = scannerRef.current.getRunningTrackCapabilities();
+        if (capabilities && 'zoom' in capabilities) {
+          const zoomCaps = capabilities.zoom as { min: number; max: number };
+          if (zoomCaps && zoomCaps.max > 1) {
+            setSupportsZoom(true);
+            setZoomRange({ min: zoomCaps.min || 1, max: zoomCaps.max });
+            setZoom(1);
+          }
+        }
+      } catch (zoomErr) {
+        console.log("Zoom not supported on this device");
+        setSupportsZoom(false);
+      }
       
       setIsScanning(true);
     } catch (err: any) {
@@ -266,6 +299,31 @@ export default function QRScannerPage() {
                 </div>
               )}
             </div>
+
+            {/* Zoom Control */}
+            {isScanning && supportsZoom && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-sm mb-4 px-2"
+              >
+                <div className="flex items-center gap-3 bg-black/30 rounded-xl p-3">
+                  <ZoomOut className="w-5 h-5 text-white/70" />
+                  <input
+                    type="range"
+                    min={zoomRange.min}
+                    max={zoomRange.max}
+                    step={0.1}
+                    value={zoom}
+                    onChange={(e) => applyZoom(parseFloat(e.target.value))}
+                    className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#b97d42]"
+                    data-testid="slider-zoom"
+                  />
+                  <ZoomIn className="w-5 h-5 text-white/70" />
+                  <span className="text-white/70 text-sm min-w-[40px] text-center">{zoom.toFixed(1)}x</span>
+                </div>
+              </motion.div>
+            )}
 
             {/* Scan Button */}
             <motion.button
