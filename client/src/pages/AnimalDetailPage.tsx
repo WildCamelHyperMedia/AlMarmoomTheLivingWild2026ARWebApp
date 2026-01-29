@@ -34,6 +34,7 @@ export default function AnimalDetailPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showRewardPopup, setShowRewardPopup] = useState(false);
   const [watchTime, setWatchTime] = useState(0);
   const [hasRecordedWatch, setHasRecordedWatch] = useState(false);
   const [qrUnlockProcessed, setQrUnlockProcessed] = useState(false);
@@ -115,12 +116,18 @@ export default function AnimalDetailPage() {
               recordVideoWatch(animal.id).then((recorded) => {
                 if (recorded) {
                   setHasRecordedWatch(true);
-                  // Prompt guest to save progress
-                  if (!user) {
-                    setTimeout(() => {
-                      setShowSaveModal(true);
-                    }, 500);
-                  }
+                  // Show reward popup
+                  setShowRewardPopup(true);
+                  // Auto-hide after 3 seconds
+                  setTimeout(() => {
+                    setShowRewardPopup(false);
+                    // Then prompt guest to save progress
+                    if (!user) {
+                      setTimeout(() => {
+                        setShowSaveModal(true);
+                      }, 500);
+                    }
+                  }, 3000);
                 }
               });
             }
@@ -247,6 +254,19 @@ export default function AnimalDetailPage() {
       {/* Gradient for bottom content readability */}
       <div className="absolute bottom-0 left-0 right-0 h-[250px] bg-gradient-to-t from-black via-black/70 to-transparent z-5 pointer-events-none" />
 
+      {/* Close Button - Top Right (when playing) */}
+      {isPlaying && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setIsPlaying(false)}
+          className={`absolute top-4 ${dir === 'rtl' ? 'left-4' : 'right-4'} z-50 w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors text-white`}
+          data-testid="button-stop-video"
+        >
+          <X className="w-6 h-6" />
+        </motion.button>
+      )}
+
       {/* Play Button Overlay */}
       {!isPlaying && !isArOpen && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
@@ -360,6 +380,58 @@ export default function AnimalDetailPage() {
           <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
         </button>
       </div>
+
+      {/* Reward Popup */}
+      <AnimatePresence>
+        {showRewardPopup && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 pointer-events-none"
+          >
+            <motion.div 
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              className="bg-gradient-to-br from-primary/95 to-[#8B6B58] backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/20 text-center max-w-xs pointer-events-auto"
+            >
+              {/* Celebration Icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1, rotate: [0, -10, 10, 0] }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center"
+              >
+                <span className="text-3xl">🎉</span>
+              </motion.div>
+              
+              {/* Text */}
+              <h3 className="text-xl font-bold text-white mb-2">
+                {language === 'en' ? 'Congratulations!' : 'تهانينا!'}
+              </h3>
+              <p className="text-white/90 text-sm leading-relaxed">
+                {language === 'en' 
+                  ? `You just earned 1 reward point for watching the ${t(`animals.${animal.id}`)} video!`
+                  : `لقد ربحت نقطة مكافأة واحدة لمشاهدة فيديو ${t(`animals.${animal.id}`)}!`
+                }
+              </p>
+              
+              {/* Points Badge */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4 }}
+                className="mt-4 inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2"
+              >
+                <span className="text-2xl font-bold text-white">+1</span>
+                <span className="text-xs text-white/80 uppercase tracking-wider">
+                  {language === 'en' ? 'Point' : 'نقطة'}
+                </span>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Save Progress Modal */}
       <SaveProgressModal 
