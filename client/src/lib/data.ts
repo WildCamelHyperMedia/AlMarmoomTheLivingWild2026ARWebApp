@@ -15,6 +15,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/1-Little Grebe.webp",
     scientificName: "TACHYBAPTUS RUFICOLLIS",
     videoEn: "/videos/little_grebe_en.mp4",
+    videoAr: "/videos/little_grebe_ar.mp4",
     arUrl: "https://webxr.run/5O012Vdy8VAbw"
   },
   {
@@ -167,6 +168,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/20-Arabian Oryx.webp",
     scientificName: "ORYX LEUCORYX",
     videoEn: "/videos/arabian_oryx_en.mp4",
+    videoAr: "/videos/arabian_oryx_ar.mp4",
     arUrl: "https://webxr.run/OxyZ5mJy3GWAX"
   },
   {
@@ -175,6 +177,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/21-Houbara-Bustard.webp",
     scientificName: "CHLAMYDOTIS UNDULATA",
     videoEn: "/videos/houbara_bustard_en.mp4",
+    videoAr: "/videos/houbara_bustard_ar.mp4",
     arUrl: "https://webxr.run/3oXW15Q3wgyL2"
   },
   {
@@ -183,6 +186,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/22-Dorcas-Gazelle.webp",
     scientificName: "GAZELLA DORCAS",
     videoEn: "/videos/dorcas_gazelle_en.mp4",
+    videoAr: "/videos/dorcas_gazelle_ar.mp4",
     arUrl: "https://webxr.run/0Zpa12WOw19wJ"
   },
   {
@@ -191,6 +195,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/24-Eurasian Stone-curlew.webp",
     scientificName: "BURHINUS OEDICNEMUS",
     videoEn: "/videos/eurasian_stone_curlew_en.mp4",
+    videoAr: "/videos/eurasian_stone_curlew_ar.mp4",
     arUrl: "https://webxr.run/06LeM1AzARYJP"
   },
   {
@@ -199,6 +204,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/25-White-Tailed-Lapwing.webp",
     scientificName: "VANELLUS LEUCURUS",
     videoEn: "/videos/white_tailed_lapwing_en.mp4",
+    videoAr: "/videos/white_tailed_lapwing_ar.mp4",
     arUrl: "https://webxr.run/yX7JR9wGGYm2r"
   },
   {
@@ -207,6 +213,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/26-Desert-Eagle-Owl.webp",
     scientificName: "BUBO ASCALAPHUS",
     videoEn: "/videos/desert_eagle_owl_en.mp4",
+    videoAr: "/videos/desert_eagle_owl_ar.mp4",
     arUrl: "https://webxr.run/nOAvvLXVoYrxk"
   },
   {
@@ -215,6 +222,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/28-hedgehog.webp",
     scientificName: "PARAECHINUS AETHIOPICUS",
     videoEn: "/videos/hedgehog_en.mp4",
+    videoAr: "/videos/hedgehog_ar.mp4",
     arUrl: "https://webxr.run/Lm5VY4pEmlln"
   },
 ];
