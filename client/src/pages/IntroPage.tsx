@@ -122,7 +122,7 @@ export default function IntroPage() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
-        className="relative w-full aspect-[9/16] max-h-[45vh] sm:max-h-[50vh] bg-black/20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl z-10 mb-4 sm:mb-8"
+        className="relative w-full aspect-[9/16] max-h-[35vh] sm:max-h-[40vh] bg-black/20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl z-10 mb-4 sm:mb-8"
       >
         {!isPlaying ? (
             <img 
