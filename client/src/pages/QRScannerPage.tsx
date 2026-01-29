@@ -23,7 +23,7 @@ export default function QRScannerPage() {
   const [, setLocation] = useLocation();
   const { language, dir } = useLanguage();
   const { user } = useUser();
-  const { refreshProgress } = useProgress();
+  const { refreshProgress, recordUnlock } = useProgress();
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<UnlockResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -200,6 +200,10 @@ export default function QRScannerPage() {
         const data = await response.json();
         
         if (data.success) {
+          // Update points immediately for this unlock
+          if (!data.alreadyUnlocked) {
+            recordUnlock(data.animalId);
+          }
           await refreshProgress();
           // Track QR scan for analytics
           trackQRScan(data.animalId, code);
@@ -243,6 +247,8 @@ export default function QRScannerPage() {
         if (!alreadyUnlocked) {
           unlocked.push(animalId);
           localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
+          // Update points immediately for this unlock
+          recordUnlock(animalId);
         }
         
         await refreshProgress();

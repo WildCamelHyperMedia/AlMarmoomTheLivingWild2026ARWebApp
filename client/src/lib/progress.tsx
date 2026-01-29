@@ -34,6 +34,7 @@ interface ProgressContextType {
   unlockedAnimals: string[];
   points: number;
   recordVideoWatch: (animalId: string) => Promise<boolean>;
+  recordUnlock: (animalId: string) => void;
   hasWatched: (animalId: string) => boolean;
   isUnlocked: (animalId: string) => boolean;
   refreshProgress: () => Promise<void>;
@@ -46,6 +47,7 @@ interface ProgressContextType {
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
 const POINTS_PER_VIDEO = 1;
+const POINTS_PER_UNLOCK = 1;
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: userLoading, getAuthHeaders } = useUser();
@@ -60,9 +62,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         const saved = safeLocalStorage.getItem("watchedVideos");
         const videos = saved ? JSON.parse(saved) : [];
         setWatchedVideos(Array.isArray(videos) ? videos : []);
-        setPoints(Array.isArray(videos) ? videos.length * POINTS_PER_VIDEO : 0);
         const savedUnlocked = safeLocalStorage.getItem("unlockedAnimals");
-        setUnlockedAnimals(savedUnlocked ? JSON.parse(savedUnlocked) : []);
+        const unlocked = savedUnlocked ? JSON.parse(savedUnlocked) : [];
+        setUnlockedAnimals(Array.isArray(unlocked) ? unlocked : []);
+        // Calculate points from both videos watched and animals unlocked
+        const videoPoints = Array.isArray(videos) ? videos.length * POINTS_PER_VIDEO : 0;
+        const unlockPoints = Array.isArray(unlocked) ? unlocked.length * POINTS_PER_UNLOCK : 0;
+        setPoints(videoPoints + unlockPoints);
       } catch {
         setWatchedVideos([]);
         setUnlockedAnimals([]);
@@ -82,7 +88,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       const unlocked = data.progress.unlockedAnimals || [];
       setWatchedVideos(videos);
       setUnlockedAnimals(unlocked);
-      setPoints(videos.length * POINTS_PER_VIDEO);
+      // Calculate points from both videos watched and animals unlocked
+      setPoints((videos.length * POINTS_PER_VIDEO) + (unlocked.length * POINTS_PER_UNLOCK));
     } catch {
       setWatchedVideos([]);
       setUnlockedAnimals([]);
@@ -140,6 +147,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     return unlockedAnimals.includes(animalId);
   };
 
+  // Called after a successful QR unlock to update local points immediately
+  const recordUnlock = (animalId: string) => {
+    if (!unlockedAnimals.includes(animalId)) {
+      const newUnlocked = [...unlockedAnimals, animalId];
+      setUnlockedAnimals(newUnlocked);
+      setPoints(prev => prev + POINTS_PER_UNLOCK);
+      
+      if (!user) {
+        safeLocalStorage.setItem("unlockedAnimals", JSON.stringify(newUnlocked));
+      }
+    }
+  };
+
   const isCollectionComplete = unlockedAnimals.length >= TOTAL_ANIMALS;
   const unlockedCount = unlockedAnimals.length;
 
@@ -149,6 +169,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       unlockedAnimals, 
       points, 
       recordVideoWatch, 
+      recordUnlock,
       hasWatched, 
       isUnlocked, 
       refreshProgress, 
