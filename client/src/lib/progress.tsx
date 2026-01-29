@@ -1,8 +1,33 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { useUser } from "./user";
 import { animals } from "./data";
 
 const TOTAL_ANIMALS = animals.length; // 24 animals
+
+// Safe localStorage wrapper for Safari private browsing
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Safari private browsing or storage full - fail silently
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Fail silently
+    }
+  }
+};
 
 interface ProgressContextType {
   watchedVideos: string[];
@@ -29,14 +54,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [points, setPoints] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProgress = async () => {
+  const fetchProgress = useCallback(async () => {
     if (!user) {
       try {
-        const saved = localStorage.getItem("watchedVideos");
+        const saved = safeLocalStorage.getItem("watchedVideos");
         const videos = saved ? JSON.parse(saved) : [];
         setWatchedVideos(Array.isArray(videos) ? videos : []);
         setPoints(Array.isArray(videos) ? videos.length * POINTS_PER_VIDEO : 0);
-        const savedUnlocked = localStorage.getItem("unlockedAnimals");
+        const savedUnlocked = safeLocalStorage.getItem("unlockedAnimals");
         setUnlockedAnimals(savedUnlocked ? JSON.parse(savedUnlocked) : []);
       } catch {
         setWatchedVideos([]);
@@ -64,12 +89,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       setPoints(0);
     }
     setIsLoading(false);
-  };
+  }, [user, getAuthHeaders]);
 
   useEffect(() => {
     if (userLoading) return;
     fetchProgress();
-  }, [user, userLoading]);
+  }, [user, userLoading, fetchProgress]);
 
   const refreshProgress = async () => {
     await fetchProgress();
@@ -100,8 +125,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         console.error("Failed to sync progress:", error);
       }
     } else {
-      localStorage.setItem("watchedVideos", JSON.stringify(newWatched));
-      localStorage.setItem("points", newPoints.toString());
+      safeLocalStorage.setItem("watchedVideos", JSON.stringify(newWatched));
+      safeLocalStorage.setItem("points", newPoints.toString());
     }
     
     return true;
