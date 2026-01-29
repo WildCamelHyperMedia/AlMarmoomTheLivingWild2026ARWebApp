@@ -18,17 +18,17 @@ export const animalQRCodes: AnimalQRCode[] = [
   { animalId: "purple_sunbird", token: "PS2024-FQ9R1B8O", qrValue: "TLW-purple_sunbird-PS2024-FQ9R1B8O" },
   { animalId: "blue_throated_wagtail", token: "BTW2024-GV4S3L6A", qrValue: "TLW-blue_throated_wagtail-BTW2024-GV4S3L6A" },
   { animalId: "gerbillus_cheesmani", token: "GC2024-HX7U5M2E", qrValue: "TLW-gerbillus_cheesmani-GC2024-HX7U5M2E" },
-  { animalId: "yellow_wagtail", token: "YW2024-IZ1V8P4F", qrValue: "TLW-yellow_wagtail-IZ1V8P4F" },
-  { animalId: "sandfish_lizard", token: "SL2024-JQ3W2R7G", qrValue: "TLW-sandfish_lizard-JQ3W2R7G" },
-  { animalId: "spiny_tailed_lizard", token: "STL2024-KS6X4T9H", qrValue: "TLW-spiny_tailed_lizard-KS6X4T9H" },
-  { animalId: "little_owl", token: "LO2024-LT8Y6U1J", qrValue: "TLW-little_owl-LT8Y6U1J" },
-  { animalId: "arabian_oryx", token: "AO2024-MU2Z9V3K", qrValue: "TLW-arabian_oryx-MU2Z9V3K" },
-  { animalId: "houbara_bustard", token: "HB2024-NV5A1W6L", qrValue: "TLW-houbara_bustard-NV5A1W6L" },
-  { animalId: "dorcas_gazelle", token: "DG2024-OW7B3X8M", qrValue: "TLW-dorcas_gazelle-OW7B3X8M" },
-  { animalId: "eurasian_stone_curlew", token: "ESC2024-PX9C5Y2N", qrValue: "TLW-eurasian_stone_curlew-PX9C5Y2N" },
-  { animalId: "white_tailed_lapwing", token: "WTL2024-QY1D7Z4O", qrValue: "TLW-white_tailed_lapwing-QY1D7Z4O" },
-  { animalId: "desert_eagle_owl", token: "DEO2024-RZ3E9A6P", qrValue: "TLW-desert_eagle_owl-RZ3E9A6P" },
-  { animalId: "hedgehog", token: "HH2024-SA5F1B8Q", qrValue: "TLW-hedgehog-SA5F1B8Q" }
+  { animalId: "yellow_wagtail", token: "YW2024-IZ1V8P4F", qrValue: "TLW-yellow_wagtail-YW2024-IZ1V8P4F" },
+  { animalId: "sandfish_lizard", token: "SL2024-JQ3W2R7G", qrValue: "TLW-sandfish_lizard-SL2024-JQ3W2R7G" },
+  { animalId: "spiny_tailed_lizard", token: "STL2024-KS6X4T9H", qrValue: "TLW-spiny_tailed_lizard-STL2024-KS6X4T9H" },
+  { animalId: "little_owl", token: "LO2024-LT8Y6U1J", qrValue: "TLW-little_owl-LO2024-LT8Y6U1J" },
+  { animalId: "arabian_oryx", token: "AO2024-MU2Z9V3K", qrValue: "TLW-arabian_oryx-AO2024-MU2Z9V3K" },
+  { animalId: "houbara_bustard", token: "HB2024-NV5A1W6L", qrValue: "TLW-houbara_bustard-HB2024-NV5A1W6L" },
+  { animalId: "dorcas_gazelle", token: "DG2024-OW7B3X8M", qrValue: "TLW-dorcas_gazelle-DG2024-OW7B3X8M" },
+  { animalId: "eurasian_stone_curlew", token: "ESC2024-PX9C5Y2N", qrValue: "TLW-eurasian_stone_curlew-ESC2024-PX9C5Y2N" },
+  { animalId: "white_tailed_lapwing", token: "WTL2024-QY1D7Z4O", qrValue: "TLW-white_tailed_lapwing-WTL2024-QY1D7Z4O" },
+  { animalId: "desert_eagle_owl", token: "DEO2024-RZ3E9A6P", qrValue: "TLW-desert_eagle_owl-DEO2024-RZ3E9A6P" },
+  { animalId: "hedgehog", token: "HH2024-SA5F1B8Q", qrValue: "TLW-hedgehog-HH2024-SA5F1B8Q" }
 ];
 
 export function validateQRCode(qrValue: string): { valid: boolean; animalId?: string } {
