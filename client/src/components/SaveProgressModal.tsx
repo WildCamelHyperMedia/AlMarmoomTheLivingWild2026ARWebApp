@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Gift, Shield, User, Mail, ArrowRight, Loader2, Award } from "lucide-react";
+import { X, Gift, Shield, User, Mail, ArrowRight, Loader2, Award, Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useLanguage } from "@/lib/language";
@@ -17,7 +17,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
   const { setUser } = useUser();
   const { watchedVideos, points, unlockedCount, unlockedAnimals } = useProgress();
   
-  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,6 +43,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
         body: JSON.stringify({ 
           name: formData.name, 
           email: formData.email,
+          phone: formData.phone,
           watchedVideos: watchedVideos,
           unlockedAnimals: unlockedAnimals,
           points: points
@@ -184,6 +185,21 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
                       className="bg-white/5 border border-white/10 text-white placeholder:text-white/30 h-14 rounded-xl focus:ring-2 focus:ring-[#b97d42]/50 focus:border-[#b97d42]/50 pl-12 pr-4 text-base transition-all"
                       dir="ltr"
                       data-testid="input-save-email"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <Phone className="w-5 h-5 text-white/30" />
+                    </div>
+                    <Input 
+                      type="tel" 
+                      placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      className="bg-white/5 border border-white/10 text-white placeholder:text-white/30 h-14 rounded-xl focus:ring-2 focus:ring-[#b97d42]/50 focus:border-[#b97d42]/50 pl-12 pr-4 text-base transition-all"
+                      dir="ltr"
+                      data-testid="input-save-phone"
                     />
                   </div>
                   

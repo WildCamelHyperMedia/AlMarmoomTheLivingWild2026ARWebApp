@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Globe, User, Mail, Lock, Shield } from "lucide-react";
+import { ArrowLeft, Globe, User, Mail, Lock, Shield, Phone } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -17,13 +17,14 @@ export default function AuthPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: ""
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const resetForm = () => {
-    setFormData({ name: "", email: "", password: "" });
+    setFormData({ name: "", email: "", phone: "", password: "" });
     setError("");
   };
 
@@ -54,6 +55,7 @@ export default function AuthPage() {
         body: JSON.stringify({ 
           name: formData.name.trim(), 
           email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
           watchedVideos: [],
           points: 0
         })
@@ -309,6 +311,19 @@ export default function AuthPage() {
                   className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
                   dir="ltr"
                   data-testid="input-email"
+                />
+              </div>
+
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <Input 
+                  type="tel" 
+                  placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
+                  dir="ltr"
+                  data-testid="input-phone"
                 />
               </div>
               
