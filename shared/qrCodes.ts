@@ -32,9 +32,32 @@ export const animalQRCodes: AnimalQRCode[] = [
 ];
 
 export function validateQRCode(qrValue: string): { valid: boolean; animalId?: string } {
-  const qrCode = animalQRCodes.find(qr => qr.qrValue === qrValue);
-  if (qrCode) {
-    return { valid: true, animalId: qrCode.animalId };
+  // Clean the QR code value - remove whitespace, newlines, and normalize
+  const cleanedValue = qrValue.trim().replace(/[\r\n\t]/g, '');
+  
+  // First try exact match with cleaned value
+  const exactMatch = animalQRCodes.find(qr => qr.qrValue === cleanedValue);
+  if (exactMatch) {
+    return { valid: true, animalId: exactMatch.animalId };
   }
+  
+  // Try case-insensitive match (iOS sometimes changes case)
+  const caseInsensitiveMatch = animalQRCodes.find(
+    qr => qr.qrValue.toLowerCase() === cleanedValue.toLowerCase()
+  );
+  if (caseInsensitiveMatch) {
+    return { valid: true, animalId: caseInsensitiveMatch.animalId };
+  }
+  
+  // Try to extract and validate TLW format even with slight variations
+  const tlwMatch = cleanedValue.match(/^TLW-([a-z_]+)-(.+)$/i);
+  if (tlwMatch) {
+    const animalId = tlwMatch[1].toLowerCase();
+    const matchByAnimalId = animalQRCodes.find(qr => qr.animalId === animalId);
+    if (matchByAnimalId) {
+      return { valid: true, animalId: matchByAnimalId.animalId };
+    }
+  }
+  
   return { valid: false };
 }

@@ -142,20 +142,23 @@ export default function QRScannerPage() {
 
   // Extract animal ID and signature from URL format or legacy token format
   const extractQRData = (code: string): { animalId: string | null; signature: string | null; isUrl: boolean } => {
+    // Clean the scanned code - iOS can add whitespace/newlines
+    const cleanedCode = code.trim().replace(/[\r\n\t]/g, '');
+    
     // Check if it's a URL format (e.g., https://app.replit.app/animal/desert_hare?qr=unlock&sig=XXXX)
     try {
-      const url = new URL(code);
-      const pathMatch = url.pathname.match(/\/animal\/([a-z_]+)/);
+      const url = new URL(cleanedCode);
+      const pathMatch = url.pathname.match(/\/animal\/([a-z_]+)/i);
       if (pathMatch && pathMatch[1]) {
         const signature = url.searchParams.get('sig');
-        return { animalId: pathMatch[1], signature, isUrl: true };
+        return { animalId: pathMatch[1].toLowerCase(), signature, isUrl: true };
       }
     } catch {
       // Not a URL, try legacy token format
     }
     
     // Legacy token format: TLW-{animalId}-{token}
-    const validation = validateQRCode(code);
+    const validation = validateQRCode(cleanedCode);
     if (validation.valid && validation.animalId) {
       return { animalId: validation.animalId, signature: null, isUrl: false };
     }
@@ -271,47 +274,65 @@ export default function QRScannerPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="h-[100dvh] w-full bg-background text-white flex flex-col"
+      className="h-[100dvh] w-full bg-black text-white flex flex-col relative"
       dir={dir}
     >
-      {/* Header */}
+      {/* Full Screen QR Scanner Container */}
+      {!result && (
+        <div 
+          ref={containerRef}
+          className="absolute inset-0 w-full h-full bg-black"
+        >
+          <div id="qr-reader" className="w-full h-full" />
+          
+          {!isScanning && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+              <div className="text-center">
+                <Scan className="h-24 w-24 text-white/30 mx-auto mb-4" />
+                <p className="text-white/70 text-center px-6">{t("subtitle")}</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Scanning Frame Overlay */}
+          {isScanning && (
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-64 h-64 border-2 border-[#b97d42] rounded-2xl relative">
+                  <div className="absolute -top-0.5 -left-0.5 w-8 h-8 border-t-4 border-l-4 border-[#b97d42] rounded-tl-2xl" />
+                  <div className="absolute -top-0.5 -right-0.5 w-8 h-8 border-t-4 border-r-4 border-[#b97d42] rounded-tr-2xl" />
+                  <div className="absolute -bottom-0.5 -left-0.5 w-8 h-8 border-b-4 border-l-4 border-[#b97d42] rounded-bl-2xl" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-4 border-r-4 border-[#b97d42] rounded-br-2xl" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Header - Overlaid on camera */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between p-4 border-b border-white/10"
+        className="relative z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent"
       >
         <motion.button
           onClick={() => setLocation("/gallery")}
-          className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+          className={`p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           data-testid="button-back"
         >
           <ArrowLeft className="h-6 w-6" />
         </motion.button>
-        <h1 className="text-lg font-semibold">{t("title")}</h1>
+        <h1 className="text-lg font-semibold drop-shadow-lg">{t("title")}</h1>
         <div className="w-10" />
       </motion.div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      {/* Bottom Controls - Overlaid on camera */}
+      <div className="relative z-10 mt-auto p-6 bg-gradient-to-t from-black/80 to-transparent">
         {!result ? (
           <>
-            <p className="text-white/70 text-center mb-6">{t("subtitle")}</p>
-            
-            {/* QR Scanner Container */}
-            <div 
-              ref={containerRef}
-              className="w-full max-w-sm aspect-square bg-black/50 rounded-2xl overflow-hidden relative mb-6"
-            >
-              <div id="qr-reader" className="w-full h-full" />
-              
-              {!isScanning && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Scan className="h-24 w-24 text-white/30" />
-                </div>
-              )}
-            </div>
 
             {/* Zoom Control */}
             {isScanning && supportsZoom && (
