@@ -86,6 +86,13 @@ export default function GalleryPage() {
     setShowSaveModal(false);
   };
 
+  // Close modal when user logs in (after registration)
+  useEffect(() => {
+    if (user) {
+      setShowSaveModal(false);
+    }
+  }, [user]);
+
   if (isLoading) {
     return (
       <div className="h-[100dvh] w-full bg-background flex items-center justify-center">

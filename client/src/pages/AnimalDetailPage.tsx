@@ -103,6 +103,15 @@ export default function AnimalDetailPage() {
     }
   }, [animal, hasWatched]);
 
+  // Close modal and refresh progress when user logs in (after registration)
+  useEffect(() => {
+    if (user) {
+      setShowSaveModal(false);
+      // Refresh progress to get server-side data
+      refreshProgress();
+    }
+  }, [user]);
+
   // Track watch time - only when video is actually playing (not paused)
   useEffect(() => {
     if (isPlaying && !hasRecordedWatch && animal) {
@@ -150,12 +159,8 @@ export default function AnimalDetailPage() {
   // Handle video completion
   const handleVideoEnded = () => {
     setIsPlaying(false);
-    // Prompt guests to register after every video ends
-    if (!user) {
-      setTimeout(() => {
-        setShowSaveModal(true);
-      }, 500);
-    }
+    // Only prompt guests who haven't registered to save their progress
+    // Don't show modal if user is already logged in
   };
 
   useEffect(() => {
