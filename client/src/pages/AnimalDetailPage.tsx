@@ -245,10 +245,8 @@ export default function AnimalDetailPage() {
         )}
       </div>
       
-      {/* Gradient overlay only when NOT playing - for bottom content visibility */}
-      {!isPlaying && (
-        <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-black/90 via-black/50 to-transparent z-5" />
-      )}
+      {/* Subtle gradient at bottom for text readability - always visible */}
+      <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-gradient-to-t from-black/80 via-black/40 to-transparent z-5 pointer-events-none" />
 
       {/* Minimal Floating Controls - Always visible but unobtrusive */}
       <div className="absolute top-0 left-0 right-0 z-50 p-4 pointer-events-none">
@@ -360,41 +358,30 @@ export default function AnimalDetailPage() {
         </div>
       )}
 
-      {/* Bottom Content - Only visible when NOT playing */}
-      <AnimatePresence>
-        {!isPlaying && (
-          <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="absolute bottom-0 left-0 right-0 z-30 p-6 pb-8 flex flex-col gap-4"
-          >
-            {/* Name Block - Compact */}
-            <div className="bg-black/60 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center">
-              <h1 className="font-serif text-2xl font-bold text-white mb-1">
-                {t(`animals.${animal.id}`)}
-              </h1>
-              <p className="font-sans text-xs tracking-[0.2em] uppercase text-white/60">
-                {animal.scientificName}
-              </p>
-            </div>
+      {/* Bottom Content - Always visible, compact design */}
+      <div className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-6">
+        {/* Compact bottom bar with name and AR button side by side */}
+        <div className="flex items-center gap-3">
+          {/* Name Block - Left side, compact */}
+          <div className="flex-1 bg-black/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+            <h1 className="font-serif text-lg font-bold text-white leading-tight">
+              {t(`animals.${animal.id}`)}
+            </h1>
+            <p className="font-sans text-[10px] tracking-[0.15em] uppercase text-white/50">
+              {animal.scientificName}
+            </p>
+          </div>
 
-            {/* AR Button */}
-            <button 
-              onClick={() => setIsArOpen(true)}
-              className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
-              data-testid="button-enter-ar"
-            >
-              <ScanLine className="w-5 h-5 opacity-70" />
-              <span className="text-sm tracking-widest uppercase flex-1 text-center">
-                {t("detail.enterAr")}
-              </span>
-              <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {/* AR Button - Right side, square icon */}
+          <button 
+            onClick={() => setIsArOpen(true)}
+            className="w-14 h-14 bg-[#8B6B58] hover:bg-[#7A5C4A] rounded-xl transition-all active:scale-[0.95] flex items-center justify-center"
+            data-testid="button-enter-ar"
+          >
+            <ScanLine className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      </div>
 
       {/* Save Progress Modal */}
       <SaveProgressModal 
