@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, updateUserProgressSchema, loginSchema, animalGuideRequestSchema } from "@shared/schema";
+import { insertUserSchema, updateUserProgressSchema, loginSchema, animalGuideRequestSchema, insertLeadSchema } from "@shared/schema";
 import { animalQRCodes, validateQRCode } from "@shared/qrCodes";
 import { validateQRSignature } from "@shared/qrSignature";
 import bcrypt from "bcrypt";
@@ -892,6 +892,48 @@ Provide concise, informative answers (2-3 sentences). Focus on fascinating facts
     } catch (error: any) {
       console.error("Get user activity report error:", error);
       res.status(500).json({ error: "Failed to get user activity report" });
+    }
+  });
+
+  // Lead submission (public endpoint)
+  app.post("/api/leads", async (req, res) => {
+    try {
+      const result = insertLeadSchema.safeParse(req.body);
+      if (!result.success) {
+        const errors = result.error.errors.map(e => e.message).join(", ");
+        return res.status(400).json({ error: errors || "Invalid request data" });
+      }
+
+      const { name, email, phone } = result.data;
+      
+      // Check if lead already exists
+      const existingLead = await storage.getLeadByEmail(email.toLowerCase().trim());
+      if (existingLead) {
+        return res.status(400).json({ error: "You have already registered!" });
+      }
+
+      const lead = await storage.createLead({
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
+        phone: phone.trim()
+      });
+
+      res.json({ success: true, lead });
+    } catch (error: any) {
+      if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+        return res.status(400).json({ error: "You have already registered!" });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin: Get all leads
+  app.get("/api/admin/leads", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const leads = await storage.getAllLeads();
+      res.json({ leads });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

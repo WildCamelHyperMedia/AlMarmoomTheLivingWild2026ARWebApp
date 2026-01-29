@@ -1,4 +1,4 @@
-import { users, userProgress, loginHistory, sessions, activityLog, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory, type Session, type InsertSession, type ActivityLog, type InsertActivityLog } from "@shared/schema";
+import { users, userProgress, loginHistory, sessions, activityLog, leads, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory, type Session, type InsertSession, type ActivityLog, type InsertActivityLog, type Lead, type InsertLead } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, gt } from "drizzle-orm";
 
@@ -34,6 +34,11 @@ export interface IStorage {
   getActivityLogs(limit?: number): Promise<ActivityLog[]>;
   getActivityLogsByType(type: string, limit?: number): Promise<ActivityLog[]>;
   getActivityStats(): Promise<{ type: string; count: number }[]>;
+  
+  // Lead operations
+  createLead(lead: InsertLead): Promise<Lead>;
+  getAllLeads(): Promise<Lead[]>;
+  getLeadByEmail(email: string): Promise<Lead | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -175,6 +180,23 @@ export class DatabaseStorage implements IStorage {
       ORDER BY count DESC
     `);
     return result.rows as { type: string; count: number }[];
+  }
+
+  async createLead(lead: InsertLead): Promise<Lead> {
+    const [newLead] = await db
+      .insert(leads)
+      .values(lead)
+      .returning();
+    return newLead;
+  }
+
+  async getAllLeads(): Promise<Lead[]> {
+    return await db.select().from(leads).orderBy(desc(leads.createdAt));
+  }
+
+  async getLeadByEmail(email: string): Promise<Lead | undefined> {
+    const [lead] = await db.select().from(leads).where(eq(leads.email, email));
+    return lead || undefined;
   }
 }
 
