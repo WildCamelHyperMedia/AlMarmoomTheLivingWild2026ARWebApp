@@ -419,11 +419,14 @@ export default function GalleryPage() {
         ))}
       </div>
 
-      <SaveProgressModal 
-        isOpen={showSaveModal} 
-        onClose={() => setShowSaveModal(false)} 
-        onSuccess={handleSaveSuccess}
-      />
+      {/* Only show save modal for guests */}
+      {!user && (
+        <SaveProgressModal 
+          isOpen={showSaveModal} 
+          onClose={() => setShowSaveModal(false)} 
+          onSuccess={handleSaveSuccess}
+        />
+      )}
 
       {/* Collection Complete Celebration Modal */}
       <AnimatePresence>

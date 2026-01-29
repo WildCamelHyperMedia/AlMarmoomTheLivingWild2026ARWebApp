@@ -443,12 +443,14 @@ export default function AnimalDetailPage() {
         )}
       </AnimatePresence>
 
-      {/* Save Progress Modal */}
-      <SaveProgressModal 
-        isOpen={showSaveModal} 
-        onClose={() => setShowSaveModal(false)} 
-        onSuccess={() => setShowSaveModal(false)}
-      />
+      {/* Save Progress Modal - only for guests */}
+      {!user && (
+        <SaveProgressModal 
+          isOpen={showSaveModal} 
+          onClose={() => setShowSaveModal(false)} 
+          onSuccess={() => setShowSaveModal(false)}
+        />
+      )}
     </div>
   );
 }
