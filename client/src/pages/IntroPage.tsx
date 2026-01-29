@@ -70,7 +70,7 @@ export default function IntroPage() {
   }
 
   return (
-    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden safe-top safe-bottom">
+    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden safe-top safe-bottom">
       
       {/* Desert Dunes Background */}
       <div 
@@ -168,7 +168,7 @@ export default function IntroPage() {
       </motion.div>
 
       {/* Action Buttons */}
-      <div className="w-full max-w-[300px] sm:max-w-sm space-y-3 sm:space-y-4 z-10 mt-auto">
+      <div className="w-full max-w-[300px] sm:max-w-sm space-y-3 sm:space-y-4 z-10">
         
         {/* Start Journey Button - Clickable after 5 seconds */}
         <div className="relative">
