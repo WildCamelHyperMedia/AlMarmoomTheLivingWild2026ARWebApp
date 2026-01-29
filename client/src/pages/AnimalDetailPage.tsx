@@ -218,9 +218,8 @@ export default function AnimalDetailPage() {
       {/* Hidden voiceover audio element */}
       <audio ref={voiceoverRef} />
       
-      {/* Full Screen Background Media */}
+      {/* Full Screen Background Media - FILLS ENTIRE SCREEN */}
       <div className="absolute inset-0 z-0">
-        {/* Render either video or image as background */}
         {isPlaying && currentVideo ? (
           <video 
             ref={videoRef}
@@ -232,7 +231,7 @@ export default function AnimalDetailPage() {
             muted={isMuted}
             onEnded={handleVideoEnded}
             onClick={() => setIsPlaying(false)}
-            className="w-full h-full object-contain absolute inset-0 z-0 bg-black"
+            className="w-full h-full object-cover absolute inset-0 z-0"
             poster={animal.optimizedImage}
           />
         ) : (
@@ -246,60 +245,7 @@ export default function AnimalDetailPage() {
       </div>
       
       {/* Gradient for bottom content readability */}
-      <div className="absolute bottom-0 left-0 right-0 h-[220px] bg-gradient-to-t from-black via-black/60 to-transparent z-5 pointer-events-none" />
-
-      {/* Back Button - Bottom Left Corner */}
-      <div className={`absolute bottom-[200px] ${dir === 'rtl' ? 'right-4' : 'left-4'} z-50`}>
-        <Link href="/gallery">
-          <button 
-            className={`w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
-            data-testid="button-back-to-gallery"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
-        </Link>
-      </div>
-
-      {/* Video Controls - Bottom Right Corner (when playing) */}
-      {isPlaying && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className={`absolute bottom-[200px] ${dir === 'rtl' ? 'left-4' : 'right-4'} z-50 flex flex-col gap-2`}
-        >
-          <button 
-            onClick={() => setIsMuted(!isMuted)}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors text-white"
-            data-testid="button-toggle-mute"
-          >
-            {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
-          <button 
-            onClick={() => setIsPlaying(false)}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors text-white"
-            data-testid="button-stop-video"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </motion.div>
-      )}
-
-      {/* Points Countdown - Small pill, bottom center above info */}
-      {isPlaying && !hasRecordedWatch && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-[210px] left-1/2 -translate-x-1/2 z-50"
-        >
-          <div className="bg-primary/90 backdrop-blur-sm rounded-full px-4 py-1.5 shadow-lg">
-            <span className="text-xs text-background font-bold">
-              {watchTime < MIN_WATCH_TIME 
-                ? `${MIN_WATCH_TIME - watchTime}s`
-                : '✓'}
-            </span>
-          </div>
-        </motion.div>
-      )}
+      <div className="absolute bottom-0 left-0 right-0 h-[250px] bg-gradient-to-t from-black via-black/70 to-transparent z-5 pointer-events-none" />
 
       {/* Play Button Overlay */}
       {!isPlaying && !isArOpen && (
@@ -352,19 +298,56 @@ export default function AnimalDetailPage() {
         </div>
       )}
 
-      {/* Bottom Content - Always visible, stacked layout */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 p-6 flex flex-col gap-4">
-        {/* Name Block */}
-        <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center">
-          <h1 className="font-serif text-2xl font-bold text-white mb-1">
-            {t(`animals.${animal.id}`)}
-          </h1>
-          <p className="font-sans text-xs tracking-[0.2em] uppercase text-white/60">
-            {animal.scientificName}
-          </p>
+      {/* Bottom Content - All controls integrated */}
+      <div className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-6 flex flex-col gap-3">
+        
+        {/* Control Row - Back, Name/Timer, Close/Volume */}
+        <div className="flex items-center gap-3">
+          {/* Back Button */}
+          <Link href="/gallery">
+            <button 
+              className={`w-14 h-14 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+              data-testid="button-back-to-gallery"
+            >
+              <ArrowLeft className="h-6 w-6 text-white" />
+            </button>
+          </Link>
+          
+          {/* Name Block with optional countdown */}
+          <div className="flex-1 bg-black/50 backdrop-blur-md rounded-2xl p-3 border border-white/10 text-center relative overflow-hidden">
+            {/* Countdown progress bar */}
+            {isPlaying && !hasRecordedWatch && (
+              <motion.div 
+                initial={{ width: "0%" }}
+                animate={{ width: `${(watchTime / MIN_WATCH_TIME) * 100}%` }}
+                className="absolute bottom-0 left-0 h-1 bg-primary rounded-full"
+              />
+            )}
+            <h1 className="font-serif text-xl font-bold text-white leading-tight">
+              {t(`animals.${animal.id}`)}
+            </h1>
+            <p className="font-sans text-[10px] tracking-[0.15em] uppercase text-white/50">
+              {animal.scientificName}
+            </p>
+          </div>
+          
+          {/* Right Controls - Volume or Close when playing, empty when not */}
+          {isPlaying ? (
+            <div className="flex flex-col gap-2">
+              <button 
+                onClick={() => setIsMuted(!isMuted)}
+                className="w-14 h-14 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors text-white"
+                data-testid="button-toggle-mute"
+              >
+                {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+              </button>
+            </div>
+          ) : (
+            <div className="w-14 h-14" />
+          )}
         </div>
 
-        {/* AR Button */}
+        {/* AR Button - Full width */}
         <button 
           onClick={() => setIsArOpen(true)}
           className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
