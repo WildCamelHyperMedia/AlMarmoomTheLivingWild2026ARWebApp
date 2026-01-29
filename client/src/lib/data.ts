@@ -14,6 +14,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/1-Little Grebe.jpg",
     optimizedImage: "/animals/optimized/1-Little Grebe.webp",
     scientificName: "TACHYBAPTUS RUFICOLLIS",
+    videoEn: "/videos/little_grebe_en.mp4",
     arUrl: "https://webxr.run/5O012Vdy8VAbw"
   },
   {
@@ -161,6 +162,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/20-Arabian Oryx.jpg",
     optimizedImage: "/animals/optimized/20-Arabian Oryx.webp",
     scientificName: "ORYX LEUCORYX",
+    videoEn: "/videos/arabian_oryx_en.mp4",
     arUrl: "https://webxr.run/OxyZ5mJy3GWAX"
   },
   {
@@ -168,6 +170,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/21-Houbara-Bustard.jpg",
     optimizedImage: "/animals/optimized/21-Houbara-Bustard.webp",
     scientificName: "CHLAMYDOTIS UNDULATA",
+    videoEn: "/videos/houbara_bustard_en.mp4",
     arUrl: "https://webxr.run/3oXW15Q3wgyL2"
   },
   {
@@ -175,6 +178,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/22-Dorcas-Gazelle.jpg",
     optimizedImage: "/animals/optimized/22-Dorcas-Gazelle.webp",
     scientificName: "GAZELLA DORCAS",
+    videoEn: "/videos/dorcas_gazelle_en.mp4",
     arUrl: "https://webxr.run/0Zpa12WOw19wJ"
   },
   {
@@ -182,8 +186,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/24-Eurasian Stone-curlew.jpg",
     optimizedImage: "/animals/optimized/24-Eurasian Stone-curlew.webp",
     scientificName: "BURHINUS OEDICNEMUS",
-    videoEn: "/videos/stone_curlew.mp4",
-    videoAr: "/videos/stone_curlew.mp4",
+    videoEn: "/videos/eurasian_stone_curlew_en.mp4",
     arUrl: "https://webxr.run/06LeM1AzARYJP"
   },
   {
@@ -191,8 +194,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/25-White-Tailed-Lapwing.jpg",
     optimizedImage: "/animals/optimized/25-White-Tailed-Lapwing.webp",
     scientificName: "VANELLUS LEUCURUS",
-    videoEn: "/videos/stone_curlew.mp4",
-    videoAr: "/videos/stone_curlew.mp4",
+    videoEn: "/videos/white_tailed_lapwing_en.mp4",
     arUrl: "https://webxr.run/yX7JR9wGGYm2r"
   },
   {
@@ -200,6 +202,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/26-Desert-Eagle-Owl.jpg",
     optimizedImage: "/animals/optimized/26-Desert-Eagle-Owl.webp",
     scientificName: "BUBO ASCALAPHUS",
+    videoEn: "/videos/desert_eagle_owl_en.mp4",
     arUrl: "https://webxr.run/nOAvvLXVoYrxk"
   },
   {
@@ -207,6 +210,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/28-hedgehog.jpg",
     optimizedImage: "/animals/optimized/28-hedgehog.webp",
     scientificName: "PARAECHINUS AETHIOPICUS",
+    videoEn: "/videos/hedgehog_en.mp4",
     arUrl: "https://webxr.run/Lm5VY4pEmlln"
   },
 ];
