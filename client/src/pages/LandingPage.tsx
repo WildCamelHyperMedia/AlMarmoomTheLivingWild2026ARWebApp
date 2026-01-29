@@ -34,7 +34,7 @@ export default function LandingPage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 flex h-full flex-col items-center justify-end px-6 pb-24 text-center">
+      <div className="relative z-20 flex h-full flex-col items-center justify-end px-6 pb-40 text-center">
         
         {/* Language Selection */}
         <motion.div 
