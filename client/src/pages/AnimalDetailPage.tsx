@@ -237,10 +237,25 @@ export default function AnimalDetailPage() {
             autoPlay 
             controls={false}
             playsInline
+            // @ts-ignore - webkit-playsinline is needed for older iOS
+            webkit-playsinline="true"
+            preload="auto"
             loop={false}
             muted={isMuted}
             onEnded={handleVideoEnded}
             onClick={() => setIsPlaying(false)}
+            onCanPlay={() => {
+              // Ensure video plays after it's ready
+              if (videoRef.current && isPlaying) {
+                videoRef.current.play().catch(() => {});
+              }
+            }}
+            onStalled={() => {
+              // Try to resume if video stalls
+              if (videoRef.current && isPlaying) {
+                videoRef.current.play().catch(() => {});
+              }
+            }}
             className="w-full h-full object-cover absolute inset-0 z-0"
             poster={animal.optimizedImage}
           />

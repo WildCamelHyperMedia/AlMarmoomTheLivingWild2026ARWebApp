@@ -108,7 +108,7 @@ export default function QRScannerPage() {
         {
           fps: 10,
           qrbox: { width: 200, height: 200 },
-          aspectRatio: containerHeight / containerWidth, // Force portrait aspect ratio
+          aspectRatio: 1.0, // Force square aspect ratio for consistent scanning
         },
         async (decodedText) => {
           await stopScanner();
