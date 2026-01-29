@@ -219,17 +219,23 @@ export default function QRScannerPage() {
       dir={dir}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <button
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between p-4 border-b border-white/10"
+      >
+        <motion.button
           onClick={() => setLocation("/gallery")}
           className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           data-testid="button-back"
         >
           <ArrowLeft className="h-6 w-6" />
-        </button>
+        </motion.button>
         <h1 className="text-lg font-semibold">{t("title")}</h1>
         <div className="w-10" />
-      </div>
+      </motion.div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6">
@@ -252,18 +258,32 @@ export default function QRScannerPage() {
             </div>
 
             {/* Scan Button */}
-            <button
+            <motion.button
               onClick={isScanning ? stopScanner : startScanner}
-              className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-colors ${
+              className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-colors relative overflow-hidden ${
                 isScanning 
                   ? 'bg-red-500 hover:bg-red-600' 
                   : 'bg-[#b97d42] hover:bg-[#a06d35]'
               }`}
+              whileHover={{ scale: 1.05, boxShadow: isScanning ? "0 10px 30px rgba(239,68,68,0.4)" : "0 10px 30px rgba(185,125,66,0.4)" }}
+              whileTap={{ scale: 0.95 }}
               data-testid="button-scan"
             >
-              <Camera className="h-5 w-5" />
-              {isScanning ? t("stopScan") : t("startScan")}
-            </button>
+              {!isScanning && (
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+                />
+              )}
+              <motion.div
+                animate={isScanning ? { rotate: 360 } : { rotate: 0 }}
+                transition={isScanning ? { duration: 2, repeat: Infinity, ease: "linear" } : {}}
+              >
+                <Camera className="h-5 w-5 relative z-10" />
+              </motion.div>
+              <span className="relative z-10">{isScanning ? t("stopScan") : t("startScan")}</span>
+            </motion.button>
 
             {error && (
               <p className="mt-4 text-red-400 text-center">{error}</p>
@@ -286,13 +306,15 @@ export default function QRScannerPage() {
                 </p>
                 
                 <div className="flex flex-col gap-3 w-full max-w-xs">
-                  <button
+                  <motion.button
                     onClick={() => setLocation(`/animal/${result.animalId}`)}
                     className="w-full py-3 bg-[#b97d42] rounded-full font-semibold"
+                    whileHover={{ scale: 1.03, boxShadow: "0 10px 30px rgba(185,125,66,0.4)" }}
+                    whileTap={{ scale: 0.97 }}
                     data-testid="button-view-animal"
                   >
                     {t("viewAnimal")}
-                  </button>
+                  </motion.button>
                   <button
                     onClick={() => {
                       setResult(null);

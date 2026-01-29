@@ -323,21 +323,30 @@ export default function IntroPage() {
                   transition={{ delay: 0.6 }}
                   className="space-y-3"
                 >
-                  <button
+                  <motion.button
                     onClick={handleRegisterNow}
-                    className="w-full bg-[#b97d42] hover:bg-[#855338] text-white font-bold py-4 rounded-xl text-lg transition-all active:scale-[0.98] shadow-lg"
+                    className="w-full bg-[#b97d42] hover:bg-[#855338] text-white font-bold py-4 rounded-xl text-lg transition-all shadow-lg relative overflow-hidden"
+                    whileHover={{ scale: 1.03, boxShadow: "0 10px 30px rgba(185,125,66,0.5)" }}
+                    whileTap={{ scale: 0.97 }}
                     data-testid="button-register-now"
                   >
-                    {t("intro.popup.register")}
-                  </button>
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      animate={{ x: ["-100%", "200%"] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+                    />
+                    <span className="relative z-10">{t("intro.popup.register")}</span>
+                  </motion.button>
 
-                  <button
+                  <motion.button
                     onClick={handleSkipToGallery}
                     className="w-full text-[#5b3e34] hover:text-[#30221b] font-medium py-2 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     data-testid="button-skip-to-gallery"
                   >
                     {t("intro.popup.skip")}
-                  </button>
+                  </motion.button>
                 </motion.div>
               </div>
             </motion.div>

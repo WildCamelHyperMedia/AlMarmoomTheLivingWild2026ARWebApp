@@ -181,51 +181,82 @@ export default function AuthPage() {
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background pointer-events-none" />
 
       {/* Header */}
-      <div className="w-full flex justify-between items-center mb-6 z-10">
-        <button 
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full flex justify-between items-center mb-6 z-10"
+      >
+        <motion.button 
           onClick={handleBack}
           className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+          whileTap={{ scale: 0.9 }}
           data-testid="button-back"
         >
           <ArrowLeft className="h-6 w-6" />
-        </button>
-        <button 
+        </motion.button>
+        <motion.button 
           onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
           className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-white/10 transition-colors text-sm"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           data-testid="button-language"
         >
           <Globe className="h-4 w-4 text-white/60" />
           <span className="text-white/80">{language === 'en' ? 'العربية' : 'English'}</span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Mode Tabs */}
-      <div className="w-full max-w-sm z-10 mb-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="w-full max-w-sm z-10 mb-6"
+      >
         <div className="flex bg-[#5b3e34]/50 rounded-2xl p-1 backdrop-blur-sm">
-          <button
+          <motion.button
             onClick={() => switchMode("register")}
-            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
               mode === "register" 
                 ? "bg-[#b97d42] text-white shadow-lg" 
                 : "text-white/60 hover:text-white/80"
             }`}
+            whileHover={{ scale: mode !== "register" ? 1.02 : 1 }}
+            whileTap={{ scale: 0.98 }}
             data-testid="tab-register"
           >
             {language === 'en' ? 'Register' : 'تسجيل جديد'}
-          </button>
-          <button
+            {mode === "register" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-[#b97d42] rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+          </motion.button>
+          <motion.button
             onClick={() => switchMode("login")}
-            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
               mode === "login" 
                 ? "bg-[#b97d42] text-white shadow-lg" 
                 : "text-white/60 hover:text-white/80"
             }`}
+            whileHover={{ scale: mode !== "login" ? 1.02 : 1 }}
+            whileTap={{ scale: 0.98 }}
             data-testid="tab-login"
           >
             {language === 'en' ? 'Login' : 'تسجيل الدخول'}
-          </button>
+            {mode === "login" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-[#b97d42] rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {/* Register Form */}
@@ -294,16 +325,24 @@ export default function AuthPage() {
             </div>
 
             <motion.button 
+              whileHover={{ scale: 1.02, boxShadow: "0 10px 40px rgba(185,125,66,0.5)" }}
               whileTap={{ scale: 0.98 }}
               onClick={handleRegister}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(185,125,66,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(185,125,66,0.4)] disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
               data-testid="button-register"
             >
-              {isLoading 
-                ? (language === 'en' ? 'Registering...' : 'جاري التسجيل...') 
-                : (language === 'en' ? 'Register' : 'تسجيل')
-              }
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+              />
+              <span className="relative z-10">
+                {isLoading 
+                  ? (language === 'en' ? 'Registering...' : 'جاري التسجيل...') 
+                  : (language === 'en' ? 'Register' : 'تسجيل')
+                }
+              </span>
             </motion.button>
 
             <button 
@@ -382,16 +421,24 @@ export default function AuthPage() {
             </div>
 
             <motion.button 
+              whileHover={{ scale: 1.02, boxShadow: "0 10px 40px rgba(185,125,66,0.5)" }}
               whileTap={{ scale: 0.98 }}
               onClick={handleLogin}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(185,125,66,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#b97d42] to-[#855338] text-white font-bold py-4 rounded-2xl transition-all mb-3 shadow-[0_4px_30px_rgba(185,125,66,0.4)] disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
               data-testid="button-login"
             >
-              {isLoading 
-                ? (language === 'en' ? 'Logging in...' : 'جاري الدخول...') 
-                : (language === 'en' ? 'Login' : 'دخول')
-              }
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+              />
+              <span className="relative z-10">
+                {isLoading 
+                  ? (language === 'en' ? 'Logging in...' : 'جاري الدخول...') 
+                  : (language === 'en' ? 'Login' : 'دخول')
+                }
+              </span>
             </motion.button>
 
             <button 

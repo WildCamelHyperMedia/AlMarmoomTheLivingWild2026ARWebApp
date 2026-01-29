@@ -232,16 +232,30 @@ export default function GalleryPage() {
           {chunks.map((chunk, pageIndex) => (
             <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative overflow-y-auto" key={pageIndex}>
               <div className="grid grid-cols-2 gap-6 pb-4">
-                {chunk.map((animal) => {
+                {chunk.map((animal, animalIndex) => {
                   const watched = watchedVideos.includes(animal.id);
                   const unlocked = isUnlocked(animal.id);
                   
                   return (
-                    <div key={animal.id} className="relative">
+                    <motion.div 
+                      key={animal.id} 
+                      className="relative"
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ 
+                        delay: animalIndex * 0.05,
+                        duration: 0.4,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                    >
                       {unlocked ? (
                         <Link href={`/animal/${animal.id}`}>
-                          <div className="flex flex-col items-center gap-3 text-center cursor-pointer group">
-                            <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300">
+                          <motion.div 
+                            className="flex flex-col items-center gap-3 text-center cursor-pointer group"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-primary/50 transition-colors duration-300 group-hover:shadow-[0_0_30px_rgba(185,125,66,0.3)]">
                               <img 
                                 src={animal.optimizedImage} 
                                 alt={t(`animals.${animal.id}`)}
@@ -251,40 +265,52 @@ export default function GalleryPage() {
                                 onError={(e) => { e.currentTarget.src = animal.image; }}
                               />
                               {watched && (
-                                <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
+                                <motion.div 
+                                  className="absolute top-1 right-1 bg-primary rounded-full p-1"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                                >
                                   <Star className="w-3 h-3 text-white fill-white" />
-                                </div>
+                                </motion.div>
                               )}
                             </div>
                             <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
                               {t(`animals.${animal.id}`)}
                             </span>
-                          </div>
+                          </motion.div>
                         </Link>
                       ) : (
-                        <div 
+                        <motion.div 
                           className="flex flex-col items-center gap-3 text-center cursor-pointer group"
                           onClick={() => setLocation("/scan")}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg">
+                          <div className="relative w-full aspect-square rounded-full overflow-hidden border-2 border-white/10 shadow-lg group-hover:border-white/20 transition-all duration-300">
                             <img 
                               src={animal.optimizedImage} 
                               alt={t(`animals.${animal.id}`)}
-                              className="w-full h-full object-cover grayscale blur-sm opacity-50"
+                              className="w-full h-full object-cover grayscale blur-sm opacity-50 group-hover:opacity-60 transition-opacity duration-300"
                               loading={pageIndex === 0 ? "eager" : "lazy"}
                               decoding="async"
                               onError={(e) => { e.currentTarget.src = animal.image; }}
                             />
                             <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                              <Lock className="w-8 h-8 text-white/70" />
+                              <motion.div
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                              >
+                                <Lock className="w-8 h-8 text-white/70" />
+                              </motion.div>
                             </div>
                           </div>
-                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center">
+                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center group-hover:text-white/60 transition-colors duration-300">
                             {language === 'en' ? 'Scan to Unlock' : 'امسح للفتح'}
                           </span>
-                        </div>
+                        </motion.div>
                       )}
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -345,16 +371,31 @@ export default function GalleryPage() {
 
       {/* QR Scanner Button - Large Bottom Center */}
       <div className="flex justify-center py-4 relative z-20 shrink-0">
-        <button
+        <motion.button
           onClick={() => setLocation("/scan")}
-          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#b97d42] to-[#855338] hover:from-[#a06d35] hover:to-[#6d4530] text-white rounded-full shadow-lg shadow-[#b97d42]/30 transition-all duration-300 transform hover:scale-105 active:scale-95"
+          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#b97d42] to-[#855338] text-white rounded-full shadow-lg shadow-[#b97d42]/30 relative overflow-hidden"
+          whileHover={{ scale: 1.05, boxShadow: "0 15px 40px rgba(185,125,66,0.5)" }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
           data-testid="button-qr-scan"
         >
-          <QrCode className="h-6 w-6" />
-          <span className="font-semibold text-base">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1.5, ease: "easeInOut" }}
+          />
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <QrCode className="h-6 w-6 relative z-10" />
+          </motion.div>
+          <span className="font-semibold text-base relative z-10">
             {language === 'en' ? 'Scan to Unlock Animals' : 'امسح لفتح الحيوانات'}
           </span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Pagination Dots */}

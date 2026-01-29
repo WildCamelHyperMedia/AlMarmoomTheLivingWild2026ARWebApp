@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { useUser } from "@/lib/user";
 import { animals } from "@/lib/data";
@@ -197,8 +198,8 @@ export default function AdminPage() {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item) => (
-              <button
+            {menuItems.map((item, index) => (
+              <motion.button
                 key={item.id}
                 onClick={() => { setCurrentView(item.id); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
@@ -206,10 +207,15 @@ export default function AdminPage() {
                     ? "bg-[#b97d42] text-background" 
                     : "hover:bg-white/10 text-white/80"
                 }`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ x: 5 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <item.icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
-              </button>
+              </motion.button>
             ))}
             
             {/* Gallery Link */}
@@ -270,12 +276,12 @@ export default function AdminPage() {
                   
                   {/* Stats Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <StatCard icon={Users} label="Total Users" value={analytics.stats.totalUsers} color="blue" />
-                    <StatCard icon={Eye} label="Videos Watched" value={analytics.stats.totalVideosWatched} color="green" />
-                    <StatCard icon={TrendingUp} label="Avg per User" value={analytics.stats.avgVideosPerUser} color="purple" />
-                    <StatCard icon={UserPlus} label="Today" value={analytics.stats.signupsToday} color="yellow" />
-                    <StatCard icon={Calendar} label="This Week" value={analytics.stats.signupsThisWeek} color="pink" />
-                    <StatCard icon={History} label="Total Logins" value={analytics.stats.totalLogins} color="orange" />
+                    <StatCard icon={Users} label="Total Users" value={analytics.stats.totalUsers} color="blue" index={0} />
+                    <StatCard icon={Eye} label="Videos Watched" value={analytics.stats.totalVideosWatched} color="green" index={1} />
+                    <StatCard icon={TrendingUp} label="Avg per User" value={analytics.stats.avgVideosPerUser} color="purple" index={2} />
+                    <StatCard icon={UserPlus} label="Today" value={analytics.stats.signupsToday} color="yellow" index={3} />
+                    <StatCard icon={Calendar} label="This Week" value={analytics.stats.signupsThisWeek} color="pink" index={4} />
+                    <StatCard icon={History} label="Total Logins" value={analytics.stats.totalLogins} color="orange" index={5} />
                   </div>
 
                   {/* Charts Row */}
@@ -676,11 +682,12 @@ export default function AdminPage() {
   );
 }
 
-function StatCard({ icon: Icon, label, value, color }: { 
+function StatCard({ icon: Icon, label, value, color, index = 0 }: { 
   icon: any; 
   label: string; 
   value: number | string; 
   color: string;
+  index?: number;
 }) {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-500/20 text-blue-400',
@@ -692,12 +699,22 @@ function StatCard({ icon: Icon, label, value, color }: {
   };
 
   return (
-    <div className="bg-[#3E2D24]/60 rounded-xl p-4">
-      <div className={`w-10 h-10 rounded-lg ${colorClasses[color]} flex items-center justify-center mb-3`}>
+    <motion.div 
+      className="bg-[#3E2D24]/60 rounded-xl p-4 cursor-pointer"
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+      whileHover={{ scale: 1.03, boxShadow: "0 10px 30px rgba(0,0,0,0.3)" }}
+    >
+      <motion.div 
+        className={`w-10 h-10 rounded-lg ${colorClasses[color]} flex items-center justify-center mb-3`}
+        whileHover={{ rotate: [0, -10, 10, 0] }}
+        transition={{ duration: 0.4 }}
+      >
         <Icon className="w-5 h-5" />
-      </div>
+      </motion.div>
       <p className="text-2xl font-bold">{value}</p>
       <p className="text-xs text-white/50 mt-1">{label}</p>
-    </div>
+    </motion.div>
   );
 }

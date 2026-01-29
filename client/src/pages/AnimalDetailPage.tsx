@@ -368,17 +368,30 @@ export default function AnimalDetailPage() {
         </div>
 
         {/* AR Button - Full width */}
-        <button 
+        <motion.button 
           onClick={() => setIsArOpen(true)}
-          className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
+          className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all flex items-center justify-between px-6 group relative overflow-hidden"
+          whileHover={{ scale: 1.02, boxShadow: "0 10px 40px rgba(139,107,88,0.4)" }}
+          whileTap={{ scale: 0.98 }}
           data-testid="button-enter-ar"
         >
-          <ScanLine className="w-5 h-5 opacity-70" />
-          <span className="text-sm tracking-widest uppercase flex-1 text-center">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+          />
+          <ScanLine className="w-5 h-5 opacity-70 relative z-10" />
+          <span className="text-sm tracking-widest uppercase flex-1 text-center relative z-10">
             {t("detail.enterAr")}
           </span>
-          <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
-        </button>
+          <motion.div 
+            className={`relative z-10 ${dir === 'rtl' ? 'rotate-180' : ''}`}
+            animate={{ x: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ArrowRight className="w-5 h-5 opacity-70" />
+          </motion.div>
+        </motion.button>
       </div>
 
       {/* Reward Popup */}
