@@ -6,7 +6,7 @@ import { animals } from "@/lib/data";
 import { 
   LayoutDashboard, Users, History, Trophy, LogOut, 
   TrendingUp, Eye, UserPlus, Calendar, ChevronRight,
-  Menu, X, Images, Star, Download, Activity
+  Menu, X, Images, Star, Download, Activity, FileText
 } from "lucide-react";
 
 interface UserWithProgress {
@@ -38,7 +38,15 @@ interface Analytics {
   recentLogins: { id: string; userId: string; loginAt: string; userName: string; userEmail: string }[];
 }
 
-type AdminView = "dashboard" | "users" | "history" | "leaderboard" | "activity";
+type AdminView = "dashboard" | "users" | "history" | "leaderboard" | "activity" | "leads";
+
+interface Lead {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+}
 
 interface ActivityLogEntry {
   id: string;
@@ -67,6 +75,7 @@ export default function AdminPage() {
   const [selectedUserAnimals, setSelectedUserAnimals] = useState<{ name: string; animals: string[] } | null>(null);
   const [activityStats, setActivityStats] = useState<{ type: string; count: number }[]>([]);
   const [recentActivities, setRecentActivities] = useState<ActivityLogEntry[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -79,11 +88,12 @@ export default function AdminPage() {
   const fetchData = async () => {
     try {
       const headers = getAuthHeaders();
-      const [usersRes, analyticsRes, activityStatsRes, activitiesRes] = await Promise.all([
+      const [usersRes, analyticsRes, activityStatsRes, activitiesRes, leadsRes] = await Promise.all([
         fetch("/api/admin/users", { headers }),
         fetch("/api/admin/analytics", { headers }),
         fetch("/api/admin/activity-stats", { headers }),
-        fetch("/api/admin/activities?limit=100", { headers })
+        fetch("/api/admin/activities?limit=100", { headers }),
+        fetch("/api/admin/leads", { headers })
       ]);
 
       if (usersRes.ok) {
@@ -104,6 +114,11 @@ export default function AdminPage() {
       if (activitiesRes.ok) {
         const activitiesData = await activitiesRes.json();
         setRecentActivities(activitiesData.activities || []);
+      }
+
+      if (leadsRes.ok) {
+        const leadsData = await leadsRes.json();
+        setLeads(leadsData.leads || []);
       }
     } catch (err) {
       console.error("Failed to fetch admin data:", err);
@@ -244,6 +259,7 @@ export default function AdminPage() {
   const menuItems = [
     { id: "dashboard" as AdminView, icon: LayoutDashboard, label: "Dashboard" },
     { id: "users" as AdminView, icon: Users, label: "Users" },
+    { id: "leads" as AdminView, icon: FileText, label: "Leads" },
     { id: "history" as AdminView, icon: History, label: "Login History" },
     { id: "leaderboard" as AdminView, icon: Trophy, label: "Leaderboard" },
     { id: "activity" as AdminView, icon: Activity, label: "Activity" },
@@ -557,6 +573,66 @@ export default function AdminPage() {
                     </div>
                     {regularUsers.length === 0 && (
                       <div className="text-center py-12 text-white/60">No users yet</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Leads View */}
+              {currentView === "leads" && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <h2 className="text-xl md:text-2xl font-bold">Lead Submissions</h2>
+                    <span className="bg-[#3E2D24] px-3 py-1 rounded-full text-sm">
+                      {leads.length} leads
+                    </span>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-3">
+                    {leads.map((lead) => (
+                      <div key={lead.id} className="bg-[#3E2D24]/60 rounded-xl p-4 space-y-2">
+                        <div>
+                          <p className="font-bold">{lead.name}</p>
+                          <p className="text-sm text-white/60">{lead.email}</p>
+                          <p className="text-xs text-white/40">{lead.phone}</p>
+                        </div>
+                        <div className="text-xs text-white/50 pt-2 border-t border-white/10">
+                          Registered {formatDate(lead.createdAt)}
+                        </div>
+                      </div>
+                    ))}
+                    {leads.length === 0 && (
+                      <div className="text-center py-12 text-white/60 bg-[#3E2D24]/60 rounded-xl">No leads yet</div>
+                    )}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block bg-[#3E2D24]/60 rounded-xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-white/10">
+                            <th className="text-left p-4 text-white/60 font-medium">Name</th>
+                            <th className="text-left p-4 text-white/60 font-medium">Email</th>
+                            <th className="text-left p-4 text-white/60 font-medium">Phone</th>
+                            <th className="text-left p-4 text-white/60 font-medium">Registered</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {leads.map((lead) => (
+                            <tr key={lead.id} className="border-b border-white/5 hover:bg-white/5">
+                              <td className="p-4 font-medium">{lead.name}</td>
+                              <td className="p-4 text-white/80">{lead.email}</td>
+                              <td className="p-4 text-white/80">{lead.phone}</td>
+                              <td className="p-4 text-white/60 text-sm">{formatDate(lead.createdAt)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {leads.length === 0 && (
+                      <div className="text-center py-12 text-white/60">No leads yet</div>
                     )}
                   </div>
                 </div>
