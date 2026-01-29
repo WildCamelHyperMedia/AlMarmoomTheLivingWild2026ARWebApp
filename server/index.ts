@@ -3,8 +3,34 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { storage } from "./storage";
+import { db } from "./db";
+import { users } from "@shared/schema";
+import bcrypt from "bcrypt";
 
 const app = express();
+
+async function initializeAdmin() {
+  try {
+    const adminEmail = "admin@almarmoom.ae";
+    const existingAdmin = await storage.getUserByEmail(adminEmail);
+    
+    if (!existingAdmin) {
+      console.log("Creating admin user...");
+      const hashedPassword = await bcrypt.hash("admin123", 10);
+      await db.insert(users).values({
+        name: "Admin",
+        email: adminEmail,
+        phone: "+971500000000",
+        password: hashedPassword,
+        isAdmin: true
+      });
+      console.log("Admin user created successfully");
+    }
+  } catch (error) {
+    console.error("Error initializing admin:", error);
+  }
+}
 const httpServer = createServer(app);
 
 app.use(compression());
@@ -63,6 +89,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  await initializeAdmin();
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
