@@ -98,3 +98,24 @@ export const animalGuideRequestSchema = z.object({
 });
 
 export type AnimalGuideRequest = z.infer<typeof animalGuideRequestSchema>;
+
+// Activity log table for comprehensive tracking
+export const activityLog = pgTable("activity_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id"), // For tracking guest sessions
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  activityType: text("activity_type").notNull(), // 'qr_scan', 'video_watch', 'ar_view', 'registration', 'login'
+  animalId: text("animal_id"),
+  metadata: text("metadata"), // JSON string for additional data
+  userAgent: text("user_agent"),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertActivityLogSchema = createInsertSchema(activityLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+export type ActivityLog = typeof activityLog.$inferSelect;

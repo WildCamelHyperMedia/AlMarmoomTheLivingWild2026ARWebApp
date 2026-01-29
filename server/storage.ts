@@ -1,4 +1,4 @@
-import { users, userProgress, loginHistory, sessions, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory, type Session, type InsertSession } from "@shared/schema";
+import { users, userProgress, loginHistory, sessions, activityLog, type User, type InsertUser, type UserProgress, type InsertUserProgress, type UpdateUserProgress, type LoginHistory, type InsertLoginHistory, type Session, type InsertSession, type ActivityLog, type InsertActivityLog } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql, and, gt } from "drizzle-orm";
 
@@ -28,6 +28,12 @@ export interface IStorage {
   deleteSession(token: string): Promise<void>;
   deleteUserSessions(userId: string): Promise<void>;
   cleanExpiredSessions(): Promise<void>;
+  
+  // Activity log operations
+  createActivityLog(activity: InsertActivityLog): Promise<ActivityLog>;
+  getActivityLogs(limit?: number): Promise<ActivityLog[]>;
+  getActivityLogsByType(type: string, limit?: number): Promise<ActivityLog[]>;
+  getActivityStats(): Promise<{ type: string; count: number }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -137,6 +143,38 @@ export class DatabaseStorage implements IStorage {
 
   async cleanExpiredSessions(): Promise<void> {
     await db.delete(sessions).where(sql`expires_at < NOW()`);
+  }
+
+  async createActivityLog(activity: InsertActivityLog): Promise<ActivityLog> {
+    const [log] = await db
+      .insert(activityLog)
+      .values(activity)
+      .returning();
+    return log;
+  }
+
+  async getActivityLogs(limit: number = 200): Promise<ActivityLog[]> {
+    return await db.select().from(activityLog).orderBy(desc(activityLog.createdAt)).limit(limit);
+  }
+
+  async getActivityLogsByType(type: string, limit: number = 100): Promise<ActivityLog[]> {
+    return await db
+      .select()
+      .from(activityLog)
+      .where(eq(activityLog.activityType, type))
+      .orderBy(desc(activityLog.createdAt))
+      .limit(limit);
+  }
+
+  async getActivityStats(): Promise<{ type: string; count: number }[]> {
+    const result = await db.execute(sql`
+      SELECT activity_type as type, COUNT(*) as count 
+      FROM activity_log 
+      WHERE created_at >= NOW() - INTERVAL '30 days'
+      GROUP BY activity_type 
+      ORDER BY count DESC
+    `);
+    return result.rows as { type: string; count: number }[];
   }
 }
 
