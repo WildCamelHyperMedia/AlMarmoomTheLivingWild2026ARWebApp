@@ -34,33 +34,33 @@ export default function LandingPage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 flex h-full flex-col items-center justify-end px-6 pb-8 text-center">
+      <div className="relative z-20 flex h-full flex-col items-center justify-end px-4 sm:px-6 text-center safe-bottom">
         
         {/* Language Selection */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="w-full max-w-xs space-y-3"
+          className="w-full max-w-[280px] sm:max-w-xs space-y-3 mb-2"
         >
           {/* Arabic Option */}
           <button 
             onClick={() => handleLanguageSelect("ar")}
-            className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-[#5b3e34]/80 px-4 py-3 text-right backdrop-blur-md transition-all hover:bg-[#855338] active:scale-95 border border-[#b97d42]/30 hover:border-[#b97d42]"
+            className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-[#5b3e34]/80 px-4 sm:px-5 py-4 text-right backdrop-blur-md transition-all hover:bg-[#855338] active:scale-[0.98] border border-[#b97d42]/30 hover:border-[#b97d42]"
             data-testid="button-language-arabic"
           >
-            <ArrowRight className="h-4 w-4 text-[#fef3dc]/70 rotate-180 group-hover:-translate-x-1 group-hover:text-[#b97d42] transition-all" />
-            <span className="font-arabic text-lg text-[#fef3dc]">العربية</span>
+            <ArrowRight className="h-5 w-5 text-[#fef3dc]/70 rotate-180 group-hover:-translate-x-1 group-hover:text-[#b97d42] transition-all" />
+            <span className="font-arabic text-lg sm:text-xl text-[#fef3dc]">العربية</span>
           </button>
 
           {/* English Option */}
           <button 
             onClick={() => handleLanguageSelect("en")}
-            className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-[#5b3e34]/80 px-4 py-3 text-left backdrop-blur-md transition-all hover:bg-[#855338] active:scale-95 border border-[#b97d42]/30 hover:border-[#b97d42]"
+            className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-[#5b3e34]/80 px-4 sm:px-5 py-4 text-left backdrop-blur-md transition-all hover:bg-[#855338] active:scale-[0.98] border border-[#b97d42]/30 hover:border-[#b97d42]"
             data-testid="button-language-english"
           >
-            <span className="font-serif text-lg text-[#fef3dc]">English</span>
-            <ArrowRight className="h-4 w-4 text-[#fef3dc]/70 group-hover:translate-x-1 group-hover:text-[#b97d42] transition-all" />
+            <span className="font-serif text-lg sm:text-xl text-[#fef3dc]">English</span>
+            <ArrowRight className="h-5 w-5 text-[#fef3dc]/70 group-hover:translate-x-1 group-hover:text-[#b97d42] transition-all" />
           </button>
         </motion.div>
       </div>

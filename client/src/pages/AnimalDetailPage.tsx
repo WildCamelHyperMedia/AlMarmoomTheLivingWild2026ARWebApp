@@ -313,17 +313,17 @@ export default function AnimalDetailPage() {
       )}
 
       {/* Bottom Content - All controls integrated */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-6 flex flex-col gap-3">
+      <div className="absolute bottom-0 left-0 right-0 z-30 p-3 sm:p-4 pb-4 sm:pb-6 flex flex-col gap-2 sm:gap-3 safe-bottom">
         
         {/* Control Row - Back, Name/Timer, Close/Volume */}
         <div className="flex items-center gap-3">
           {/* Back Button */}
           <Link href="/gallery">
             <button 
-              className={`w-14 h-14 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+              className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
               data-testid="button-back-to-gallery"
             >
-              <ArrowLeft className="h-6 w-6 text-white" />
+              <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </button>
           </Link>
           
@@ -337,10 +337,10 @@ export default function AnimalDetailPage() {
                 className="absolute bottom-0 left-0 h-1 bg-primary rounded-full"
               />
             )}
-            <h1 className="font-serif text-xl font-bold text-white leading-tight">
+            <h1 className="font-serif text-lg sm:text-xl font-bold text-white leading-tight">
               {t(`animals.${animal.id}`)}
             </h1>
-            <p className="font-sans text-[10px] tracking-[0.15em] uppercase text-white/50">
+            <p className="font-sans text-[9px] sm:text-[10px] tracking-[0.15em] uppercase text-white/50">
               {animal.scientificName}
             </p>
           </div>
@@ -350,10 +350,10 @@ export default function AnimalDetailPage() {
             <div className="flex flex-col gap-2">
               <button 
                 onClick={() => setIsMuted(!isMuted)}
-                className="w-14 h-14 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors text-white"
+                className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors text-white"
                 data-testid="button-toggle-mute"
               >
-                {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
             </div>
           ) : (
@@ -367,7 +367,7 @@ export default function AnimalDetailPage() {
             trackARView(animal.id);
             setIsArOpen(true);
           }}
-          className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all flex items-center justify-between px-6 group relative overflow-hidden"
+          className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all flex items-center justify-between px-4 sm:px-6 group relative overflow-hidden"
           whileHover={{ scale: 1.02, boxShadow: "0 10px 40px rgba(139,107,88,0.4)" }}
           whileTap={{ scale: 0.98 }}
           data-testid="button-enter-ar"

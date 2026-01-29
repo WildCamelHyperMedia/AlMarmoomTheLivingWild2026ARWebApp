@@ -314,7 +314,7 @@ export default function QRScannerPage() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent"
+        className="relative z-10 flex items-center justify-between p-3 sm:p-4 bg-gradient-to-b from-black/80 to-transparent safe-top"
       >
         <motion.button
           onClick={() => setLocation("/gallery")}
@@ -330,7 +330,7 @@ export default function QRScannerPage() {
       </motion.div>
 
       {/* Bottom Controls - Overlaid on camera */}
-      <div className="relative z-10 mt-auto p-6 bg-gradient-to-t from-black/80 to-transparent">
+      <div className="relative z-10 mt-auto p-4 sm:p-6 bg-gradient-to-t from-black/80 to-transparent safe-bottom">
         {!result ? (
           <>
 

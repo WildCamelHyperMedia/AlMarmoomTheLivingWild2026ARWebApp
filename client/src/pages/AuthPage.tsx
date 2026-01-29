@@ -170,7 +170,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-6 py-6 relative overflow-hidden">
+    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-4 sm:px-6 py-4 sm:py-6 relative overflow-hidden safe-top safe-bottom">
       
       {/* Desert Dunes Background */}
       <div 
@@ -213,7 +213,7 @@ export default function AuthPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="w-full max-w-sm z-10 mb-6"
+        className="w-full max-w-[320px] sm:max-w-sm z-10 mb-4 sm:mb-6"
       >
         <div className="flex bg-[#5b3e34]/50 rounded-2xl p-1 backdrop-blur-sm">
           <motion.button

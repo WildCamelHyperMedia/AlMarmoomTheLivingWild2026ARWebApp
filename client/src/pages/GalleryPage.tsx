@@ -114,7 +114,7 @@ export default function GalleryPage() {
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background pointer-events-none" />
 
       {/* Header */}
-      <div className="flex items-center justify-between p-6 z-10 relative">
+      <div className="flex items-center justify-between p-4 sm:p-6 z-10 relative safe-top">
         <button 
           onClick={() => setLocation("/intro")}
           className={`p-2 rounded-full hover:bg-white/10 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
@@ -172,20 +172,20 @@ export default function GalleryPage() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="px-6 mb-6 z-10 relative"
+        className="px-4 sm:px-6 mb-4 sm:mb-6 z-10 relative"
       >
-        <div className="flex justify-between items-end mb-4">
-          <h1 className="font-serif text-2xl font-bold uppercase tracking-wider text-white">
+        <div className="flex justify-between items-end mb-3 sm:mb-4">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold uppercase tracking-wider text-white">
             {t("gallery.title")}
           </h1>
           
           <div className="flex flex-col items-end">
-            <span className="text-[10px] text-white/50 font-sans tracking-widest uppercase mb-1">
+            <span className="text-[9px] sm:text-[10px] text-white/50 font-sans tracking-widest uppercase mb-1">
               {language === 'en' ? 'Points' : 'النقاط'}
             </span>
             <div className="flex items-baseline gap-1">
-              <Star className="w-4 h-4 text-primary fill-primary" />
-              <span className="font-serif text-2xl font-bold text-primary">
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-primary fill-primary" />
+              <span className="font-serif text-xl sm:text-2xl font-bold text-primary">
                 {points}
               </span>
             </div>
@@ -237,8 +237,8 @@ export default function GalleryPage() {
       <div className="flex-1 overflow-hidden touch-pan-y relative" ref={emblaRef} dir={dir}>
         <div className="flex h-full touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
-            <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative overflow-y-auto" key={pageIndex}>
-              <div className="grid grid-cols-2 gap-6 pb-4">
+            <div className="flex-[0_0_100%] min-w-0 px-4 sm:px-6 relative overflow-y-auto" key={pageIndex}>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 pb-4">
                 {chunk.map((animal, animalIndex) => {
                   const watched = watchedVideos.includes(animal.id);
                   const unlocked = isUnlocked(animal.id);
@@ -282,7 +282,7 @@ export default function GalleryPage() {
                                 </motion.div>
                               )}
                             </div>
-                            <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center group-hover:text-primary transition-colors duration-300">
+                            <span className="text-[9px] sm:text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center text-center px-1 group-hover:text-primary transition-colors duration-300">
                               {t(`animals.${animal.id}`)}
                             </span>
                           </motion.div>
@@ -312,7 +312,7 @@ export default function GalleryPage() {
                               </motion.div>
                             </div>
                           </div>
-                          <span className="text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center group-hover:text-white/60 transition-colors duration-300">
+                          <span className="text-[9px] sm:text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center text-center px-1 group-hover:text-white/60 transition-colors duration-300">
                             {language === 'en' ? 'Scan to Unlock' : 'امسح للفتح'}
                           </span>
                         </motion.div>
