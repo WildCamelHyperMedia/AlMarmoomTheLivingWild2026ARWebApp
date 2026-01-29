@@ -237,8 +237,8 @@ export default function GalleryPage() {
       <div className="flex-1 overflow-hidden touch-pan-y relative" ref={emblaRef} dir={dir}>
         <div className="flex h-full touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
-            <div className="flex-[0_0_100%] min-w-0 px-4 sm:px-6 relative overflow-y-auto" key={pageIndex}>
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 pb-4">
+            <div className="flex-[0_0_100%] min-w-0 px-4 sm:px-6 relative overflow-y-auto flex items-start" key={pageIndex}>
+              <div className="grid grid-cols-3 gap-4 sm:gap-5 md:gap-6 pb-4 w-full content-start">
                 {chunk.map((animal, animalIndex) => {
                   const watched = watchedVideos.includes(animal.id);
                   const unlocked = isUnlocked(animal.id);
@@ -258,7 +258,7 @@ export default function GalleryPage() {
                       {unlocked ? (
                         <Link href={`/animal/${animal.id}`}>
                           <motion.div 
-                            className="flex flex-col items-center gap-3 text-center cursor-pointer group"
+                            className="flex flex-col items-center gap-1 text-center cursor-pointer group"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
@@ -289,7 +289,7 @@ export default function GalleryPage() {
                         </Link>
                       ) : (
                         <motion.div 
-                          className="flex flex-col items-center gap-3 text-center cursor-pointer group"
+                          className="flex flex-col items-center gap-1 text-center cursor-pointer group"
                           onClick={() => setLocation("/scan")}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
