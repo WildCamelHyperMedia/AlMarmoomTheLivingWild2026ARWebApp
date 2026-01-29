@@ -144,13 +144,8 @@ export default function AnimalDetailPage() {
     };
   }, [isPlaying, hasRecordedWatch, animal, user, recordVideoWatch]);
 
-  // Auto-play video when animal has video
+  // Don't auto-play - let user tap play button
   const currentVideo = animal ? (language === 'ar' ? animal.videoAr : animal.videoEn) : undefined;
-  useEffect(() => {
-    if (currentVideo) {
-      setIsPlaying(true);
-    }
-  }, [currentVideo]);
 
   // Handle video completion
   const handleVideoEnded = () => {
@@ -242,12 +237,30 @@ export default function AnimalDetailPage() {
             poster={animal.optimizedImage}
           />
         ) : (
-          <img 
-            src={animal.optimizedImage} 
-            alt={t(`animals.${animal.id}`)}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.currentTarget.src = animal.image; }}
-          />
+          <>
+            <img 
+              src={animal.optimizedImage} 
+              alt={t(`animals.${animal.id}`)}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.src = animal.image; }}
+            />
+            {/* Play Button Overlay */}
+            {currentVideo && (
+              <motion.button
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsPlaying(true)}
+                className="absolute inset-0 flex items-center justify-center z-10"
+                data-testid="button-play-video"
+              >
+                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/40 flex items-center justify-center shadow-2xl">
+                  <Play className="w-10 h-10 text-white fill-white ml-1" />
+                </div>
+              </motion.button>
+            )}
+          </>
         )}
       </div>
       

@@ -68,11 +68,16 @@ export default function QRScannerPage() {
     try {
       scannerRef.current = new Html5Qrcode("qr-reader");
       
+      // Get container dimensions for portrait aspect ratio
+      const containerWidth = containerRef.current?.clientWidth || 300;
+      const containerHeight = containerRef.current?.clientHeight || 400;
+      
       await scannerRef.current.start(
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
+          qrbox: { width: 200, height: 200 },
+          aspectRatio: containerHeight / containerWidth, // Force portrait aspect ratio
         },
         async (decodedText) => {
           await stopScanner();
