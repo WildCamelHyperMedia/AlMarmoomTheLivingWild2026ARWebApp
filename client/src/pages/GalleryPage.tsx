@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, LogOut, Shield, Bookmark, Star, QrCode, Lock, Trophy, Crown, X } from "lucide-react";
+import { ArrowLeft, LogOut, Shield, Bookmark, Star, QrCode, Lock, Trophy, Crown, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
@@ -18,6 +18,7 @@ export default function GalleryPage() {
   const { watchedVideos, points, isUnlocked, isCollectionComplete, unlockedCount, totalAnimals } = useProgress();
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [hasSeenCompletion, setHasSeenCompletion] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
   const chunkSize = ANIMALS_PER_PAGE;
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
@@ -32,9 +33,18 @@ export default function GalleryPage() {
     if (emblaApi) {
       emblaApi.on("select", () => {
         setSelectedIndex(emblaApi.selectedScrollSnap());
+        setShowSwipeHint(false);
       });
     }
   }, [emblaApi]);
+
+  // Auto-hide swipe hint after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSwipeHint(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (emblaApi) {
@@ -215,7 +225,7 @@ export default function GalleryPage() {
       </motion.div>
 
       {/* Carousel */}
-      <div className="flex-1 overflow-hidden touch-pan-y" ref={emblaRef} dir={dir}>
+      <div className="flex-1 overflow-hidden touch-pan-y relative" ref={emblaRef} dir={dir}>
         <div className="flex h-full touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
             <div className="flex-[0_0_100%] min-w-0 pl-6 pr-6 relative overflow-y-auto" key={pageIndex}>
@@ -279,6 +289,56 @@ export default function GalleryPage() {
             </div>
           ))}
         </div>
+
+        {/* Swipe Hint Animation */}
+        <AnimatePresence>
+          {showSwipeHint && chunks.length > 1 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 pointer-events-none flex items-center justify-center"
+            >
+              {/* Left/Right Edge Indicators */}
+              <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/40 to-transparent flex items-center justify-start pl-2">
+                <motion.div
+                  animate={{ x: [-5, 5, -5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ChevronLeft className="w-8 h-8 text-white/60" />
+                </motion.div>
+              </div>
+              <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black/40 to-transparent flex items-center justify-end pr-2">
+                <motion.div
+                  animate={{ x: [5, -5, 5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ChevronRight className="w-8 h-8 text-white/60" />
+                </motion.div>
+              </div>
+
+              {/* Bottom Text Hint */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2"
+              >
+                <motion.div
+                  animate={{ x: [-8, 8, -8] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-4 h-4 text-primary" />
+                  <span className="text-white/80 text-xs font-medium">
+                    {language === 'en' ? 'Swipe for more' : 'اسحب للمزيد'}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-primary" />
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* QR Scanner Button - Large Bottom Center */}
