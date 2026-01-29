@@ -83,7 +83,7 @@ export async function registerRoutes(
 
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
+        return res.status(400).json({ error: "User already exists. Please use login instead." });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -120,6 +120,10 @@ export async function registerRoutes(
       const { password: _, ...safeUser } = user;
       res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
     } catch (error: any) {
+      // Handle duplicate key errors with user-friendly message
+      if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+        return res.status(400).json({ error: "User already exists. Please use login instead." });
+      }
       res.status(400).json({ error: error.message });
     }
   });
@@ -154,7 +158,7 @@ export async function registerRoutes(
 
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
+        return res.status(400).json({ error: "User already exists. Please use login instead." });
       }
 
       // Generate a random password for the guest account
@@ -218,6 +222,10 @@ export async function registerRoutes(
       const { password: _, ...safeUser } = user;
       res.json({ user: safeUser, token, expiresAt: getExpiryDate().toISOString() });
     } catch (error: any) {
+      // Handle duplicate key errors with user-friendly message
+      if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+        return res.status(400).json({ error: "User already exists. Please use login instead." });
+      }
       res.status(400).json({ error: error.message });
     }
   });
