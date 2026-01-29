@@ -23,7 +23,10 @@ export default function AnimalDetailPage() {
 
   const animal = animals.find((a) => a.id === params?.id);
   
-  const [isPlaying, setIsPlaying] = useState(false);
+  // Check if coming from QR scan to auto-play video
+  const urlParams = new URLSearchParams(searchString);
+  const shouldAutoPlay = urlParams.get('autoplay') === '1' || urlParams.get('qr') === 'unlock';
+  const [isPlaying, setIsPlaying] = useState(shouldAutoPlay);
   const [isArOpen, setIsArOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);

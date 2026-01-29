@@ -178,8 +178,8 @@ export default function QRScannerPage() {
           }
           await refreshProgress();
           trackQRScan(data.animalId, code);
-          // Navigate directly to animal page
-          setLocation(`/animal/${data.animalId}`);
+          // Navigate directly to animal page with auto-play flag
+          setLocation(`/animal/${data.animalId}?autoplay=1`);
         } else {
           setError(data.message || t("invalidCode"));
           scheduleRestart();
@@ -215,8 +215,8 @@ export default function QRScannerPage() {
         
         await refreshProgress();
         trackQRScan(animalId, code);
-        // Navigate directly to animal page
-        setLocation(`/animal/${animalId}`);
+        // Navigate directly to animal page with auto-play flag
+        setLocation(`/animal/${animalId}?autoplay=1`);
       }
     } catch (err) {
       console.error("Unlock error:", err);
