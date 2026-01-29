@@ -70,7 +70,7 @@ export default function IntroPage() {
   }
 
   return (
-    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden safe-top safe-bottom">
+    <div className="h-[100dvh] w-full bg-background text-white flex flex-col items-center px-4 sm:px-6 py-4 sm:py-6 relative overflow-hidden safe-top safe-bottom">
       
       {/* Desert Dunes Background */}
       <div 
@@ -81,11 +81,11 @@ export default function IntroPage() {
       {/* Background Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background pointer-events-none" />
 
-      {/* Header */}
+      {/* Header with Back Button and Logo */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full mb-4 sm:mb-8 z-10 flex justify-between items-start"
+        className="w-full z-10 flex justify-between items-center mb-2"
       >
         <button 
           onClick={() => setLocation("/")}
@@ -95,7 +95,8 @@ export default function IntroPage() {
         >
           <ArrowLeft className="h-5 w-5 text-white/60 hover:text-white" />
         </button>
-        {user && (
+        <img src="/logo.png" alt="Al Marmoom" className="w-28 sm:w-36 h-auto" />
+        {user ? (
           <button 
             onClick={handleLogout}
             className="p-2 rounded-full hover:bg-white/10 transition-colors"
@@ -104,26 +105,20 @@ export default function IntroPage() {
           >
             <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
           </button>
+        ) : (
+          <div className="w-9" />
         )}
       </motion.div>
 
-      {/* Logo Area */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="text-center mb-4 sm:mb-8 z-10"
-      >
-        <img src="/logo.png" alt="Al Marmoom" className="w-32 sm:w-40 h-auto mx-auto" />
-      </motion.div>
-
-      {/* Video Player Area */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2 }}
-        className="relative w-full max-w-xs sm:max-w-sm mx-auto aspect-[9/16] max-h-[35vh] sm:max-h-[40vh] bg-black/20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl z-10 mb-4 sm:mb-8"
-      >
+      {/* Main Content - Centered */}
+      <div className="flex-1 w-full flex flex-col items-center justify-center z-10">
+        {/* Video Player Area */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="relative w-full max-w-sm sm:max-w-md mx-auto aspect-[9/16] max-h-[50vh] sm:max-h-[55vh] bg-black/20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-4"
+        >
         {!isPlaying ? (
             <img 
               src="/images/photographer_ghillie.png" 
@@ -167,58 +162,59 @@ export default function IntroPage() {
         )}
       </motion.div>
 
-      {/* Action Buttons */}
-      <div className="w-full max-w-[300px] sm:max-w-sm space-y-3 sm:space-y-4 z-10">
-        
-        {/* Start Journey Button - Clickable after 5 seconds */}
-        <div className="relative">
-          <motion.button
-            onClick={handleStartJourney}
-            disabled={!canProceed}
-            className={`w-full py-3 sm:py-4 rounded-xl font-bold tracking-wide transition-all duration-300 overflow-hidden relative text-sm sm:text-base ${
-              canProceed 
-                ? "bg-primary text-background hover:bg-primary/90 active:scale-[0.98] cursor-pointer" 
-                : "bg-white/10 text-white/30 cursor-not-allowed"
-            }`}
-          >
-            {/* Progress Bar Background for disabled state */}
-            {!canProceed && (
-              <motion.div 
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 5, ease: "linear" }}
-                className="absolute inset-0 bg-white/10 z-0"
-              />
-            )}
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {t("intro.start")}
-              {!canProceed && <span className="text-xs opacity-50">({countdown}s)</span>}
-            </span>
-          </motion.button>
+        {/* Action Buttons */}
+        <div className="w-full max-w-[300px] sm:max-w-sm space-y-3 sm:space-y-4">
           
-          {/* Shine Effect when enabled */}
-          <AnimatePresence>
-            {canProceed && (
-              <motion.div
-                initial={{ x: "-100%", opacity: 0 }}
-                animate={{ x: "100%", opacity: [0, 1, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none rounded-xl"
-              />
-            )}
-          </AnimatePresence>
+          {/* Start Journey Button - Clickable after 5 seconds */}
+          <div className="relative">
+            <motion.button
+              onClick={handleStartJourney}
+              disabled={!canProceed}
+              className={`w-full py-3 sm:py-4 rounded-xl font-bold tracking-wide transition-all duration-300 overflow-hidden relative text-sm sm:text-base ${
+                canProceed 
+                  ? "bg-primary text-background hover:bg-primary/90 active:scale-[0.98] cursor-pointer" 
+                  : "bg-white/10 text-white/30 cursor-not-allowed"
+              }`}
+            >
+              {/* Progress Bar Background for disabled state */}
+              {!canProceed && (
+                <motion.div 
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 5, ease: "linear" }}
+                  className="absolute inset-0 bg-white/10 z-0"
+                />
+              )}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {t("intro.start")}
+                {!canProceed && <span className="text-xs opacity-50">({countdown}s)</span>}
+              </span>
+            </motion.button>
+            
+            {/* Shine Effect when enabled */}
+            <AnimatePresence>
+              {canProceed && (
+                <motion.div
+                  initial={{ x: "-100%", opacity: 0 }}
+                  animate={{ x: "100%", opacity: [0, 1, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none rounded-xl"
+                />
+              )}
+            </AnimatePresence>
+          </div>
         </div>
-
-        {/* Partner Logo */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="flex justify-center pt-4"
-        >
-          <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-5 sm:h-6 w-auto opacity-60 grayscale" />
-        </motion.div>
       </div>
+
+      {/* Partner Logo - Bottom */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2 }}
+        className="flex justify-center py-4 z-10 mt-auto"
+      >
+        <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-5 sm:h-6 w-auto opacity-60 grayscale" />
+      </motion.div>
 
       {/* Prize Popup Modal - Elegant Card Design */}
       <AnimatePresence>
