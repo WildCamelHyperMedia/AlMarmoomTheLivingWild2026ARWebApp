@@ -10,18 +10,6 @@ import bcrypt from "bcrypt";
 
 const app = express();
 
-// HTTP to HTTPS redirect for production (supports existing HTTP QR codes)
-app.use((req, res, next) => {
-  // Check if request came via HTTP (Replit uses x-forwarded-proto header)
-  const proto = req.headers['x-forwarded-proto'];
-  if (proto === 'http' && process.env.NODE_ENV === 'production') {
-    // Redirect to HTTPS with same URL
-    const httpsUrl = `https://${req.headers.host}${req.url}`;
-    return res.redirect(301, httpsUrl);
-  }
-  next();
-});
-
 async function initializeAdmin() {
   try {
     const adminEmail = "admin@almarmoom.ae";
