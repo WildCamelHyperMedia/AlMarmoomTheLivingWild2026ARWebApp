@@ -148,6 +148,12 @@ export default function AnimalDetailPage() {
   // Handle video completion
   const handleVideoEnded = () => {
     setIsPlaying(false);
+    // Prompt guests to register after every video ends
+    if (!user) {
+      setTimeout(() => {
+        setShowSaveModal(true);
+      }, 500);
+    }
   };
 
   useEffect(() => {
