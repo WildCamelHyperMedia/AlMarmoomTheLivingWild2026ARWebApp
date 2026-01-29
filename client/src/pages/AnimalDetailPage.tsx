@@ -334,7 +334,9 @@ export default function AnimalDetailPage() {
               <motion.div 
                 initial={{ width: "0%" }}
                 animate={{ width: `${(watchTime / MIN_WATCH_TIME) * 100}%` }}
-                className="absolute bottom-0 left-0 h-1 bg-primary rounded-full"
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="absolute bottom-0 left-0 h-1.5 bg-primary"
+                style={{ minWidth: watchTime > 0 ? '8px' : '0px' }}
               />
             )}
             <h1 className="font-serif text-lg sm:text-xl font-bold text-white leading-tight">
