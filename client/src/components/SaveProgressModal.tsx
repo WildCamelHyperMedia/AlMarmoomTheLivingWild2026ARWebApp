@@ -126,7 +126,19 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
                 {t("intro.popup.title")}
               </motion.h2>
 
-              {/* Subtitle */}
+              {/* Discovery Count */}
+              <motion.p
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.35 }}
+                className="text-[#5b3e34] text-sm mb-3"
+              >
+                {language === 'en' 
+                  ? `${unlockedCount} Animal${unlockedCount !== 1 ? 's' : ''} Discovered. Save Your Journey.`
+                  : `تم اكتشاف ${unlockedCount} حيوان. احفظ رحلتك.`
+                }
+              </motion.p>
+
               {/* Message */}
               <motion.p
                 initial={{ y: 10, opacity: 0 }}
