@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { trackRegistration, trackLogin } from "@/lib/activityTracker";
 
 type AuthMode = "register" | "login" | "admin";
 
@@ -68,6 +69,8 @@ export default function AuthPage() {
       }
 
       setUser(data.user, data.token, data.expiresAt);
+      // Track registration for analytics
+      trackRegistration(formData.email);
       setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);
@@ -112,6 +115,8 @@ export default function AuthPage() {
       }
 
       setUser(data.user, data.token, data.expiresAt);
+      // Track login for analytics
+      trackLogin(formData.email);
       setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
 import { useProgress } from "@/lib/progress";
+import { trackRegistration } from "@/lib/activityTracker";
 
 interface SaveProgressModalProps {
   isOpen: boolean;
@@ -57,6 +58,8 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
       }
 
       setUser(data.user, data.token, data.expiresAt);
+      // Track guest registration for analytics
+      trackRegistration(formData.email);
       localStorage.removeItem("watchedVideos");
       localStorage.removeItem("unlockedAnimals");
       localStorage.removeItem("points");
