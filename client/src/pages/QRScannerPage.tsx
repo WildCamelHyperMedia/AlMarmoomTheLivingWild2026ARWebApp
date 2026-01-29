@@ -9,6 +9,7 @@ import { animals } from "@/lib/data";
 import { apiRequest } from "@/lib/queryClient";
 import { useProgress } from "@/lib/progress";
 import { validateQRCode } from "@shared/qrCodes";
+import { trackQRScan } from "@/lib/activityTracker";
 
 interface UnlockResult {
   success: boolean;
@@ -151,6 +152,8 @@ export default function QRScannerPage() {
         
         if (data.success) {
           await refreshProgress();
+          // Track QR scan for analytics
+          trackQRScan(data.animalId, code);
           setResult({
             success: true,
             animalId: data.animalId,
@@ -194,6 +197,8 @@ export default function QRScannerPage() {
         }
         
         await refreshProgress();
+        // Track QR scan for analytics (even for guests)
+        trackQRScan(animalId, code);
         setResult({
           success: true,
           animalId,

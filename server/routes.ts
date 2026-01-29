@@ -754,5 +754,73 @@ Provide concise, informative answers (2-3 sentences). Focus on fascinating facts
     }
   });
 
+  // Activity logging endpoint - works for both guests and logged-in users
+  app.post("/api/activity", async (req, res) => {
+    try {
+      const { activityType, animalId, metadata, sessionId } = req.body;
+      
+      if (!activityType) {
+        return res.status(400).json({ error: "Activity type is required" });
+      }
+
+      // Check if user is authenticated
+      let userId: string | undefined = undefined;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.slice(7);
+        const session = await storage.getSessionByToken(token);
+        if (session) {
+          userId = session.userId;
+        }
+      }
+
+      await storage.createActivityLog({
+        sessionId: sessionId || null,
+        userId: userId || null,
+        activityType,
+        animalId: animalId || null,
+        metadata: metadata ? JSON.stringify(metadata) : null,
+        userAgent: req.headers["user-agent"] || null,
+        ipAddress: req.ip || req.headers["x-forwarded-for"]?.toString() || null,
+      });
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Activity log error:", error);
+      res.status(500).json({ error: "Failed to log activity" });
+    }
+  });
+
+  // Admin endpoint to get all activity logs
+  app.get("/api/admin/activities", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 200;
+      const type = req.query.type as string;
+      
+      let activities;
+      if (type) {
+        activities = await storage.getActivityLogsByType(type, limit);
+      } else {
+        activities = await storage.getActivityLogs(limit);
+      }
+      
+      res.json({ activities });
+    } catch (error: any) {
+      console.error("Get activities error:", error);
+      res.status(500).json({ error: "Failed to get activities" });
+    }
+  });
+
+  // Admin endpoint to get activity statistics
+  app.get("/api/admin/activity-stats", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const stats = await storage.getActivityStats();
+      res.json({ stats });
+    } catch (error: any) {
+      console.error("Get activity stats error:", error);
+      res.status(500).json({ error: "Failed to get activity stats" });
+    }
+  });
+
   return httpServer;
 }

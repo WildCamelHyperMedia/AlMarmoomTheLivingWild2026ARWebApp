@@ -9,6 +9,7 @@ import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
 import SaveProgressModal from "@/components/SaveProgressModal";
 import { apiRequest } from "@/lib/queryClient";
+import { trackVideoWatch, trackARView } from "@/lib/activityTracker";
 
 const voiceoverMap: Record<string, { en: string; ar: string }> = {
   eurasian_stone_curlew: {
@@ -125,6 +126,8 @@ export default function AnimalDetailPage() {
               recordVideoWatch(animal.id).then((recorded) => {
                 if (recorded) {
                   setHasRecordedWatch(true);
+                  // Track video watch for analytics
+                  trackVideoWatch(animal.id);
                   // Show reward popup
                   setShowRewardPopup(true);
                   // Auto-hide after 3 seconds
@@ -387,7 +390,10 @@ export default function AnimalDetailPage() {
 
         {/* AR Button - Full width */}
         <motion.button 
-          onClick={() => setIsArOpen(true)}
+          onClick={() => {
+            trackARView(animal.id);
+            setIsArOpen(true);
+          }}
           className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all flex items-center justify-between px-6 group relative overflow-hidden"
           whileHover={{ scale: 1.02, boxShadow: "0 10px 40px rgba(139,107,88,0.4)" }}
           whileTap={{ scale: 0.98 }}
