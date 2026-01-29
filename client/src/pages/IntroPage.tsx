@@ -253,9 +253,9 @@ export default function IntroPage() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", damping: 12 }}
-                  className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#30221b] flex items-center justify-center shadow-lg"
+                  className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#30221b] flex items-center justify-center shadow-lg"
                 >
-                  <Gift className="w-10 h-10 text-[#b97d42]" />
+                  <Gift className="w-8 h-8 text-[#b97d42]" />
                 </motion.div>
 
                 {/* Title */}
@@ -263,17 +263,27 @@ export default function IntroPage() {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-2xl font-bold text-[#30221b] font-serif mb-3"
+                  className="text-2xl font-bold text-[#30221b] mb-2"
                 >
                   {t("intro.popup.title")}
                 </motion.h2>
+
+                {/* Subtitle */}
+                <motion.p
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.35 }}
+                  className="text-[#5b3e34] text-xs mb-4"
+                >
+                  {t("intro.popup.subtitle")}
+                </motion.p>
 
                 {/* Message */}
                 <motion.p
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-[#5b3e34] text-sm leading-relaxed mb-6"
+                  className="text-[#5b3e34] text-sm leading-relaxed mb-5"
                 >
                   {t("intro.popup.message")}
                 </motion.p>
@@ -283,30 +293,30 @@ export default function IntroPage() {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="space-y-3 mb-8"
+                  className="space-y-2 mb-6"
                 >
                   {/* Prize 1 */}
-                  <div className="flex items-center gap-3 bg-[#30221b] rounded-xl p-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#b97d42] flex items-center justify-center flex-shrink-0">
-                      <Camera className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 bg-[#f5e6d3] border border-[#d3c4b0] rounded-xl p-3">
+                    <div className="w-9 h-9 rounded-lg bg-[#30221b] flex items-center justify-center flex-shrink-0">
+                      <Camera className="w-4 h-4 text-[#b97d42]" />
                     </div>
-                    <span className="text-[#fef3dc] font-medium text-left">{t("intro.popup.prize1")}</span>
+                    <span className="text-[#30221b] font-medium text-left text-sm">{t("intro.popup.prize1")}</span>
                   </div>
 
                   {/* Prize 2 */}
-                  <div className="flex items-center gap-3 bg-[#30221b] rounded-xl p-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#b97d42] flex items-center justify-center flex-shrink-0">
-                      <Book className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 bg-[#f5e6d3] border border-[#d3c4b0] rounded-xl p-3">
+                    <div className="w-9 h-9 rounded-lg bg-[#30221b] flex items-center justify-center flex-shrink-0">
+                      <Book className="w-4 h-4 text-[#b97d42]" />
                     </div>
-                    <span className="text-[#fef3dc] font-medium text-left">{t("intro.popup.prize2")}</span>
+                    <span className="text-[#30221b] font-medium text-left text-sm">{t("intro.popup.prize2")}</span>
                   </div>
 
                   {/* Prize 3 */}
-                  <div className="flex items-center gap-3 bg-[#30221b] rounded-xl p-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#b97d42] flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 bg-[#f5e6d3] border border-[#d3c4b0] rounded-xl p-3">
+                    <div className="w-9 h-9 rounded-lg bg-[#30221b] flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-4 h-4 text-[#b97d42]" />
                     </div>
-                    <span className="text-[#fef3dc] font-medium text-left">{t("intro.popup.prize3")}</span>
+                    <span className="text-[#30221b] font-medium text-left text-sm">{t("intro.popup.prize3")}</span>
                   </div>
                 </motion.div>
 
