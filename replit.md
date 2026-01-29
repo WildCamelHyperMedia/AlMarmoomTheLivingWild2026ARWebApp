@@ -59,6 +59,17 @@ Preferred communication style: Simple, everyday language.
 - **HTML Preview**: `/qr-codes.html` - printable page with all 24 animal QR codes
 - **Gallery Integration**: Locked animals shown with grayscale/blur, unlock prompt redirects to scanner
 
+### Activity Tracking System
+- **Database Table**: `activity_log` stores all user interactions (QR scans, video watches, AR views, registrations, logins)
+- **Tracking Module**: `client/src/lib/activityTracker.ts` - frontend utility for logging activities
+- **Session IDs**: Guest users get anonymous session IDs for tracking; logged-in users tracked by user ID
+- **Activity Types**: qr_scan, video_watch, ar_view, registration, login, page_view
+- **Admin Endpoints**: 
+  - GET `/api/admin/activities` - fetches recent activity logs
+  - GET `/api/admin/activity-stats` - fetches aggregated statistics by type
+- **Admin View**: Activity tab in admin panel shows stats cards and recent activity table
+- **Metadata**: Each activity log can include additional metadata (animal name, QR code, email, etc.)
+
 ### Key Design Patterns
 - **Shared Types**: Schema definitions in `/shared/schema.ts` are used by both frontend and backend for type consistency
 - **Storage Abstraction**: `IStorage` interface in `server/storage.ts` allows for different storage implementations
