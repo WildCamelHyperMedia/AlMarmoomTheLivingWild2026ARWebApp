@@ -6,7 +6,7 @@ import { animals } from "@/lib/data";
 import { 
   LayoutDashboard, Users, History, Trophy, LogOut, 
   TrendingUp, Eye, UserPlus, Calendar, ChevronRight,
-  Menu, X, Images, Star, Download
+  Menu, X, Images, Star, Download, Activity
 } from "lucide-react";
 
 interface UserWithProgress {
@@ -38,7 +38,17 @@ interface Analytics {
   recentLogins: { id: string; userId: string; loginAt: string; userName: string; userEmail: string }[];
 }
 
-type AdminView = "dashboard" | "users" | "history" | "leaderboard";
+type AdminView = "dashboard" | "users" | "history" | "leaderboard" | "activity";
+
+interface ActivityLogEntry {
+  id: string;
+  activityType: string;
+  animalId: string | null;
+  userId: string | null;
+  sessionId: string | null;
+  metadata: Record<string, any> | null;
+  createdAt: string;
+}
 
 const getAnimalName = (id: string): string => {
   const animal = animals.find(a => a.id === id);
@@ -55,6 +65,8 @@ export default function AdminPage() {
   const [currentView, setCurrentView] = useState<AdminView>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedUserAnimals, setSelectedUserAnimals] = useState<{ name: string; animals: string[] } | null>(null);
+  const [activityStats, setActivityStats] = useState<{ type: string; count: number }[]>([]);
+  const [recentActivities, setRecentActivities] = useState<ActivityLogEntry[]>([]);
 
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -67,9 +79,11 @@ export default function AdminPage() {
   const fetchData = async () => {
     try {
       const headers = getAuthHeaders();
-      const [usersRes, analyticsRes] = await Promise.all([
+      const [usersRes, analyticsRes, activityStatsRes, activitiesRes] = await Promise.all([
         fetch("/api/admin/users", { headers }),
-        fetch("/api/admin/analytics", { headers })
+        fetch("/api/admin/analytics", { headers }),
+        fetch("/api/admin/activity-stats", { headers }),
+        fetch("/api/admin/activities?limit=100", { headers })
       ]);
 
       if (usersRes.ok) {
@@ -80,6 +94,16 @@ export default function AdminPage() {
       if (analyticsRes.ok) {
         const analyticsData = await analyticsRes.json();
         setAnalytics(analyticsData);
+      }
+
+      if (activityStatsRes.ok) {
+        const activityStatsData = await activityStatsRes.json();
+        setActivityStats(activityStatsData.stats || []);
+      }
+
+      if (activitiesRes.ok) {
+        const activitiesData = await activitiesRes.json();
+        setRecentActivities(activitiesData.activities || []);
       }
     } catch (err) {
       console.error("Failed to fetch admin data:", err);
@@ -146,6 +170,7 @@ export default function AdminPage() {
     { id: "users" as AdminView, icon: Users, label: "Users" },
     { id: "history" as AdminView, icon: History, label: "Login History" },
     { id: "leaderboard" as AdminView, icon: Trophy, label: "Leaderboard" },
+    { id: "activity" as AdminView, icon: Activity, label: "Activity" },
   ];
 
   const regularUsers = users.filter(u => !u.isAdmin);
@@ -636,6 +661,133 @@ export default function AdminPage() {
                       <p className="text-sm text-white/40 mt-2">Users will appear here as they watch videos</p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Activity View */}
+              {currentView === "activity" && (
+                <div className="space-y-6">
+                  <h2 className="text-xl md:text-2xl font-bold">Activity Logs</h2>
+                  
+                  {/* Activity Stats Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {(() => {
+                      const activityTypes = ['qr_scan', 'video_watch', 'ar_view', 'registration', 'login'];
+                      const colorMap: Record<string, string> = {
+                        qr_scan: 'blue',
+                        video_watch: 'green',
+                        ar_view: 'purple',
+                        registration: 'yellow',
+                        login: 'orange'
+                      };
+                      const labelMap: Record<string, string> = {
+                        qr_scan: 'QR Scans',
+                        video_watch: 'Video Watches',
+                        ar_view: 'AR Views',
+                        registration: 'Registrations',
+                        login: 'Logins'
+                      };
+                      return activityTypes.map((type, index) => {
+                        const stat = activityStats.find(s => s.type === type);
+                        const count = stat ? Number(stat.count) : 0;
+                        return (
+                          <StatCard 
+                            key={type}
+                            icon={Activity} 
+                            label={labelMap[type]} 
+                            value={count} 
+                            color={colorMap[type]} 
+                            index={index} 
+                          />
+                        );
+                      });
+                    })()}
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-2">
+                    {recentActivities.map((activity) => (
+                      <div key={activity.id} className="bg-[#3E2D24]/60 rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="bg-[#b97d42]/20 text-[#b97d42] px-2 py-1 rounded text-xs font-medium">
+                            {activity.activityType.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-xs text-white/50">{formatDate(activity.createdAt)}</span>
+                        </div>
+                        <div className="text-sm">
+                          {activity.animalId && (
+                            <p className="text-white/80">Animal: {getAnimalName(activity.animalId)}</p>
+                          )}
+                          <p className="text-white/60">
+                            {activity.userId ? `User: ${activity.userId.slice(0, 8)}...` : `Session: ${activity.sessionId?.slice(0, 8) || 'N/A'}...`}
+                          </p>
+                        </div>
+                        {activity.metadata && Object.keys(activity.metadata).length > 0 && (
+                          <p className="text-xs text-white/40 truncate">
+                            {JSON.stringify(activity.metadata)}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                    {recentActivities.length === 0 && (
+                      <div className="text-center py-12 text-white/60 bg-[#3E2D24]/60 rounded-xl">
+                        <Activity className="w-12 h-12 mx-auto text-white/20 mb-3" />
+                        <p>No activity logs yet</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block bg-[#3E2D24]/60 rounded-xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-white/10">
+                            <th className="text-left p-4 text-white/60 font-medium">Type</th>
+                            <th className="text-left p-4 text-white/60 font-medium">Animal</th>
+                            <th className="text-left p-4 text-white/60 font-medium">User/Session</th>
+                            <th className="text-left p-4 text-white/60 font-medium">Time</th>
+                            <th className="text-left p-4 text-white/60 font-medium">Metadata</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {recentActivities.map((activity) => (
+                            <tr key={activity.id} className="border-b border-white/5 hover:bg-white/5">
+                              <td className="p-4">
+                                <span className="bg-[#b97d42]/20 text-[#b97d42] px-2 py-1 rounded text-sm font-medium">
+                                  {activity.activityType.replace(/_/g, ' ')}
+                                </span>
+                              </td>
+                              <td className="p-4 text-white/80">
+                                {activity.animalId ? getAnimalName(activity.animalId) : '-'}
+                              </td>
+                              <td className="p-4 text-white/60 text-sm">
+                                {activity.userId 
+                                  ? `User: ${activity.userId.slice(0, 8)}...` 
+                                  : activity.sessionId 
+                                    ? `Session: ${activity.sessionId.slice(0, 8)}...`
+                                    : '-'
+                                }
+                              </td>
+                              <td className="p-4 text-white/60 text-sm">{formatDate(activity.createdAt)}</td>
+                              <td className="p-4 text-white/40 text-xs max-w-xs truncate">
+                                {activity.metadata && Object.keys(activity.metadata).length > 0 
+                                  ? JSON.stringify(activity.metadata)
+                                  : '-'
+                                }
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {recentActivities.length === 0 && (
+                      <div className="text-center py-12 text-white/60">
+                        <Activity className="w-12 h-12 mx-auto text-white/20 mb-3" />
+                        <p>No activity logs yet</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </>
