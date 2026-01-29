@@ -23,6 +23,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/2-Frog-headed Lizard 1.webp",
     scientificName: "PHRYNOCEPHALUS ARABICUS",
     videoEn: "/videos/frog_headed_lizard_en.mp4",
+    videoAr: "/videos/frog_headed_lizard_ar.mp4",
     arUrl: "https://webxr.run/xE00Z77wlw9Eo"
   },
   {
@@ -139,6 +140,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/17-Sandfish Lizard.webp",
     scientificName: "SCINCUS SCINCUS",
     videoEn: "/videos/sandfish_lizard_en.mp4",
+    videoAr: "/videos/sandfish_lizard_ar.mp4",
     arUrl: "https://webxr.run/xlPbloxOb85O"
   },
   {
@@ -147,6 +149,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/18-Spiny-tailed Lizard.webp",
     scientificName: "UROMASTYX AEGYPTIA",
     videoEn: "/videos/spiny_tailed_lizard_en.mp4",
+    videoAr: "/videos/spiny_tailed_lizard_ar.mp4",
     arUrl: "https://webxr.run/AR0moLmQ5kMV"
   },
   {
@@ -155,6 +158,7 @@ export const animals: Animal[] = [
     optimizedImage: "/animals/optimized/19-Little Owl.webp",
     scientificName: "ATHENE NOCTUA",
     videoEn: "/videos/little_owl_en.mp4",
+    videoAr: "/videos/little_owl_ar.mp4",
     arUrl: "https://webxr.run/dy0GNJWeXdbXp"
   },
   {
