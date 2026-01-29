@@ -376,8 +376,22 @@ export default function GalleryPage() {
         </AnimatePresence>
       </div>
 
+      {/* Pagination Dots */}
+      <div className="flex justify-center gap-2 py-1 relative z-20 shrink-0">
+        {chunks.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => emblaApi && emblaApi.scrollTo(index)}
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+              index === selectedIndex ? "bg-white" : "bg-white/30"
+            }`}
+            aria-label={`Go to page ${index + 1}`}
+          />
+        ))}
+      </div>
+
       {/* QR Scanner Button - Large Bottom Center */}
-      <div className="flex justify-center py-2 relative z-20 shrink-0">
+      <div className="flex justify-center py-2 pb-3 relative z-20 shrink-0 safe-bottom">
         <motion.button
           onClick={() => setLocation("/scan")}
           className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#b97d42] to-[#855338] text-white rounded-full shadow-lg shadow-[#b97d42]/30 relative overflow-hidden"
@@ -403,20 +417,6 @@ export default function GalleryPage() {
             {language === 'en' ? 'Scan to Unlock Animals' : 'امسح لفتح الحيوانات'}
           </span>
         </motion.button>
-      </div>
-
-      {/* Pagination Dots */}
-      <div className="flex justify-center gap-3 pb-2 pt-1 relative z-20 shrink-0 safe-bottom">
-        {chunks.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => emblaApi && emblaApi.scrollTo(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer border border-transparent hover:border-white/50 ${
-              index === selectedIndex ? "bg-white scale-110" : "bg-white/20 hover:bg-white/40"
-            }`}
-            aria-label={`Go to page ${index + 1}`}
-          />
-        ))}
       </div>
 
       {/* Only show save modal for guests */}
