@@ -382,7 +382,7 @@ export default function GalleryPage() {
           <button
             key={index}
             onClick={() => emblaApi && emblaApi.scrollTo(index)}
-            className={`w-1 h-1 rounded-full transition-all duration-300 cursor-pointer ${
+            className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
               index === selectedIndex ? "bg-white" : "bg-white/40"
             }`}
             aria-label={`Go to page ${index + 1}`}
