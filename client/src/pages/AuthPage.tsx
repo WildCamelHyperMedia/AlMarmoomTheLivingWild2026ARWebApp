@@ -79,11 +79,6 @@ export default function AuthPage() {
   };
 
   const handleLogin = async () => {
-    if (!formData.name.trim()) {
-      setError(language === 'en' ? "Please enter your name" : "يرجى إدخال اسمك");
-      return;
-    }
-    
     if (!formData.email.trim()) {
       setError(language === 'en' ? "Please enter your email" : "يرجى إدخال بريدك الإلكتروني");
       return;
@@ -103,7 +98,6 @@ export default function AuthPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          name: formData.name.trim(), 
           email: formData.email.trim().toLowerCase()
         })
       });
@@ -397,24 +391,11 @@ export default function AuthPage() {
                 {language === 'en' ? 'Welcome Back' : 'مرحباً بعودتك'}
               </h1>
               <p className="text-white/50 text-sm">
-                {language === 'en' ? 'Enter your name and email to continue' : 'أدخل اسمك وبريدك للمتابعة'}
+                {language === 'en' ? 'Enter your email to continue' : 'أدخل بريدك للمتابعة'}
               </p>
             </div>
 
             <div className="w-full space-y-3 mb-4">
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                <Input 
-                  type="text" 
-                  placeholder={language === 'en' ? "Your Name" : "اسمك"}
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
-                  dir={dir}
-                  data-testid="input-login-name"
-                />
-              </div>
-
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                 <Input 

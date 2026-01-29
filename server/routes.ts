@@ -222,14 +222,10 @@ export async function registerRoutes(
     }
   });
 
-  // User login by name + email (no password needed for regular users)
+  // User login by email only (no password needed for regular users)
   app.post("/api/auth/user-login", async (req, res) => {
     try {
-      const { name, email } = req.body;
-      
-      if (!name || typeof name !== "string" || name.trim().length < 1) {
-        return res.status(400).json({ error: "Name is required" });
-      }
+      const { email } = req.body;
       
       if (!email || typeof email !== "string") {
         return res.status(400).json({ error: "Email is required" });
@@ -243,11 +239,6 @@ export async function registerRoutes(
       const user = await storage.getUserByEmail(email.trim().toLowerCase());
       if (!user) {
         return res.status(401).json({ error: "No account found with this email" });
-      }
-
-      // Verify name matches (case insensitive)
-      if (user.name.toLowerCase() !== name.trim().toLowerCase()) {
-        return res.status(401).json({ error: "Name does not match our records" });
       }
 
       // Don't allow admin login through this endpoint
