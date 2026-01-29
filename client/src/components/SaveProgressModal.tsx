@@ -127,8 +127,8 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
                     </h2>
                     <p className="text-white/50 text-sm">
                       {language === 'en' 
-                        ? `${unlockedCount} animals discovered • ${points} points earned` 
-                        : `${unlockedCount} حيوانات مكتشفة • ${points} نقاط مكتسبة`}
+                        ? `${unlockedCount} ${unlockedCount === 1 ? 'animal' : 'animals'} discovered • ${points} ${points === 1 ? 'point' : 'points'} earned` 
+                        : `${unlockedCount} ${unlockedCount === 1 ? 'حيوان مكتشف' : 'حيوانات مكتشفة'} • ${points} ${points === 1 ? 'نقطة مكتسبة' : 'نقاط مكتسبة'}`}
                     </p>
                   </div>
                 </div>
