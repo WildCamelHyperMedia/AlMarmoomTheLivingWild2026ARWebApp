@@ -137,6 +137,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/17-Sandfish Lizard.jpg",
     optimizedImage: "/animals/optimized/17-Sandfish Lizard.webp",
     scientificName: "SCINCUS SCINCUS",
+    videoEn: "/videos/sandfish_lizard_en.mp4",
     arUrl: "https://webxr.run/xlPbloxOb85O"
   },
   {
@@ -144,6 +145,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/18-Spiny-tailed Lizard.jpg",
     optimizedImage: "/animals/optimized/18-Spiny-tailed Lizard.webp",
     scientificName: "UROMASTYX AEGYPTIA",
+    videoEn: "/videos/spiny_tailed_lizard_en.mp4",
     arUrl: "https://webxr.run/AR0moLmQ5kMV"
   },
   {
@@ -151,6 +153,7 @@ export const animals: Animal[] = [
     image: "/animals/All Animals - Pictures/19-Little Owl.jpg",
     optimizedImage: "/animals/optimized/19-Little Owl.webp",
     scientificName: "ATHENE NOCTUA",
+    videoEn: "/videos/little_owl_en.mp4",
     arUrl: "https://webxr.run/dy0GNJWeXdbXp"
   },
   {
