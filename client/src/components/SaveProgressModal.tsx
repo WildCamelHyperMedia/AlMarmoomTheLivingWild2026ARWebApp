@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Gift, Shield, User, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { X, Gift, Shield, User, Mail, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useLanguage } from "@/lib/language";
@@ -118,17 +118,8 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
                     <X className="w-4 h-4 text-white/60" />
                   </button>
 
-                  {/* Icon and title */}
+                  {/* Title */}
                   <div className="flex flex-col items-center text-center">
-                    <motion.div 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.1, type: "spring" }}
-                      className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#b97d42] to-[#855338] flex items-center justify-center mb-4 shadow-lg shadow-[#b97d42]/30"
-                    >
-                      <Sparkles className="w-8 h-8 text-white" />
-                    </motion.div>
-                    
                     <h2 className="text-2xl font-bold text-white font-serif mb-1">
                       {language === 'en' ? 'Save Your Journey' : 'احفظ رحلتك'}
                     </h2>
