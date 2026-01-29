@@ -31,9 +31,28 @@ export const animalQRCodes: AnimalQRCode[] = [
   { animalId: "hedgehog", token: "HH2024-SA5F1B8Q", qrValue: "TLW-hedgehog-HH2024-SA5F1B8Q" }
 ];
 
+// Aggressively clean QR code text - handles iOS encoding quirks
+export function cleanQRText(text: string): string {
+  if (!text) return '';
+  
+  return text
+    // Remove BOM and zero-width characters
+    .replace(/[\uFEFF\u200B\u200C\u200D\u2060]/g, '')
+    // Remove all control characters
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    // Remove carriage returns, newlines, tabs
+    .replace(/[\r\n\t]/g, '')
+    // Remove leading/trailing whitespace
+    .trim()
+    // Normalize multiple spaces to single
+    .replace(/\s+/g, ' ')
+    // Remove any non-printable characters
+    .replace(/[^\x20-\x7E]/g, '');
+}
+
 export function validateQRCode(qrValue: string): { valid: boolean; animalId?: string } {
-  // Clean the QR code value - remove whitespace, newlines, and normalize
-  const cleanedValue = qrValue.trim().replace(/[\r\n\t]/g, '');
+  // Aggressively clean the QR code value
+  const cleanedValue = cleanQRText(qrValue);
   
   // First try exact match with cleaned value
   const exactMatch = animalQRCodes.find(qr => qr.qrValue === cleanedValue);
@@ -49,13 +68,17 @@ export function validateQRCode(qrValue: string): { valid: boolean; animalId?: st
     return { valid: true, animalId: caseInsensitiveMatch.animalId };
   }
   
-  // Try to extract and validate TLW format even with slight variations
+  // Try to extract and validate TLW format with token validation
   const tlwMatch = cleanedValue.match(/^TLW-([a-z_]+)-(.+)$/i);
   if (tlwMatch) {
     const animalId = tlwMatch[1].toLowerCase();
-    const matchByAnimalId = animalQRCodes.find(qr => qr.animalId === animalId);
-    if (matchByAnimalId) {
-      return { valid: true, animalId: matchByAnimalId.animalId };
+    const token = tlwMatch[2];
+    // Must match both animal ID AND token for security
+    const matchByAnimalAndToken = animalQRCodes.find(
+      qr => qr.animalId === animalId && qr.token.toLowerCase() === token.toLowerCase()
+    );
+    if (matchByAnimalAndToken) {
+      return { valid: true, animalId: matchByAnimalAndToken.animalId };
     }
   }
   

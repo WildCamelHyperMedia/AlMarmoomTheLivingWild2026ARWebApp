@@ -8,7 +8,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { animals } from "@/lib/data";
 import { apiRequest } from "@/lib/queryClient";
 import { useProgress } from "@/lib/progress";
-import { validateQRCode } from "@shared/qrCodes";
+import { validateQRCode, cleanQRText } from "@shared/qrCodes";
 import { trackQRScan } from "@/lib/activityTracker";
 
 interface UnlockResult {
@@ -106,11 +106,12 @@ export default function QRScannerPage() {
       await scannerRef.current.start(
         { facingMode: "environment" },
         {
-          fps: 10,
-          qrbox: { width: 200, height: 200 },
-          aspectRatio: 1.0, // Force square aspect ratio for consistent scanning
+          fps: 15,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
         },
         async (decodedText) => {
+          console.log("[QR] Raw scan result:", decodedText);
           await stopScanner();
           await handleQRCode(decodedText);
         },
@@ -142,8 +143,13 @@ export default function QRScannerPage() {
 
   // Extract animal ID and signature from URL format or legacy token format
   const extractQRData = (code: string): { animalId: string | null; signature: string | null; isUrl: boolean } => {
-    // Clean the scanned code - iOS can add whitespace/newlines
-    const cleanedCode = code.trim().replace(/[\r\n\t]/g, '');
+    const cleanedCode = cleanQRText(code);
+    
+    // Dev-only debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.log("[QR Debug] Raw length:", code.length, "Clean length:", cleanedCode.length);
+      console.log("[QR Debug] Cleaned code:", cleanedCode);
+    }
     
     // Check if it's a URL format (e.g., https://app.replit.app/animal/desert_hare?qr=unlock&sig=XXXX)
     try {
@@ -157,8 +163,9 @@ export default function QRScannerPage() {
       // Not a URL, try legacy token format
     }
     
-    // Legacy token format: TLW-{animalId}-{token}
+    // Legacy token format: TLW-{animalId}-{token} - requires valid token
     const validation = validateQRCode(cleanedCode);
+    
     if (validation.valid && validation.animalId) {
       return { animalId: validation.animalId, signature: null, isUrl: false };
     }
