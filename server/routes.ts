@@ -137,7 +137,7 @@ export async function registerRoutes(
   // Guest signup - simplified registration with name and email only
   app.post("/api/auth/guest-signup", async (req, res) => {
     try {
-      const { name, email, watchedVideos, points } = req.body;
+      const { name, email, watchedVideos, unlockedAnimals, points } = req.body;
       
       if (!name || typeof name !== "string" || name.trim().length < 1) {
         return res.status(400).json({ error: "Name is required" });
@@ -168,8 +168,9 @@ export async function registerRoutes(
         password: hashedPassword
       });
       
-      // Validate and sanitize watchedVideos and points from client
+      // Validate and sanitize watchedVideos, unlockedAnimals and points from client
       let validWatchedVideos: string[] = [];
+      let validUnlockedAnimals: string[] = [];
       let validPoints = 0;
       
       if (Array.isArray(watchedVideos) && watchedVideos.length > 0) {
@@ -178,6 +179,12 @@ export async function registerRoutes(
           .slice(0, VALID_ANIMAL_IDS.length);
         // Calculate points based on valid watched videos (1 point each)
         validPoints = validWatchedVideos.length * 1;
+      }
+
+      if (Array.isArray(unlockedAnimals) && unlockedAnimals.length > 0) {
+        validUnlockedAnimals = unlockedAnimals
+          .filter((id): id is string => typeof id === "string" && VALID_ANIMAL_IDS.includes(id))
+          .slice(0, VALID_ANIMAL_IDS.length);
       }
       
       // Override points if provided and valid, but cap at max possible
@@ -188,7 +195,7 @@ export async function registerRoutes(
       
       await storage.createProgress({
         userId: user.id,
-        unlockedAnimals: [],
+        unlockedAnimals: validUnlockedAnimals,
         watchedVideos: validWatchedVideos,
         points: validPoints
       });

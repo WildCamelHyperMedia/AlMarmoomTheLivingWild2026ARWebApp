@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Gift, Shield, User, Mail, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { X, Gift, Shield, User, Mail, ArrowRight, Loader2, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useLanguage } from "@/lib/language";
@@ -15,7 +15,7 @@ interface SaveProgressModalProps {
 export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SaveProgressModalProps) {
   const { language, dir } = useLanguage();
   const { setUser } = useUser();
-  const { watchedVideos, points, unlockedCount } = useProgress();
+  const { watchedVideos, points, unlockedCount, unlockedAnimals } = useProgress();
   
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [error, setError] = useState("");
@@ -44,6 +44,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
           name: formData.name, 
           email: formData.email,
           watchedVideos: watchedVideos,
+          unlockedAnimals: unlockedAnimals,
           points: points
         })
       });
@@ -56,6 +57,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
 
       setUser(data.user, data.token, data.expiresAt);
       localStorage.removeItem("watchedVideos");
+      localStorage.removeItem("unlockedAnimals");
       localStorage.removeItem("points");
       onSuccess();
     } catch (err: any) {
@@ -76,7 +78,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
       textAr: "احتفظ بتقدمك بشكل آمن للأبد"
     },
     {
-      icon: Sparkles,
+      icon: Award,
       textEn: "Unlock special achievements",
       textAr: "افتح الإنجازات الخاصة"
     }
