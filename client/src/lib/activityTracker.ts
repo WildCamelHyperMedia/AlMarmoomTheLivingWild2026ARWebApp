@@ -75,15 +75,15 @@ export function trackQRScan(animalId: string, qrCode?: string): void {
   });
 }
 
-export function trackRegistration(email?: string): void {
-  logActivity({
+export async function trackRegistration(email?: string): Promise<void> {
+  await logActivity({
     activityType: "registration",
     metadata: email ? { email } : undefined,
   });
 }
 
-export function trackLogin(email?: string): void {
-  logActivity({
+export async function trackLogin(email?: string): Promise<void> {
+  await logActivity({
     activityType: "login",
     metadata: email ? { email } : undefined,
   });

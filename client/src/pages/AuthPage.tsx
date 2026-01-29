@@ -69,8 +69,8 @@ export default function AuthPage() {
       }
 
       setUser(data.user, data.token, data.expiresAt);
-      // Track registration for analytics
-      trackRegistration(formData.email);
+      // Track registration for analytics (await to ensure it completes before navigation)
+      await trackRegistration(formData.email);
       setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);
@@ -109,8 +109,8 @@ export default function AuthPage() {
       }
 
       setUser(data.user, data.token, data.expiresAt);
-      // Track login for analytics
-      trackLogin(formData.email);
+      // Track login for analytics (await to ensure it completes before navigation)
+      await trackLogin(formData.email);
       setLocation("/gallery");
     } catch (err: any) {
       setError(err.message);
