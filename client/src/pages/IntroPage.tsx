@@ -269,15 +269,6 @@ export default function IntroPage() {
                 </motion.h2>
 
                 {/* Subtitle */}
-                <motion.p
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.35 }}
-                  className="text-[#5b3e34] text-xs mb-4"
-                >
-                  {t("intro.popup.subtitle")}
-                </motion.p>
-
                 {/* Message */}
                 <motion.p
                   initial={{ y: 10, opacity: 0 }}
