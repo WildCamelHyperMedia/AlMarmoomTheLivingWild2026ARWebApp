@@ -26,7 +26,7 @@ function Router() {
       <Route path="/animal/:id" component={AnimalDetailPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/scan" component={QRScannerPage} />
-      <Route path="/register" component={LeadFormPage} />
+      <Route path="/parkers" component={LeadFormPage} />
       <Route component={NotFound} />
     </Switch>
   );
