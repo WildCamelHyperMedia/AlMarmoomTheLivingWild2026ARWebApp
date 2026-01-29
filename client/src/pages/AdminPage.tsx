@@ -117,6 +117,13 @@ export default function AdminPage() {
     setLocation("/");
   };
 
+  const escapeCSVValue = (value: string): string => {
+    if (value.includes('"') || value.includes(',') || value.includes('\n') || value.includes('\r')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  };
+
   const exportUsersToCSV = () => {
     const headers = ['Name', 'Email', 'Phone', 'Videos Watched', 'Animals Watched', 'Login Count', 'Signed Up', 'Last Login'];
     const rows = regularUsers.map(user => [
@@ -132,7 +139,7 @@ export default function AdminPage() {
     
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+      ...rows.map(row => row.map(cell => escapeCSVValue(cell)).join(','))
     ].join('\n');
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -144,6 +151,75 @@ export default function AdminPage() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const [isExportingFullReport, setIsExportingFullReport] = useState(false);
+
+  const exportComprehensiveCSV = async () => {
+    setIsExportingFullReport(true);
+    try {
+      const headers = getAuthHeaders();
+      const response = await fetch("/api/admin/user-activity-report", { headers });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch user activity report");
+      }
+      
+      const data = await response.json();
+      const reportUsers = data.users || [];
+      
+      const csvHeaders = [
+        'Name', 'Email', 'Phone', 'Registration Date',
+        'Total Videos Watched', 'Videos Watched (List)', 'Video Watch Counts (Animal: Count)',
+        'Total QR Scans', 'QR Codes Scanned (List)',
+        'Total AR Views',
+        'Total Logins', 'Last Login Date',
+        'Points'
+      ];
+      
+      const rows = reportUsers.map((user: any) => {
+        // Format video watch counts as "Animal: count" pairs
+        const videoWatchCounts = user.videoWatchCounts || {};
+        const watchCountsStr = Object.entries(videoWatchCounts)
+          .map(([animalId, count]) => `${getAnimalName(animalId)}: ${count}`)
+          .join('; ');
+        
+        return [
+          user.name || '',
+          user.email || '',
+          user.phone || '',
+          user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '',
+          (user.watchedVideos || []).length.toString(),
+          (user.watchedVideos || []).map((id: string) => getAnimalName(id)).join('; '),
+          watchCountsStr || '-',
+          (user.qrScanCount || 0).toString(),
+          (user.qrCodesScanned || []).map((id: string) => getAnimalName(id)).join('; '),
+          (user.arViewCount || 0).toString(),
+          (user.loginCount || 0).toString(),
+          user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : '-',
+          (user.points || 0).toString()
+        ];
+      });
+      
+      const csvContent = [
+        csvHeaders.join(','),
+        ...rows.map((row: string[]) => row.map(cell => escapeCSVValue(cell)).join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `al-marmoom-full-report-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to export comprehensive report:", error);
+    } finally {
+      setIsExportingFullReport(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -392,9 +468,19 @@ export default function AdminPage() {
                       <button
                         onClick={exportUsersToCSV}
                         className="flex items-center gap-2 px-3 py-2 bg-[#b97d42] text-background rounded-lg font-medium text-sm hover:bg-[#b97d42]/90 transition-colors"
+                        data-testid="button-export-csv"
                       >
                         <Download className="w-4 h-4" />
                         <span className="hidden sm:inline">Export CSV</span>
+                      </button>
+                      <button
+                        onClick={exportComprehensiveCSV}
+                        disabled={isExportingFullReport}
+                        className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg font-medium text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-testid="button-export-full-report"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden sm:inline">{isExportingFullReport ? 'Exporting...' : 'Full Report'}</span>
                       </button>
                       <span className="bg-[#3E2D24] px-3 py-1 rounded-full text-sm">
                         {regularUsers.length} users
@@ -667,7 +753,52 @@ export default function AdminPage() {
               {/* Activity View */}
               {currentView === "activity" && (
                 <div className="space-y-6">
-                  <h2 className="text-xl md:text-2xl font-bold">Activity Logs</h2>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h2 className="text-xl md:text-2xl font-bold">Activity Logs</h2>
+                    <button
+                      onClick={async () => {
+                        try {
+                          // Fetch all activity logs (up to 10000) for export
+                          const response = await fetch("/api/admin/activities?limit=10000", { 
+                            headers: getAuthHeaders() 
+                          });
+                          if (!response.ok) throw new Error("Failed to fetch activities");
+                          const data = await response.json();
+                          const allActivities = data.activities || [];
+                          
+                          const csvHeaders = ['Type', 'Animal', 'User ID', 'Session ID', 'Timestamp', 'Metadata'];
+                          const rows = allActivities.map((activity: ActivityLogEntry) => [
+                            activity.activityType,
+                            activity.animalId ? getAnimalName(activity.animalId) : '-',
+                            activity.userId || '-',
+                            activity.sessionId || '-',
+                            new Date(activity.createdAt).toLocaleString(),
+                            activity.metadata ? JSON.stringify(activity.metadata) : '-'
+                          ]);
+                          const csvContent = [
+                            csvHeaders.join(','),
+                            ...rows.map((row: string[]) => row.map(cell => escapeCSVValue(String(cell))).join(','))
+                          ].join('\n');
+                          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                          const url = URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.download = `al-marmoom-activity-logs-${new Date().toISOString().split('T')[0]}.csv`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          URL.revokeObjectURL(url);
+                        } catch (error) {
+                          console.error("Failed to export activity logs:", error);
+                        }
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 bg-[#b97d42] text-background rounded-lg font-medium text-sm hover:bg-[#b97d42]/90 transition-colors"
+                      data-testid="button-export-activity-logs"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>Export Activity Logs</span>
+                    </button>
+                  </div>
                   
                   {/* Activity Stats Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

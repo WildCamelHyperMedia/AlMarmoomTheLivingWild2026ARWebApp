@@ -822,5 +822,79 @@ Provide concise, informative answers (2-3 sentences). Focus on fascinating facts
     }
   });
 
+  // Admin endpoint for comprehensive user activity report
+  app.get("/api/admin/user-activity-report", authMiddleware, adminMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const allActivities = await storage.getActivityLogs(10000);
+      
+      const userActivityReports = await Promise.all(
+        users.filter(u => !u.isAdmin).map(async (user) => {
+          const progress = await storage.getProgress(user.id);
+          const loginHistory = await storage.getUserLoginHistory(user.id);
+          
+          // Filter activities for this user
+          const userActivities = allActivities.filter(a => a.userId === user.id);
+          
+          // Count video_watch events per animal
+          const videoWatchActivities = userActivities.filter(a => a.activityType === 'video_watch');
+          const videoWatchCounts: Record<string, number> = {};
+          videoWatchActivities.forEach(a => {
+            if (a.animalId) {
+              videoWatchCounts[a.animalId] = (videoWatchCounts[a.animalId] || 0) + 1;
+            }
+          });
+          
+          // Count qr_scan events
+          const qrScanActivities = userActivities.filter(a => a.activityType === 'qr_scan');
+          const qrCodesScanned: string[] = [];
+          qrScanActivities.forEach(a => {
+            if (a.animalId && !qrCodesScanned.includes(a.animalId)) {
+              qrCodesScanned.push(a.animalId);
+            }
+            // Also check metadata for qr code info
+            if (a.metadata) {
+              try {
+                const meta = typeof a.metadata === 'string' ? JSON.parse(a.metadata) : a.metadata;
+                if (meta.animalId && !qrCodesScanned.includes(meta.animalId)) {
+                  qrCodesScanned.push(meta.animalId);
+                }
+                if (meta.qrCode && !qrCodesScanned.includes(meta.qrCode)) {
+                  qrCodesScanned.push(meta.qrCode);
+                }
+              } catch (e) {
+                // ignore parse errors
+              }
+            }
+          });
+          
+          // Count ar_view events
+          const arViewCount = userActivities.filter(a => a.activityType === 'ar_view').length;
+          
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            createdAt: user.createdAt,
+            watchedVideos: progress?.watchedVideos || [],
+            points: progress?.points || 0,
+            loginCount: loginHistory.length,
+            lastLogin: loginHistory[0]?.loginAt || null,
+            videoWatchCounts,
+            qrScanCount: qrScanActivities.length,
+            qrCodesScanned,
+            arViewCount
+          };
+        })
+      );
+      
+      res.json({ users: userActivityReports });
+    } catch (error: any) {
+      console.error("Get user activity report error:", error);
+      res.status(500).json({ error: "Failed to get user activity report" });
+    }
+  });
+
   return httpServer;
 }
