@@ -11,13 +11,6 @@ import SaveProgressModal from "@/components/SaveProgressModal";
 import { apiRequest } from "@/lib/queryClient";
 import { trackVideoWatch, trackARView } from "@/lib/activityTracker";
 
-const voiceoverMap: Record<string, { en: string; ar: string }> = {
-  eurasian_stone_curlew: {
-    en: "/videos/stone_curlew_en.mp3",
-    ar: "/videos/stone_curlew_ar.mp3"
-  }
-};
-
 const MIN_WATCH_TIME = 10; // seconds
 
 export default function AnimalDetailPage() {
@@ -40,7 +33,6 @@ export default function AnimalDetailPage() {
   const [hasRecordedWatch, setHasRecordedWatch] = useState(false);
   const [qrUnlockProcessed, setQrUnlockProcessed] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const voiceoverRef = useRef<HTMLAudioElement>(null);
   const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentAnimalIdRef = useRef<string | null>(null);
   
@@ -170,43 +162,12 @@ export default function AnimalDetailPage() {
     if (videoRef.current) {
       videoRef.current.volume = volume;
     }
-    if (voiceoverRef.current) {
-      voiceoverRef.current.volume = volume;
-    }
   }, [volume]);
 
-  // Play/pause voiceover with video
+  // Pause video when AR opens
   useEffect(() => {
-    const voiceover = animal?.id ? voiceoverMap[animal.id] : null;
-    if (!voiceover || !voiceoverRef.current) return;
-
-    if (isPlaying) {
-      voiceoverRef.current.src = voiceover[language];
-      voiceoverRef.current.volume = volume;
-      voiceoverRef.current.muted = isMuted;
-      voiceoverRef.current.play().catch(e => console.error("Voiceover play failed:", e));
-    } else {
-      voiceoverRef.current.pause();
-      voiceoverRef.current.currentTime = 0;
-    }
-  }, [isPlaying, animal?.id, language]);
-
-  // Sync mute state with voiceover
-  useEffect(() => {
-    if (voiceoverRef.current) {
-      voiceoverRef.current.muted = isMuted;
-    }
-  }, [isMuted]);
-
-  // Pause all media when AR opens
-  useEffect(() => {
-    if (isArOpen) {
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
-      if (voiceoverRef.current) {
-        voiceoverRef.current.pause();
-      }
+    if (isArOpen && videoRef.current) {
+      videoRef.current.pause();
     }
   }, [isArOpen]);
 
@@ -224,9 +185,6 @@ export default function AnimalDetailPage() {
 
   return (
     <div className="h-[100dvh] w-full bg-background text-white relative overflow-hidden">
-      
-      {/* Hidden voiceover audio element */}
-      <audio ref={voiceoverRef} />
       
       {/* Full Screen Background Media - FILLS ENTIRE SCREEN */}
       <div className="absolute inset-0 z-0">
