@@ -218,8 +218,8 @@ export default function AnimalDetailPage() {
       {/* Hidden voiceover audio element */}
       <audio ref={voiceoverRef} />
       
-      {/* Background Media (with space for bottom content) */}
-      <div className="absolute inset-0 bottom-[280px] z-0">
+      {/* Background Media (with space for header and bottom content) */}
+      <div className="absolute inset-0 top-[72px] bottom-[280px] z-0">
         {/* Render either video or image as background */}
         {isPlaying && currentVideo ? (
           <video 
@@ -232,7 +232,7 @@ export default function AnimalDetailPage() {
             muted={isMuted}
             onEnded={handleVideoEnded}
             onClick={() => setIsPlaying(false)}
-            className="w-full h-full object-cover absolute inset-0 z-0"
+            className="w-full h-full object-contain absolute inset-0 z-0"
             poster={animal.optimizedImage}
           />
         ) : (
