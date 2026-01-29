@@ -218,8 +218,8 @@ export default function AnimalDetailPage() {
       {/* Hidden voiceover audio element */}
       <audio ref={voiceoverRef} />
       
-      {/* Background Media (with space for header and bottom content) */}
-      <div className="absolute inset-0 top-[72px] bottom-[280px] z-0">
+      {/* Background Media (starts below header, extends to bottom) */}
+      <div className="absolute inset-0 top-[72px] z-0">
         {/* Render either video or image as background */}
         {isPlaying && currentVideo ? (
           <video 
