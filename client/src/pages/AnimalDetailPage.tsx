@@ -219,7 +219,7 @@ export default function AnimalDetailPage() {
       <audio ref={voiceoverRef} />
       
       {/* Background Media (with space for bottom content) */}
-      <div className="absolute inset-0 bottom-[220px] z-0">
+      <div className="absolute inset-0 bottom-[280px] z-0">
         {/* Render either video or image as background */}
         {isPlaying && currentVideo ? (
           <video 
@@ -246,7 +246,7 @@ export default function AnimalDetailPage() {
       </div>
       
       {/* Dark background for bottom area */}
-      <div className="absolute bottom-0 left-0 right-0 h-[220px] bg-gradient-to-t from-black via-black/95 to-transparent z-5" />
+      <div className="absolute bottom-0 left-0 right-0 h-[280px] bg-gradient-to-t from-black via-black/95 to-transparent z-5" />
 
       {/* Header - Unified Control Bar */}
       <div className="absolute top-0 left-0 right-0 z-50 p-4">
