@@ -76,7 +76,9 @@ export default function GalleryPage() {
   const handleLogout = () => {
     logout();
     localStorage.removeItem("watchedVideos");
+    localStorage.removeItem("unlockedAnimals");
     localStorage.removeItem("points");
+    localStorage.removeItem("completion_seen_guest");
     setLocation("/");
   };
 
