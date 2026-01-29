@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useUser } from "./user";
+import { animals } from "./data";
+
+const TOTAL_ANIMALS = animals.length; // 24 animals
 
 interface ProgressContextType {
   watchedVideos: string[];
@@ -10,6 +13,9 @@ interface ProgressContextType {
   isUnlocked: (animalId: string) => boolean;
   refreshProgress: () => Promise<void>;
   isLoading: boolean;
+  isCollectionComplete: boolean;
+  unlockedCount: number;
+  totalAnimals: number;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
@@ -109,8 +115,23 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     return unlockedAnimals.includes(animalId);
   };
 
+  const isCollectionComplete = unlockedAnimals.length >= TOTAL_ANIMALS;
+  const unlockedCount = unlockedAnimals.length;
+
   return (
-    <ProgressContext.Provider value={{ watchedVideos, unlockedAnimals, points, recordVideoWatch, hasWatched, isUnlocked, refreshProgress, isLoading }}>
+    <ProgressContext.Provider value={{ 
+      watchedVideos, 
+      unlockedAnimals, 
+      points, 
+      recordVideoWatch, 
+      hasWatched, 
+      isUnlocked, 
+      refreshProgress, 
+      isLoading,
+      isCollectionComplete,
+      unlockedCount,
+      totalAnimals: TOTAL_ANIMALS
+    }}>
       {children}
     </ProgressContext.Provider>
   );

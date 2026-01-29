@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { ArrowLeft, LogOut, Shield, Bookmark, Star, QrCode, Lock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, LogOut, Shield, Bookmark, Star, QrCode, Lock, Trophy, Crown, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import useEmblaCarousel from "embla-carousel-react";
@@ -15,7 +15,9 @@ export default function GalleryPage() {
   const [, setLocation] = useLocation();
   const { t, dir, language } = useLanguage();
   const { user, logout, isLoading } = useUser();
-  const { watchedVideos, points, isUnlocked } = useProgress();
+  const { watchedVideos, points, isUnlocked, isCollectionComplete, unlockedCount, totalAnimals } = useProgress();
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [hasSeenCompletion, setHasSeenCompletion] = useState(false);
   const chunkSize = ANIMALS_PER_PAGE;
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     direction: dir,
@@ -39,6 +41,19 @@ export default function GalleryPage() {
       emblaApi.reInit();
     }
   }, [emblaApi, chunkSize]);
+
+  // Show completion celebration when all animals unlocked (only once)
+  useEffect(() => {
+    if (isCollectionComplete && !hasSeenCompletion) {
+      const seenKey = user ? `completion_seen_${user.id}` : 'completion_seen_guest';
+      const alreadySeen = localStorage.getItem(seenKey);
+      if (!alreadySeen) {
+        setShowCompletionModal(true);
+        localStorage.setItem(seenKey, 'true');
+      }
+      setHasSeenCompletion(true);
+    }
+  }, [isCollectionComplete, hasSeenCompletion, user]);
 
   const chunks = useMemo(() => {
     const result = [];
@@ -138,23 +153,65 @@ export default function GalleryPage() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="px-6 mb-8 z-10 relative flex justify-between items-end"
+        className="px-6 mb-6 z-10 relative"
       >
-        <h1 className="font-serif text-2xl font-bold uppercase tracking-wider text-white">
-          {t("gallery.title")}
-        </h1>
-        
-        <div className="flex flex-col items-end">
-          <span className="text-[10px] text-white/50 font-sans tracking-widest uppercase mb-1">
-            {language === 'en' ? 'Points' : 'النقاط'}
-          </span>
-          <div className="flex items-baseline gap-1">
-            <Star className="w-4 h-4 text-primary fill-primary" />
-            <span className="font-serif text-2xl font-bold text-primary">
-              {points}
+        <div className="flex justify-between items-end mb-4">
+          <h1 className="font-serif text-2xl font-bold uppercase tracking-wider text-white">
+            {t("gallery.title")}
+          </h1>
+          
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] text-white/50 font-sans tracking-widest uppercase mb-1">
+              {language === 'en' ? 'Points' : 'النقاط'}
             </span>
+            <div className="flex items-baseline gap-1">
+              <Star className="w-4 h-4 text-primary fill-primary" />
+              <span className="font-serif text-2xl font-bold text-primary">
+                {points}
+              </span>
+            </div>
           </div>
         </div>
+
+        {/* Completion Badge or Progress */}
+        {isCollectionComplete ? (
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] rounded-2xl p-3 flex items-center gap-3 shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <Crown className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-bold text-sm">
+                {language === 'en' ? 'Collection Master!' : 'سيد المجموعة!'}
+              </p>
+              <p className="text-white/80 text-xs">
+                {language === 'en' ? 'You unlocked all 24 animals' : 'لقد فتحت جميع الحيوانات الـ 24'}
+              </p>
+            </div>
+            <Trophy className="w-8 h-8 text-white" />
+          </motion.div>
+        ) : (
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl p-3 flex items-center gap-3 border border-white/10">
+            <div className="flex-1">
+              <p className="text-white/60 text-xs mb-1">
+                {language === 'en' ? 'Collection Progress' : 'تقدم المجموعة'}
+              </p>
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(unlockedCount / totalAnimals) * 100}%` }}
+                  className="h-full bg-primary rounded-full"
+                />
+              </div>
+            </div>
+            <span className="text-white font-bold text-lg">
+              {unlockedCount}/{totalAnimals}
+            </span>
+          </div>
+        )}
       </motion.div>
 
       {/* Carousel */}
@@ -257,6 +314,121 @@ export default function GalleryPage() {
         onClose={() => setShowSaveModal(false)} 
         onSuccess={handleSaveSuccess}
       />
+
+      {/* Collection Complete Celebration Modal */}
+      <AnimatePresence>
+        {showCompletionModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          >
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setShowCompletionModal(false)}
+            />
+
+            {/* Celebration Card */}
+            <motion.div 
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 50 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              className="relative w-full max-w-sm bg-gradient-to-br from-[#FFD700] via-[#FFA500] to-[#FF8C00] rounded-3xl overflow-hidden shadow-2xl"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowCompletionModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Decorative Elements */}
+              <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full translate-x-1/4 translate-y-1/4" />
+
+              {/* Content */}
+              <div className="relative p-8 text-center">
+                {/* Trophy Icon */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.2, type: "spring", damping: 10 }}
+                  className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/20 flex items-center justify-center"
+                >
+                  <Trophy className="w-12 h-12 text-white" />
+                </motion.div>
+
+                {/* Title */}
+                <motion.h2
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl font-bold text-white font-serif mb-2"
+                >
+                  {language === 'en' ? 'Congratulations!' : 'تهانينا!'}
+                </motion.h2>
+
+                {/* Subtitle */}
+                <motion.p
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-white/90 text-lg mb-6"
+                >
+                  {language === 'en' 
+                    ? "You've unlocked all 24 animals!" 
+                    : "لقد فتحت جميع الحيوانات الـ 24!"}
+                </motion.p>
+
+                {/* Badge */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5, type: "spring" }}
+                  className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-4 mb-6"
+                >
+                  <Crown className="w-8 h-8 text-white" />
+                  <div className="text-left">
+                    <p className="text-white font-bold">
+                      {language === 'en' ? 'Collection Master' : 'سيد المجموعة'}
+                    </p>
+                    <p className="text-white/70 text-sm">
+                      {language === 'en' ? 'Badge Earned!' : 'تم الحصول على الشارة!'}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Message */}
+                <motion.p
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-white/80 text-sm leading-relaxed mb-6"
+                >
+                  {language === 'en' 
+                    ? "You are now one of the elite explorers who have discovered every animal in The Living Wild collection. Your badge will always be displayed on your profile!"
+                    : "أنت الآن من المستكشفين النخبة الذين اكتشفوا كل حيوان في مجموعة الحياة البرية. ستظهر شارتك دائمًا على ملفك الشخصي!"}
+                </motion.p>
+
+                {/* Close Button */}
+                <motion.button
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  onClick={() => setShowCompletionModal(false)}
+                  className="w-full bg-white text-[#FF8C00] font-bold py-4 rounded-xl text-lg transition-all active:scale-[0.98] shadow-lg"
+                >
+                  {language === 'en' ? 'Amazing!' : 'رائع!'}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
