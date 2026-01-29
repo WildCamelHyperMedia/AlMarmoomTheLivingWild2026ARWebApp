@@ -84,6 +84,19 @@ export default function QRScannerPage() {
     setResult(null);
 
     try {
+      // Clear any existing scanner instance before creating a new one
+      if (scannerRef.current) {
+        try {
+          const state = scannerRef.current.getState();
+          if (state === 2) { // SCANNING state
+            await scannerRef.current.stop();
+          }
+          scannerRef.current.clear();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+      
       scannerRef.current = new Html5Qrcode("qr-reader");
       
       // Get container dimensions for portrait aspect ratio
