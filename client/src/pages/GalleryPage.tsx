@@ -9,7 +9,7 @@ import { useProgress } from "@/lib/progress";
 import { useUser } from "@/lib/user";
 import SaveProgressModal from "@/components/SaveProgressModal";
 
-const ANIMALS_PER_PAGE = 8;
+const ANIMALS_PER_PAGE = 12;
 
 export default function GalleryPage() {
   const [, setLocation] = useLocation();
@@ -238,7 +238,7 @@ export default function GalleryPage() {
         <div className="flex h-full touch-pan-y backface-hidden will-change-transform">
           {chunks.map((chunk, pageIndex) => (
             <div className="flex-[0_0_100%] min-w-0 px-4 sm:px-6 relative overflow-y-auto" key={pageIndex}>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 pb-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 pb-4">
                 {chunk.map((animal, animalIndex) => {
                   const watched = watchedVideos.includes(animal.id);
                   const unlocked = isUnlocked(animal.id);
@@ -282,7 +282,7 @@ export default function GalleryPage() {
                                 </motion.div>
                               )}
                             </div>
-                            <span className="text-[9px] sm:text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/80 h-8 flex items-center justify-center text-center px-1 group-hover:text-primary transition-colors duration-300">
+                            <span className="text-[8px] sm:text-[9px] font-sans font-medium uppercase tracking-wider leading-tight text-white/80 h-7 flex items-center justify-center text-center px-0.5 group-hover:text-primary transition-colors duration-300">
                               {t(`animals.${animal.id}`)}
                             </span>
                           </motion.div>
@@ -308,11 +308,11 @@ export default function GalleryPage() {
                                 animate={{ scale: [1, 1.1, 1] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                               >
-                                <Lock className="w-8 h-8 text-white/70" />
+                                <Lock className="w-6 h-6 text-white/70" />
                               </motion.div>
                             </div>
                           </div>
-                          <span className="text-[9px] sm:text-[10px] font-sans font-medium uppercase tracking-widest leading-tight text-white/40 h-8 flex items-center justify-center text-center px-1 group-hover:text-white/60 transition-colors duration-300">
+                          <span className="text-[8px] sm:text-[9px] font-sans font-medium uppercase tracking-wider leading-tight text-white/40 h-7 flex items-center justify-center text-center px-0.5 group-hover:text-white/60 transition-colors duration-300">
                             {language === 'en' ? 'Scan to Unlock' : 'امسح للفتح'}
                           </span>
                         </motion.div>
