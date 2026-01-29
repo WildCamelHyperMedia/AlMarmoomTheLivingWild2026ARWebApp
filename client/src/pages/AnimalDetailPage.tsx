@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX } from "lucide-react";
-import { Link, useRoute, useLocation, useSearch } from "wouter";
+import { useRoute, useLocation, useSearch } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
 import { useState, useRef, useEffect } from "react";
@@ -321,14 +321,13 @@ export default function AnimalDetailPage() {
         {/* Control Row - Back, Name/Timer, Close/Volume */}
         <div className="flex items-center gap-3">
           {/* Back Button */}
-          <Link href="/gallery">
-            <button 
-              className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
-              data-testid="button-back-to-gallery"
-            >
-              <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </button>
-          </Link>
+          <button 
+            onClick={() => setLocation("/gallery")}
+            className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+            data-testid="button-back-to-gallery"
+          >
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          </button>
           
           {/* Name Block with optional countdown */}
           <div className="flex-1 bg-black/50 backdrop-blur-md rounded-2xl p-3 border border-white/10 text-center relative overflow-hidden">
