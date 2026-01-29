@@ -102,7 +102,7 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="h-[100dvh] w-full bg-background text-white pb-20 relative overflow-y-auto flex flex-col">
+    <div className="h-[100dvh] w-full bg-background text-white relative overflow-y-auto flex flex-col">
       
       {/* Desert Dunes Background */}
       <div 
@@ -377,7 +377,7 @@ export default function GalleryPage() {
       </div>
 
       {/* QR Scanner Button - Large Bottom Center */}
-      <div className="flex justify-center py-4 relative z-20 shrink-0">
+      <div className="flex justify-center py-2 relative z-20 shrink-0">
         <motion.button
           onClick={() => setLocation("/scan")}
           className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#b97d42] to-[#855338] text-white rounded-full shadow-lg shadow-[#b97d42]/30 relative overflow-hidden"
@@ -406,7 +406,7 @@ export default function GalleryPage() {
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center gap-3 py-2 relative z-20 shrink-0">
+      <div className="flex justify-center gap-3 pb-2 pt-1 relative z-20 shrink-0 safe-bottom">
         {chunks.map((_, index) => (
           <button
             key={index}
