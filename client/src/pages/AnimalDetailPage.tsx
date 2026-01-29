@@ -245,67 +245,61 @@ export default function AnimalDetailPage() {
         )}
       </div>
       
-      {/* Subtle gradient at bottom for text readability - always visible */}
-      <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-gradient-to-t from-black/80 via-black/40 to-transparent z-5 pointer-events-none" />
+      {/* Gradient for bottom content readability */}
+      <div className="absolute bottom-0 left-0 right-0 h-[220px] bg-gradient-to-t from-black via-black/60 to-transparent z-5 pointer-events-none" />
 
-      {/* Minimal Floating Controls - Always visible but unobtrusive */}
-      <div className="absolute top-0 left-0 right-0 z-50 p-4 pointer-events-none">
-        <div className="flex items-center justify-between pointer-events-auto">
-          {/* Left: Back Button */}
-          <Link href="/gallery">
-            <button 
-              className={`w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
-              data-testid="button-back-to-gallery"
-            >
-              <ArrowLeft className="h-5 w-5 text-white" />
-            </button>
-          </Link>
-          
-          {/* Center: Points Indicator - only during playback */}
-          <div className="flex-1 flex justify-center px-4">
-            {isPlaying && !hasRecordedWatch && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-black/50 backdrop-blur-sm rounded-full px-4 py-2"
-              >
-                <span className="text-sm text-white font-medium">
-                  {watchTime < MIN_WATCH_TIME 
-                    ? `${MIN_WATCH_TIME - watchTime}s ${language === 'en' ? 'to earn points' : 'لكسب النقاط'}`
-                    : language === 'en' ? 'Points earned!' : 'تم كسب النقاط!'}
-                </span>
-              </motion.div>
-            )}
-          </div>
-
-          {/* Right: Volume & Close (only during playback) */}
-          <div className="flex items-center gap-2">
-            {isPlaying && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-2"
-              >
-                <button 
-                  onClick={() => setIsMuted(!isMuted)}
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors text-white"
-                  data-testid="button-toggle-mute"
-                >
-                  {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                </button>
-                <button 
-                  onClick={() => setIsPlaying(false)}
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors text-white"
-                  data-testid="button-stop-video"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </motion.div>
-            )}
-            {!isPlaying && <div className="w-10 h-10" />}
-          </div>
-        </div>
+      {/* Back Button - Bottom Left Corner */}
+      <div className={`absolute bottom-[200px] ${dir === 'rtl' ? 'right-4' : 'left-4'} z-50`}>
+        <Link href="/gallery">
+          <button 
+            className={`w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors ${dir === 'rtl' ? 'rotate-180' : ''}`}
+            data-testid="button-back-to-gallery"
+          >
+            <ArrowLeft className="h-5 w-5 text-white" />
+          </button>
+        </Link>
       </div>
+
+      {/* Video Controls - Bottom Right Corner (when playing) */}
+      {isPlaying && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={`absolute bottom-[200px] ${dir === 'rtl' ? 'left-4' : 'right-4'} z-50 flex flex-col gap-2`}
+        >
+          <button 
+            onClick={() => setIsMuted(!isMuted)}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors text-white"
+            data-testid="button-toggle-mute"
+          >
+            {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          </button>
+          <button 
+            onClick={() => setIsPlaying(false)}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors text-white"
+            data-testid="button-stop-video"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </motion.div>
+      )}
+
+      {/* Points Countdown - Small pill, bottom center above info */}
+      {isPlaying && !hasRecordedWatch && (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute bottom-[210px] left-1/2 -translate-x-1/2 z-50"
+        >
+          <div className="bg-primary/90 backdrop-blur-sm rounded-full px-4 py-1.5 shadow-lg">
+            <span className="text-xs text-background font-bold">
+              {watchTime < MIN_WATCH_TIME 
+                ? `${MIN_WATCH_TIME - watchTime}s`
+                : '✓'}
+            </span>
+          </div>
+        </motion.div>
+      )}
 
       {/* Play Button Overlay */}
       {!isPlaying && !isArOpen && (
@@ -358,29 +352,30 @@ export default function AnimalDetailPage() {
         </div>
       )}
 
-      {/* Bottom Content - Always visible, compact design */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-6">
-        {/* Compact bottom bar with name and AR button side by side */}
-        <div className="flex items-center gap-3">
-          {/* Name Block - Left side, compact */}
-          <div className="flex-1 bg-black/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
-            <h1 className="font-serif text-lg font-bold text-white leading-tight">
-              {t(`animals.${animal.id}`)}
-            </h1>
-            <p className="font-sans text-[10px] tracking-[0.15em] uppercase text-white/50">
-              {animal.scientificName}
-            </p>
-          </div>
-
-          {/* AR Button - Right side, square icon */}
-          <button 
-            onClick={() => setIsArOpen(true)}
-            className="w-14 h-14 bg-[#8B6B58] hover:bg-[#7A5C4A] rounded-xl transition-all active:scale-[0.95] flex items-center justify-center"
-            data-testid="button-enter-ar"
-          >
-            <ScanLine className="w-6 h-6 text-white" />
-          </button>
+      {/* Bottom Content - Always visible, stacked layout */}
+      <div className="absolute bottom-0 left-0 right-0 z-30 p-6 flex flex-col gap-4">
+        {/* Name Block */}
+        <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center">
+          <h1 className="font-serif text-2xl font-bold text-white mb-1">
+            {t(`animals.${animal.id}`)}
+          </h1>
+          <p className="font-sans text-xs tracking-[0.2em] uppercase text-white/60">
+            {animal.scientificName}
+          </p>
         </div>
+
+        {/* AR Button */}
+        <button 
+          onClick={() => setIsArOpen(true)}
+          className="w-full bg-[#8B6B58] hover:bg-[#7A5C4A] text-white/90 font-medium py-4 rounded-2xl transition-all active:scale-[0.98] flex items-center justify-between px-6 group"
+          data-testid="button-enter-ar"
+        >
+          <ScanLine className="w-5 h-5 opacity-70" />
+          <span className="text-sm tracking-widest uppercase flex-1 text-center">
+            {t("detail.enterAr")}
+          </span>
+          <ArrowRight className={`w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
+        </button>
       </div>
 
       {/* Save Progress Modal */}
