@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gift, Camera, Book, Sparkles, CheckCircle, Loader2 } from "lucide-react";
+import { Gift, CheckCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/language";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,11 +18,8 @@ export default function LeadFormPage() {
   const content = {
     en: {
       title: "SCAN & WIN!",
-      description: "Scan the QR code, register, and explore 'Al Marmoom: The Living Wild' exhibition for your chance to win exclusive Al Marmoom merchandise, in collaboration with Parkers.",
-      subDescription: "Plus, scan the QR codes on all 24 photographs by renowned Emirati photographer H.E. Ali bin Thalith for a chance to win:",
-      prize1: "A GoPro",
-      prize2: "A signed book by Ali",
-      prize3: "A one-day photography tour with Ali",
+      description: "Visit the 'Drive-Thru Photography Exhibition at Al Marmoom', and scan & unlock as many QR codes next to each photograph for your chance to WIN amazing prizes.",
+      subDescription: "Parkers guests can also WIN 'Al Marmoom' merchandise.",
       namePlaceholder: "Your Name",
       emailPlaceholder: "Your Email",
       phonePlaceholder: "Your Phone Number",
@@ -32,11 +29,8 @@ export default function LeadFormPage() {
     },
     ar: {
       title: "امسح واربح!",
-      description: "امسح رمز الاستجابة السريعة (QR)، وسجّل بياناتك، واستكشف معرض \"المرموم: الطبيعة الحية\" (Al Marmoom: The Living Wild) لتحظى بفرصة الفوز بمنتجات حصرية من \"المرموم\"، بالتعاون مع \"باركرز\".",
-      subDescription: "بالإضافة إلى ذلك، امسح رموز الـ QR الموجودة على جميع الصور الـ 24 للمصور الإماراتي الشهير سعادة علي بن ثالث لفرصة الفوز بـ:",
-      prize1: "كاميرا GoPro",
-      prize2: "كتاب موقّع من علي",
-      prize3: "جولة تصوير فوتوغرافي ليوم واحد مع علي",
+      description: "زوروا معرض 'المرموم: حياة البرية' الذي يمرّ عبره الزوّار بالسيارة، وامسحوا أكبر عدد ممكن من رموز QR الموجودة بجانب كل صورة لفرصة الفوز بجوائز مميزة.",
+      subDescription: "سيحصل جميع ضيوف 'باركرز' أيضاً على فرصة للفوز بمنتجات 'المرموم'.",
       namePlaceholder: "اسمك",
       emailPlaceholder: "بريدك الإلكتروني",
       phonePlaceholder: "رقم هاتفك",
@@ -144,33 +138,9 @@ export default function LeadFormPage() {
                 <p className="text-[#30221b] text-sm leading-relaxed mb-4">
                   {t.description}
                 </p>
-                <p className="text-[#5b3e34] text-sm leading-relaxed mb-3">
+                <p className="text-[#5b3e34] text-sm leading-relaxed font-medium">
                   {t.subDescription}
                 </p>
-                
-                {/* Prize List */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 bg-[#f5e6d3] border border-[#d3c4b0] rounded-xl p-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#30221b] flex items-center justify-center flex-shrink-0">
-                      <Camera className="w-4 h-4 text-[#b97d42]" />
-                    </div>
-                    <span className="text-[#30221b] font-medium text-sm">{t.prize1}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 bg-[#f5e6d3] border border-[#d3c4b0] rounded-xl p-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#30221b] flex items-center justify-center flex-shrink-0">
-                      <Book className="w-4 h-4 text-[#b97d42]" />
-                    </div>
-                    <span className="text-[#30221b] font-medium text-sm">{t.prize2}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 bg-[#f5e6d3] border border-[#d3c4b0] rounded-xl p-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#30221b] flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-4 h-4 text-[#b97d42]" />
-                    </div>
-                    <span className="text-[#30221b] font-medium text-sm">{t.prize3}</span>
-                  </div>
-                </div>
               </motion.div>
 
               {/* Registration Form */}
