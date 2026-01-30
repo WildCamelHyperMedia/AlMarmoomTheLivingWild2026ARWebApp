@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Play, ScanLine, ArrowRight, X, Volume2, VolumeX, Loader2 } from "lucide-react";
 import { useRoute, useLocation, useSearch } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { animals } from "@/lib/data";
@@ -23,10 +23,9 @@ export default function AnimalDetailPage() {
 
   const animal = animals.find((a) => a.id === params?.id);
   
-  // Check if coming from QR scan to auto-play video
-  const urlParams = new URLSearchParams(searchString);
-  const shouldAutoPlay = urlParams.get('autoplay') === '1' || urlParams.get('qr') === 'unlock';
-  const [isPlaying, setIsPlaying] = useState(shouldAutoPlay);
+  // Always start with video paused - user must press play
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [isArOpen, setIsArOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -157,8 +156,13 @@ export default function AnimalDetailPage() {
   // Handle video completion
   const handleVideoEnded = () => {
     setIsPlaying(false);
-    // Only prompt guests who haven't registered to save their progress
-    // Don't show modal if user is already logged in
+    setIsVideoLoading(false);
+  };
+  
+  // Reset loading when stopping video
+  const handleStopVideo = () => {
+    setIsPlaying(false);
+    setIsVideoLoading(false);
   };
 
   useEffect(() => {
@@ -191,60 +195,39 @@ export default function AnimalDetailPage() {
       
       {/* Full Screen Background Media - FILLS ENTIRE SCREEN */}
       <div className="absolute inset-0 z-0">
-        {isPlaying && currentVideo ? (
+        {/* Background image always visible */}
+        <img 
+          src={animal.optimizedImage} 
+          alt={t(`animals.${animal.id}`)}
+          className="w-full h-full object-cover"
+          onError={(e) => { e.currentTarget.src = animal.image; }}
+        />
+        
+        {/* Video overlay when playing */}
+        {isPlaying && currentVideo && (
           <video 
             ref={videoRef}
             src={currentVideo} 
-            autoPlay 
             controls={false}
             playsInline
             // @ts-ignore - webkit-playsinline is needed for older iOS
             webkit-playsinline="true"
-            preload="auto"
+            preload="metadata"
             loop={false}
             muted={isMuted}
             onEnded={handleVideoEnded}
-            onClick={() => setIsPlaying(false)}
-            onCanPlay={() => {
-              // Ensure video plays after it's ready
+            onClick={handleStopVideo}
+            onLoadedData={() => {
+              // Start playing once video data is loaded
               if (videoRef.current && isPlaying) {
-                videoRef.current.play().catch(() => {});
+                videoRef.current.play()
+                  .then(() => setIsVideoLoading(false))
+                  .catch(() => setIsVideoLoading(false));
               }
             }}
-            onStalled={() => {
-              // Try to resume if video stalls
-              if (videoRef.current && isPlaying) {
-                videoRef.current.play().catch(() => {});
-              }
-            }}
+            onPlaying={() => setIsVideoLoading(false)}
             className="w-full h-full object-cover absolute inset-0 z-0"
-            poster={animal.optimizedImage}
           />
-        ) : (
-          <>
-            <img 
-              src={animal.optimizedImage} 
-              alt={t(`animals.${animal.id}`)}
-              className="w-full h-full object-cover"
-              onError={(e) => { e.currentTarget.src = animal.image; }}
-            />
-            {/* Play Button Overlay */}
-            {currentVideo && (
-              <motion.button
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsPlaying(true)}
-                className="absolute inset-0 flex items-center justify-center z-10"
-                data-testid="button-play-video"
-              >
-                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/40 flex items-center justify-center shadow-2xl">
-                  <Play className="w-10 h-10 text-white fill-white ml-1" />
-                </div>
-              </motion.button>
-            )}
-          </>
         )}
       </div>
       
@@ -256,7 +239,7 @@ export default function AnimalDetailPage() {
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          onClick={() => setIsPlaying(false)}
+          onClick={handleStopVideo}
           className={`absolute top-4 ${dir === 'rtl' ? 'left-4' : 'right-4'} z-50 w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors text-white`}
           data-testid="button-stop-video"
         >
@@ -265,18 +248,26 @@ export default function AnimalDetailPage() {
       )}
 
       {/* Play Button Overlay */}
-      {!isPlaying && !isArOpen && (
+      {!isPlaying && !isArOpen && currentVideo && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
           <motion.button
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsPlaying(true)}
+            onClick={() => {
+              setIsVideoLoading(true);
+              setIsPlaying(true);
+            }}
+            disabled={isVideoLoading}
             className="pointer-events-auto w-20 h-20 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl group"
             data-testid="button-play-video"
           >
-            <Play className="fill-white ml-1 w-8 h-8 group-hover:scale-110 transition-transform" />
+            {isVideoLoading ? (
+              <Loader2 className="w-8 h-8 animate-spin" />
+            ) : (
+              <Play className="fill-white ml-1 w-8 h-8 group-hover:scale-110 transition-transform" />
+            )}
           </motion.button>
         </div>
       )}
