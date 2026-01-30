@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, LogOut, ArrowLeft, Gift, Camera, Book, Sparkles } from "lucide-react";
+import { Play, LogOut, ArrowLeft, Gift, Camera, Book, Sparkles, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
@@ -10,11 +10,29 @@ export default function IntroPage() {
   const [, setLocation] = useLocation();
   const { t, language, dir } = useLanguage();
   const { user, isLoading, logout } = useUser();
+  const videoRef = useRef<HTMLVideoElement>(null);
   
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [showPrizePopup, setShowPrizePopup] = useState(false);
+
+  const handlePlayVideo = () => {
+    const video = videoRef.current;
+    if (video) {
+      setIsVideoLoading(true);
+      video.play()
+        .then(() => {
+          setIsPlaying(true);
+          setIsVideoLoading(false);
+        })
+        .catch((e) => {
+          console.error("Play failed:", e);
+          setIsVideoLoading(false);
+        });
+    }
+  };
 
   // If already logged in and admin, go to gallery
   useEffect(() => {
@@ -119,47 +137,46 @@ export default function IntroPage() {
           transition={{ delay: 0.2 }}
           className="relative w-full max-w-sm sm:max-w-md mx-auto aspect-[9/16] max-h-[50vh] sm:max-h-[55vh] bg-black/20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-4"
         >
-        {!isPlaying ? (
-            <img 
-              src="/images/photographer_ghillie.png" 
-              alt="Ali Bin Thalith" 
-              className="w-full h-full object-cover"
-            />
-        ) : (
-            <div className="relative w-full h-full">
-                <video
-                    ref={(el) => {
-                      if (el && isPlaying) {
-                        el.play().catch(e => console.error("Autoplay failed:", e));
-                      }
-                    }}
-                    src="/videos/ali-intro.mp4"
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    playsInline
-                    onEnded={() => setCanProceed(true)}
-                />
-                {/* Invisible layer to capture clicks to pause/stop if needed, or just let it play */}
-                <div 
-                    className="absolute inset-0 z-10" 
-                    onClick={() => setIsPlaying(false)} 
-                />
-            </div>
-        )}
+          {/* Poster Image (always visible as background) */}
+          <img 
+            src="/images/photographer_ghillie.png" 
+            alt="Ali Bin Thalith" 
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          
+          {/* Video (overlays poster when playing) */}
+          <video
+            ref={videoRef}
+            src="/videos/ali-intro.mp4"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+            playsInline
+            preload="metadata"
+            onEnded={() => {
+              setCanProceed(true);
+              setIsPlaying(false);
+            }}
+            onPause={() => setIsPlaying(false)}
+          />
         
-        {/* Play Button Overlay */}
-        {!isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsPlaying(true)}
-              className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white"
-            >
-              <Play className="fill-white ml-1" />
-            </motion.button>
-          </div>
-        )}
+          {/* Play Button Overlay */}
+          {!isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-10">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handlePlayVideo}
+                disabled={isVideoLoading}
+                className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white"
+                data-testid="button-play-intro-video"
+              >
+                {isVideoLoading ? (
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                ) : (
+                  <Play className="w-8 h-8 fill-white ml-1" />
+                )}
+              </motion.button>
+            </div>
+          )}
       </motion.div>
 
         {/* Action Buttons */}
