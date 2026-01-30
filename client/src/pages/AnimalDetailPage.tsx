@@ -178,6 +178,24 @@ export default function AnimalDetailPage() {
     }
   }, [isArOpen]);
 
+  // Handle play/pause when isPlaying changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    if (isPlaying) {
+      video.play()
+        .then(() => setIsVideoLoading(false))
+        .catch((e) => {
+          console.error("Video play failed:", e);
+          setIsVideoLoading(false);
+          setIsPlaying(false);
+        });
+    } else {
+      video.pause();
+    }
+  }, [isPlaying]);
+
   if (userLoading) {
     return (
       <div className="h-[100dvh] w-full bg-background flex items-center justify-center">
@@ -203,8 +221,8 @@ export default function AnimalDetailPage() {
           onError={(e) => { e.currentTarget.src = animal.image; }}
         />
         
-        {/* Video overlay when playing */}
-        {isPlaying && currentVideo && (
+        {/* Video - always rendered but opacity controlled */}
+        {currentVideo && (
           <video 
             ref={videoRef}
             src={currentVideo} 
@@ -217,16 +235,8 @@ export default function AnimalDetailPage() {
             muted={isMuted}
             onEnded={handleVideoEnded}
             onClick={handleStopVideo}
-            onLoadedData={() => {
-              // Start playing once video data is loaded
-              if (videoRef.current && isPlaying) {
-                videoRef.current.play()
-                  .then(() => setIsVideoLoading(false))
-                  .catch(() => setIsVideoLoading(false));
-              }
-            }}
             onPlaying={() => setIsVideoLoading(false)}
-            className="w-full h-full object-cover absolute inset-0 z-0"
+            className={`w-full h-full object-cover absolute inset-0 z-0 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           />
         )}
       </div>
