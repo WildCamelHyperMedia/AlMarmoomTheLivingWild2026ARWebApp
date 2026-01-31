@@ -12,7 +12,7 @@ export default function IntroPage() {
   const { user, isLoading, logout } = useUser();
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
@@ -149,13 +149,18 @@ export default function IntroPage() {
             ref={videoRef}
             src="/videos/ali-intro.mp4"
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+            autoPlay
             playsInline
-            preload="metadata"
+            preload="auto"
             onEnded={() => {
               setCanProceed(true);
               setIsPlaying(false);
             }}
-            onPause={() => setIsPlaying(false)}
+            onCanPlay={() => {
+              if (videoRef.current && isPlaying) {
+                videoRef.current.play().catch(() => setIsPlaying(false));
+              }
+            }}
           />
         
           {/* Play Button Overlay */}
