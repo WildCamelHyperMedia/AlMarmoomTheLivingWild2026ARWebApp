@@ -157,14 +157,19 @@ export default function GalleryPage() {
             </>
           )}
           {user && (
-            <button 
-              onClick={handleLogout}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
-              data-testid="button-logout"
-              title={language === 'en' ? 'Logout' : 'تسجيل الخروج'}
-            >
-              <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
-            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-white/70 text-sm max-w-[100px] truncate">
+                {user.name.split(' ')[0]}
+              </span>
+              <button 
+                onClick={handleLogout}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                data-testid="button-logout"
+                title={language === 'en' ? 'Logout' : 'تسجيل الخروج'}
+              >
+                <LogOut className="h-5 w-5 text-white/60 hover:text-white" />
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -316,7 +316,7 @@ export default function AnimalDetailPage() {
             playsInline
             // @ts-ignore - webkit-playsinline is needed for older iOS
             webkit-playsinline="true"
-            preload="metadata"
+            preload="auto"
             loop={false}
             muted={isMuted}
             onEnded={handleVideoEnded}
