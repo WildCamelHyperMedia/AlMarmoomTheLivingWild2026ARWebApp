@@ -156,3 +156,28 @@
     gap: clamp(0.5rem, 2vw, 1rem);
   }
 }
+
+/* QR Scanner Styles */
+#qr-reader {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+}
+
+#qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+#qr-reader__scan_region {
+  min-height: 100% !important;
+}
+
+#qr-reader__dashboard {
+  display: none !important;
+}
+
+#qr-shaded-region {
+  border-width: 50px !important;
+}

@@ -78,12 +78,19 @@ export default function QRScannerPage() {
       
       scannerRef.current = new Html5Qrcode("qr-reader");
       
+      // Calculate responsive qrbox size based on viewport
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const minDimension = Math.min(viewportWidth, viewportHeight);
+      const qrboxSize = Math.floor(minDimension * 0.7); // 70% of smallest dimension
+      
       await scannerRef.current.start(
         { facingMode: "environment" },
         {
-          fps: 15,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
+          fps: 10,
+          qrbox: { width: qrboxSize, height: qrboxSize },
+          aspectRatio: viewportHeight / viewportWidth,
+          disableFlip: false,
         },
         async (decodedText) => {
           console.log("[QR] Raw scan result:", decodedText);
@@ -262,17 +269,20 @@ export default function QRScannerPage() {
           </div>
         )}
         
-        {/* Scanning Frame Overlay */}
+        {/* Scanning Frame Overlay - responsive corners */}
         {isScanning && (
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-64 h-64 border-2 border-[#b97d42] rounded-2xl relative">
-                <div className="absolute -top-0.5 -left-0.5 w-8 h-8 border-t-4 border-l-4 border-[#b97d42] rounded-tl-2xl" />
-                <div className="absolute -top-0.5 -right-0.5 w-8 h-8 border-t-4 border-r-4 border-[#b97d42] rounded-tr-2xl" />
-                <div className="absolute -bottom-0.5 -left-0.5 w-8 h-8 border-b-4 border-l-4 border-[#b97d42] rounded-bl-2xl" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-4 border-r-4 border-[#b97d42] rounded-br-2xl" />
+              <div className="w-[70vmin] h-[70vmin] relative">
+                <div className="absolute -top-0.5 -left-0.5 w-12 h-12 border-t-4 border-l-4 border-[#b97d42] rounded-tl-2xl" />
+                <div className="absolute -top-0.5 -right-0.5 w-12 h-12 border-t-4 border-r-4 border-[#b97d42] rounded-tr-2xl" />
+                <div className="absolute -bottom-0.5 -left-0.5 w-12 h-12 border-b-4 border-l-4 border-[#b97d42] rounded-bl-2xl" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-12 h-12 border-b-4 border-r-4 border-[#b97d42] rounded-br-2xl" />
               </div>
             </div>
+            <p className="absolute bottom-32 left-0 right-0 text-center text-white/70 text-sm px-4">
+              {t("subtitle")}
+            </p>
           </div>
         )}
       </div>
