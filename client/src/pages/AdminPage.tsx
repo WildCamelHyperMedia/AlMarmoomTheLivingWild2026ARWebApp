@@ -879,8 +879,9 @@ export default function AdminPage() {
                   {/* Activity Stats Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {(() => {
-                      const activityTypes = ['qr_scan', 'video_watch', 'ar_view', 'registration', 'login'];
+                      const activityTypes = ['video_play', 'qr_scan', 'video_watch', 'ar_view', 'registration', 'login'];
                       const colorMap: Record<string, string> = {
+                        video_play: 'amber',
                         qr_scan: 'blue',
                         video_watch: 'green',
                         ar_view: 'purple',
@@ -888,6 +889,7 @@ export default function AdminPage() {
                         login: 'orange'
                       };
                       const labelMap: Record<string, string> = {
+                        video_play: 'Video Plays',
                         qr_scan: 'QR Scans',
                         video_watch: 'Video Watches',
                         ar_view: 'AR Views',

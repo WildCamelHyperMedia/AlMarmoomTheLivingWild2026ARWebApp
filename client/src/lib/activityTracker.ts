@@ -14,6 +14,7 @@ const getAuthToken = (): string | null => {
 export type ActivityType = 
   | "qr_scan" 
   | "video_watch" 
+  | "video_play"
   | "ar_view" 
   | "registration" 
   | "login"
@@ -54,6 +55,14 @@ export async function logActivity({ activityType, animalId, metadata }: LogActiv
 export function trackVideoWatch(animalId: string, animalName?: string): void {
   logActivity({
     activityType: "video_watch",
+    animalId,
+    metadata: animalName ? { animalName } : undefined,
+  });
+}
+
+export function trackVideoPlay(animalId: string, animalName?: string): void {
+  logActivity({
+    activityType: "video_play",
     animalId,
     metadata: animalName ? { animalName } : undefined,
   });

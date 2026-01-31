@@ -9,7 +9,7 @@ import { useUser } from "@/lib/user";
 import { AnimatePresence } from "framer-motion";
 import SaveProgressModal from "@/components/SaveProgressModal";
 import { apiRequest } from "@/lib/queryClient";
-import { trackVideoWatch, trackARView, trackQRScan } from "@/lib/activityTracker";
+import { trackVideoWatch, trackARView, trackQRScan, trackVideoPlay } from "@/lib/activityTracker";
 
 const MIN_WATCH_TIME = 10; // seconds
 
@@ -23,11 +23,12 @@ export default function AnimalDetailPage() {
 
   const animal = animals.find((a) => a.id === params?.id);
   
-  // Check if coming from external QR scan - auto-play in that case
+  // Check if coming from external QR scan - used for unlock processing only, NOT autoplay
   const urlParams = new URLSearchParams(searchString);
-  const isExternalQrScan = urlParams.get('qr') === 'unlock' || urlParams.get('autoplay') === '1';
+  const isExternalQrScan = urlParams.get('qr') === 'unlock';
   
-  const [isPlaying, setIsPlaying] = useState(isExternalQrScan);
+  // NEVER autoplay - always require user to tap play button
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isVideoActuallyPlaying, setIsVideoActuallyPlaying] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [isArOpen, setIsArOpen] = useState(false);
@@ -99,11 +100,9 @@ export default function AnimalDetailPage() {
             console.log("[QR Unlock] Progress refreshed");
           }
           
-          // Auto-play video when coming from QR scan
-          setIsPlaying(true);
-          
           // Remove the qr param from URL to prevent re-processing
-          setLocation(`/animal/${animal.id}?autoplay=1`, { replace: true });
+          // User must tap play button to play video
+          setLocation(`/animal/${animal.id}`, { replace: true });
         } catch (err) {
           console.error("Auto-unlock error:", err);
         }
@@ -324,6 +323,8 @@ export default function AnimalDetailPage() {
             onClick={() => {
               setIsVideoLoading(true);
               setIsPlaying(true);
+              // Track play button press for admin panel
+              trackVideoPlay(animal.id);
             }}
             disabled={isVideoLoading}
             className="pointer-events-auto w-20 h-20 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl group"
