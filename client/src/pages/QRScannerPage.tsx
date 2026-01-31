@@ -82,7 +82,7 @@ export default function QRScannerPage() {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const minDimension = Math.min(viewportWidth, viewportHeight);
-      const qrboxSize = Math.floor(minDimension * 0.7); // 70% of smallest dimension
+      const qrboxSize = Math.floor(minDimension * 0.6); // 60% of smallest dimension for better framing
       
       await scannerRef.current.start(
         { facingMode: "environment" },
@@ -91,13 +91,22 @@ export default function QRScannerPage() {
           qrbox: { width: qrboxSize, height: qrboxSize },
           aspectRatio: viewportHeight / viewportWidth,
           disableFlip: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          },
+          formatsToSupport: undefined, // Support all QR formats
         },
         async (decodedText) => {
-          console.log("[QR] Raw scan result:", decodedText);
+          console.log("[QR] Scanned successfully:", decodedText);
           await stopScanner();
           await handleQRCode(decodedText);
         },
-        () => {}
+        (errorMessage) => {
+          // This fires constantly while scanning, only log actual errors
+          if (errorMessage && !errorMessage.includes("No QR code found")) {
+            console.log("[QR] Scan attempt:", errorMessage);
+          }
+        }
       );
       
       setIsScanning(true);
@@ -113,31 +122,52 @@ export default function QRScannerPage() {
   const extractQRData = (code: string): { animalId: string | null; signature: string | null; isUrl: boolean } => {
     const cleanedCode = cleanQRText(code);
     
-    // Dev-only debug logging
-    if (process.env.NODE_ENV === 'development') {
-      console.log("[QR Debug] Raw length:", code.length, "Clean length:", cleanedCode.length);
-      console.log("[QR Debug] Cleaned code:", cleanedCode);
-    }
+    // Always log for debugging in production too (helps diagnose field issues)
+    console.log("[QR Extract] Raw:", code.substring(0, 100));
+    console.log("[QR Extract] Cleaned:", cleanedCode.substring(0, 100));
     
-    // Check if it's a URL format (e.g., https://app.replit.app/animal/desert_hare?qr=unlock&sig=XXXX)
+    // Check if it's a URL format (e.g., https://app.almarmoomthelivingwild.ae/animal/desert_hare?qr=unlock&sig=XXXX)
     try {
       const url = new URL(cleanedCode);
+      console.log("[QR Extract] Parsed URL, pathname:", url.pathname);
+      
+      // Match various URL patterns
       const pathMatch = url.pathname.match(/\/animal\/([a-z_]+)/i);
       if (pathMatch && pathMatch[1]) {
         const signature = url.searchParams.get('sig');
+        console.log("[QR Extract] Found animal from URL:", pathMatch[1]);
         return { animalId: pathMatch[1].toLowerCase(), signature, isUrl: true };
+      }
+      
+      // Also check if the URL contains qr parameter with animal ID
+      const qrParam = url.searchParams.get('animal') || url.searchParams.get('id');
+      if (qrParam) {
+        console.log("[QR Extract] Found animal from param:", qrParam);
+        return { animalId: qrParam.toLowerCase(), signature: url.searchParams.get('sig'), isUrl: true };
       }
     } catch {
       // Not a URL, try legacy token format
+      console.log("[QR Extract] Not a URL, trying token format");
     }
     
     // Legacy token format: TLW-{animalId}-{token} - requires valid token
     const validation = validateQRCode(cleanedCode);
+    console.log("[QR Extract] Token validation:", validation);
     
     if (validation.valid && validation.animalId) {
       return { animalId: validation.animalId, signature: null, isUrl: false };
     }
     
+    // Last resort: try to find animal ID anywhere in the string
+    const animalIds = animals.map(a => a.id);
+    for (const id of animalIds) {
+      if (cleanedCode.toLowerCase().includes(id)) {
+        console.log("[QR Extract] Found animal ID in string:", id);
+        return { animalId: id, signature: null, isUrl: false };
+      }
+    }
+    
+    console.log("[QR Extract] No animal found in code");
     return { animalId: null, signature: null, isUrl: false };
   };
 
