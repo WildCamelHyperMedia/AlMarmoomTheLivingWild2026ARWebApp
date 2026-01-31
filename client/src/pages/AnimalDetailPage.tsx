@@ -45,6 +45,9 @@ export default function AnimalDetailPage() {
   
   // Auto-unlock when accessed via QR code URL (?qr=unlock&sig=XXXX)
   useEffect(() => {
+    // Wait for user loading to complete before processing unlock
+    if (userLoading) return;
+    
     const params = new URLSearchParams(searchString);
     const isQrUnlock = params.get('qr') === 'unlock';
     const signature = params.get('sig');
@@ -54,54 +57,66 @@ export default function AnimalDetailPage() {
       
       const performUnlock = async () => {
         try {
+          console.log("[QR Unlock] Processing unlock for:", animal.id, "User:", user?.name || "guest", "Signature:", signature);
+          
           // Track QR scan from external camera
           trackQRScan(animal.id, `external-camera-${signature || 'no-sig'}`);
           
-          if (user) {
+          // Check if there's an auth token (user might be logged in even if user object not loaded)
+          const authToken = localStorage.getItem("authToken");
+          
+          if (user || authToken) {
             // Logged-in user: use server API with signature
-            if (signature) {
-              await apiRequest("POST", "/api/unlock-animal", { 
-                animalId: animal.id,
-                signature: signature 
+            console.log("[QR Unlock] Logged-in user detected, calling server API");
+            try {
+              const headers: HeadersInit = { "Content-Type": "application/json" };
+              if (authToken) {
+                headers["Authorization"] = `Bearer ${authToken}`;
+              }
+              
+              const response = await fetch("/api/unlock-animal", {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ 
+                  animalId: animal.id,
+                  signature: signature 
+                })
               });
+              
+              if (response.ok) {
+                console.log("[QR Unlock] Server unlock successful");
+              } else {
+                const errorData = await response.json();
+                console.error("[QR Unlock] Server unlock failed:", errorData);
+                // Fall back to localStorage for guests
+                if (response.status === 401) {
+                  console.log("[QR Unlock] Auth failed, falling back to localStorage");
+                  saveToLocalStorage();
+                }
+              }
+            } catch (err) {
+              console.error("[QR Unlock] Server request failed:", err);
+              saveToLocalStorage();
             }
             await refreshProgress();
           } else {
-            // Guest user: validate signature if present, otherwise just unlock
-            console.log("[QR Unlock] Guest user, signature:", signature);
-            
-            if (signature && signature !== 'no-sig') {
-              const validateResponse = await fetch("/api/validate-qr", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ animalId: animal.id, signature })
-              });
-              const validation = await validateResponse.json();
-              console.log("[QR Unlock] Validation result:", validation);
-              
-              if (!validation.valid) {
-                console.error("[QR Unlock] Invalid QR code:", validation.message);
-                // Don't redirect - still allow the unlock for testing
-              }
-            }
-            
-            // Store unlock in localStorage for guest
+            // Guest user: store in localStorage
+            console.log("[QR Unlock] Guest user detected");
+            saveToLocalStorage();
+            await refreshProgress();
+          }
+          
+          function saveToLocalStorage() {
             const storedUnlocked = localStorage.getItem("unlockedAnimals");
-            console.log("[QR Unlock] Current unlocked from localStorage:", storedUnlocked);
             const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
             if (!unlocked.includes(animal.id)) {
               unlocked.push(animal.id);
               localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
-              console.log("[QR Unlock] Saved new unlocked list:", unlocked);
-            } else {
-              console.log("[QR Unlock] Animal already unlocked:", animal.id);
+              console.log("[QR Unlock] Saved to localStorage:", unlocked);
             }
-            await refreshProgress();
-            console.log("[QR Unlock] Progress refreshed");
           }
           
           // Remove the qr param from URL to prevent re-processing
-          // User must tap play button to play video
           setLocation(`/animal/${animal.id}`, { replace: true });
         } catch (err) {
           console.error("Auto-unlock error:", err);
@@ -110,7 +125,7 @@ export default function AnimalDetailPage() {
       
       performUnlock();
     }
-  }, [searchString, animal, user, qrUnlockProcessed, refreshProgress, setLocation]);
+  }, [searchString, animal, user, userLoading, qrUnlockProcessed, refreshProgress, setLocation]);
   
   // Reset state when animal changes
   useEffect(() => {
