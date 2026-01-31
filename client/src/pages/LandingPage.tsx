@@ -74,10 +74,11 @@ export default function LandingPage() {
             ref={videoRef}
             src="/videos/landing-video.mp4"
             className="w-full h-full object-cover rounded-2xl"
+            autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
           />
           
           {/* Loading Indicator */}
