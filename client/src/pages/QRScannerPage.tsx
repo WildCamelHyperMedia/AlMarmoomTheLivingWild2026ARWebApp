@@ -76,25 +76,28 @@ export default function QRScannerPage() {
         }
       }
       
-      scannerRef.current = new Html5Qrcode("qr-reader");
+      // Detect iOS for specific optimizations
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      console.log("[QR] Starting scanner, iOS detected:", isIOS);
       
-      // Calculate responsive qrbox size based on viewport
+      scannerRef.current = new Html5Qrcode("qr-reader", {
+        verbose: true, // Enable verbose logging for debugging
+        formatsToSupport: [0], // 0 = QR_CODE format only for faster detection
+      });
+      
+      // Calculate responsive qrbox size - larger area for better detection
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const minDimension = Math.min(viewportWidth, viewportHeight);
-      const qrboxSize = Math.floor(minDimension * 0.6); // 60% of smallest dimension for better framing
+      const qrboxSize = Math.floor(minDimension * 0.75); // 75% for larger scan area
       
       await scannerRef.current.start(
         { facingMode: "environment" },
         {
-          fps: 10,
+          fps: isIOS ? 15 : 10, // Higher FPS on iOS for better detection
           qrbox: { width: qrboxSize, height: qrboxSize },
-          aspectRatio: viewportHeight / viewportWidth,
+          aspectRatio: 1.0, // Use square aspect ratio for consistency
           disableFlip: false,
-          experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true
-          },
-          formatsToSupport: undefined, // Support all QR formats
         },
         async (decodedText) => {
           console.log("[QR] Scanned successfully:", decodedText);
@@ -102,10 +105,7 @@ export default function QRScannerPage() {
           await handleQRCode(decodedText);
         },
         (errorMessage) => {
-          // This fires constantly while scanning, only log actual errors
-          if (errorMessage && !errorMessage.includes("No QR code found")) {
-            console.log("[QR] Scan attempt:", errorMessage);
-          }
+          // Log periodically to show scanner is working
         }
       );
       
