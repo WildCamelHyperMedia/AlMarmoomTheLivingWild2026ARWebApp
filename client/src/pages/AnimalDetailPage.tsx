@@ -28,6 +28,7 @@ export default function AnimalDetailPage() {
   const isExternalQrScan = urlParams.get('qr') === 'unlock' || urlParams.get('autoplay') === '1';
   
   const [isPlaying, setIsPlaying] = useState(isExternalQrScan);
+  const [isVideoActuallyPlaying, setIsVideoActuallyPlaying] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [isArOpen, setIsArOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -124,47 +125,42 @@ export default function AnimalDetailPage() {
     }
   }, [user]);
 
-  // Track watch time - only when video is actually playing (not paused)
+  // Track watch time - only when video is actually playing
   useEffect(() => {
-    console.log("[Video] Effect triggered - isPlaying:", isPlaying, "hasRecordedWatch:", hasRecordedWatch, "animal:", animal?.id);
+    console.log("[Video] Timer effect - isVideoActuallyPlaying:", isVideoActuallyPlaying, "hasRecordedWatch:", hasRecordedWatch, "animal:", animal?.id);
     
-    if (isPlaying && !hasRecordedWatch && animal) {
+    if (isVideoActuallyPlaying && !hasRecordedWatch && animal) {
       console.log("[Video] Starting watch timer for:", animal.id);
       
       watchTimerRef.current = setInterval(() => {
-        // Only count time if video is not paused
-        if (videoRef.current && !videoRef.current.paused) {
-          setWatchTime(prev => {
-            const newTime = prev + 1;
-            console.log("[Video] Watch time:", newTime, "seconds for", animal.id);
-            
-            // Record watch when minimum time reached
-            if (newTime >= MIN_WATCH_TIME && !hasRecordedWatch) {
-              console.log("[Video] Min time reached, recording watch for:", animal.id);
-              recordVideoWatch(animal.id).then((recorded) => {
-                console.log("[Video] recordVideoWatch returned:", recorded, "for:", animal.id);
-                if (recorded) {
-                  setHasRecordedWatch(true);
-                  trackVideoWatch(animal.id);
-                  setShowRewardPopup(true);
-                  setTimeout(() => {
-                    setShowRewardPopup(false);
-                    if (!user) {
-                      setTimeout(() => {
-                        setShowSaveModal(true);
-                      }, 500);
-                    }
-                  }, 3000);
-                }
-              }).catch(err => {
-                console.error("[Video] recordVideoWatch error:", err);
-              });
-            }
-            return newTime;
-          });
-        } else {
-          console.log("[Video] Video paused or not ready, paused:", videoRef.current?.paused);
-        }
+        setWatchTime(prev => {
+          const newTime = prev + 1;
+          console.log("[Video] Watch time:", newTime, "seconds for", animal.id);
+          
+          // Record watch when minimum time reached
+          if (newTime >= MIN_WATCH_TIME && !hasRecordedWatch) {
+            console.log("[Video] Min time reached, recording watch for:", animal.id);
+            recordVideoWatch(animal.id).then((recorded) => {
+              console.log("[Video] recordVideoWatch returned:", recorded, "for:", animal.id);
+              if (recorded) {
+                setHasRecordedWatch(true);
+                trackVideoWatch(animal.id);
+                setShowRewardPopup(true);
+                setTimeout(() => {
+                  setShowRewardPopup(false);
+                  if (!user) {
+                    setTimeout(() => {
+                      setShowSaveModal(true);
+                    }, 500);
+                  }
+                }, 3000);
+              }
+            }).catch(err => {
+              console.error("[Video] recordVideoWatch error:", err);
+            });
+          }
+          return newTime;
+        });
       }, 1000);
     }
     
@@ -173,7 +169,7 @@ export default function AnimalDetailPage() {
         clearInterval(watchTimerRef.current);
       }
     };
-  }, [isPlaying, hasRecordedWatch, animal, user, recordVideoWatch]);
+  }, [isVideoActuallyPlaying, hasRecordedWatch, animal, user, recordVideoWatch]);
 
   // Don't auto-play - let user tap play button
   const currentVideo = animal ? (language === 'ar' ? animal.videoAr : animal.videoEn) : undefined;
@@ -182,12 +178,14 @@ export default function AnimalDetailPage() {
   const handleVideoEnded = () => {
     setIsPlaying(false);
     setIsVideoLoading(false);
+    setIsVideoActuallyPlaying(false);
   };
   
   // Reset loading when stopping video
   const handleStopVideo = () => {
     setIsPlaying(false);
     setIsVideoLoading(false);
+    setIsVideoActuallyPlaying(false);
   };
 
   useEffect(() => {
@@ -278,7 +276,15 @@ export default function AnimalDetailPage() {
             muted={isMuted}
             onEnded={handleVideoEnded}
             onClick={handleStopVideo}
-            onPlaying={() => setIsVideoLoading(false)}
+            onPlaying={() => {
+              console.log("[Video] onPlaying event fired");
+              setIsVideoLoading(false);
+              setIsVideoActuallyPlaying(true);
+            }}
+            onPause={() => {
+              console.log("[Video] onPause event fired");
+              setIsVideoActuallyPlaying(false);
+            }}
             className={`w-full h-full object-cover absolute inset-0 z-0 transition-opacity duration-300 pointer-events-auto ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
           />
         )}
