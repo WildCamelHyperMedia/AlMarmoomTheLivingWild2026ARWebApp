@@ -212,7 +212,7 @@ export default function AnimalDetailPage() {
     <div className="h-[100dvh] w-full bg-background text-white relative overflow-hidden">
       
       {/* Full Screen Background Media - FILLS ENTIRE SCREEN */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Background image always visible */}
         <img 
           src={animal.optimizedImage} 
@@ -236,13 +236,13 @@ export default function AnimalDetailPage() {
             onEnded={handleVideoEnded}
             onClick={handleStopVideo}
             onPlaying={() => setIsVideoLoading(false)}
-            className={`w-full h-full object-cover absolute inset-0 z-0 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`w-full h-full object-cover absolute inset-0 z-0 transition-opacity duration-300 pointer-events-auto ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
           />
         )}
       </div>
       
       {/* Gradient for bottom content readability */}
-      <div className="absolute bottom-0 left-0 right-0 h-[250px] bg-gradient-to-t from-black via-black/70 to-transparent z-5 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-[250px] bg-gradient-to-t from-black via-black/70 to-transparent z-10 pointer-events-none" />
 
       {/* Close Button - Top Right (when playing) */}
       {isPlaying && (
