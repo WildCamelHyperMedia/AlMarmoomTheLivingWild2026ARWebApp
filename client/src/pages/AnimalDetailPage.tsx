@@ -213,10 +213,17 @@ export default function AnimalDetailPage() {
     if (!video) return;
     
     if (isPlaying) {
-      console.log("[Video] Attempting to play video, readyState:", video.readyState);
+      console.log("[Video] Attempting to play video, readyState:", video.readyState, "src:", video.src ? "loaded" : "empty");
+      
+      // Force load the video if not loaded
+      if (!video.src || video.readyState === 0) {
+        console.log("[Video] Loading video source...");
+        video.load();
+      }
       
       // Wait for video to be ready enough to play
       const attemptPlay = () => {
+        console.log("[Video] attemptPlay called, readyState:", video.readyState);
         video.play()
           .then(() => {
             console.log("[Video] Play succeeded, paused:", video.paused);
@@ -224,19 +231,51 @@ export default function AnimalDetailPage() {
           })
           .catch((e) => {
             console.error("[Video] Play failed:", e.name, e.message);
-            // If autoplay was blocked, user needs to tap again
-            if (e.name === 'NotAllowedError') {
+            setIsVideoLoading(false);
+            // Try muted playback as fallback (works on most browsers)
+            if (e.name === 'NotAllowedError' && !video.muted) {
+              console.log("[Video] Trying muted playback...");
+              video.muted = true;
+              video.play().catch(() => {
+                console.error("[Video] Muted playback also failed");
+                setIsPlaying(false);
+              });
+            } else {
               setIsPlaying(false);
             }
-            setIsVideoLoading(false);
           });
       };
       
+      // readyState 2+ means enough data to play
       if (video.readyState >= 2) {
         attemptPlay();
       } else {
-        console.log("[Video] Video not ready, waiting for canplay event");
-        video.addEventListener('canplay', attemptPlay, { once: true });
+        console.log("[Video] Video not ready (readyState:", video.readyState, "), waiting...");
+        
+        // Set up multiple event listeners for better compatibility
+        const onCanPlay = () => {
+          console.log("[Video] canplay event fired");
+          attemptPlay();
+        };
+        const onLoadedData = () => {
+          console.log("[Video] loadeddata event fired");
+          if (video.readyState >= 2) attemptPlay();
+        };
+        
+        video.addEventListener('canplay', onCanPlay, { once: true });
+        video.addEventListener('loadeddata', onLoadedData, { once: true });
+        
+        // Timeout fallback - try playing anyway after 3 seconds
+        const timeout = setTimeout(() => {
+          console.log("[Video] Timeout fallback - attempting play");
+          attemptPlay();
+        }, 3000);
+        
+        return () => {
+          clearTimeout(timeout);
+          video.removeEventListener('canplay', onCanPlay);
+          video.removeEventListener('loadeddata', onLoadedData);
+        };
       }
     } else {
       video.pause();
