@@ -126,25 +126,29 @@ export default function AnimalDetailPage() {
 
   // Track watch time - only when video is actually playing (not paused)
   useEffect(() => {
+    console.log("[Video] Effect triggered - isPlaying:", isPlaying, "hasRecordedWatch:", hasRecordedWatch, "animal:", animal?.id);
+    
     if (isPlaying && !hasRecordedWatch && animal) {
+      console.log("[Video] Starting watch timer for:", animal.id);
+      
       watchTimerRef.current = setInterval(() => {
         // Only count time if video is not paused
         if (videoRef.current && !videoRef.current.paused) {
           setWatchTime(prev => {
             const newTime = prev + 1;
+            console.log("[Video] Watch time:", newTime, "seconds for", animal.id);
+            
             // Record watch when minimum time reached
             if (newTime >= MIN_WATCH_TIME && !hasRecordedWatch) {
+              console.log("[Video] Min time reached, recording watch for:", animal.id);
               recordVideoWatch(animal.id).then((recorded) => {
+                console.log("[Video] recordVideoWatch returned:", recorded, "for:", animal.id);
                 if (recorded) {
                   setHasRecordedWatch(true);
-                  // Track video watch for analytics
                   trackVideoWatch(animal.id);
-                  // Show reward popup
                   setShowRewardPopup(true);
-                  // Auto-hide after 3 seconds
                   setTimeout(() => {
                     setShowRewardPopup(false);
-                    // Then prompt guest to save progress
                     if (!user) {
                       setTimeout(() => {
                         setShowSaveModal(true);
@@ -152,10 +156,14 @@ export default function AnimalDetailPage() {
                     }
                   }, 3000);
                 }
+              }).catch(err => {
+                console.error("[Video] recordVideoWatch error:", err);
               });
             }
             return newTime;
           });
+        } else {
+          console.log("[Video] Video paused or not ready, paused:", videoRef.current?.paused);
         }
       }, 1000);
     }
@@ -201,13 +209,31 @@ export default function AnimalDetailPage() {
     if (!video) return;
     
     if (isPlaying) {
-      video.play()
-        .then(() => setIsVideoLoading(false))
-        .catch((e) => {
-          console.error("Video play failed:", e);
-          setIsVideoLoading(false);
-          setIsPlaying(false);
-        });
+      console.log("[Video] Attempting to play video, readyState:", video.readyState);
+      
+      // Wait for video to be ready enough to play
+      const attemptPlay = () => {
+        video.play()
+          .then(() => {
+            console.log("[Video] Play succeeded, paused:", video.paused);
+            setIsVideoLoading(false);
+          })
+          .catch((e) => {
+            console.error("[Video] Play failed:", e.name, e.message);
+            // If autoplay was blocked, user needs to tap again
+            if (e.name === 'NotAllowedError') {
+              setIsPlaying(false);
+            }
+            setIsVideoLoading(false);
+          });
+      };
+      
+      if (video.readyState >= 2) {
+        attemptPlay();
+      } else {
+        console.log("[Video] Video not ready, waiting for canplay event");
+        video.addEventListener('canplay', attemptPlay, { once: true });
+      }
     } else {
       video.pause();
     }

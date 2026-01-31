@@ -108,19 +108,28 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   };
 
   const recordVideoWatch = async (animalId: string): Promise<boolean> => {
+    console.log("[Progress] recordVideoWatch called for:", animalId);
+    console.log("[Progress] Current watchedVideos:", watchedVideos);
+    console.log("[Progress] Already watched?", watchedVideos.includes(animalId));
+    
     if (watchedVideos.includes(animalId)) {
+      console.log("[Progress] Skipping - already watched");
       return false;
     }
 
     const newWatched = [...watchedVideos, animalId];
     const newPoints = points + POINTS_PER_VIDEO;
     
+    console.log("[Progress] New watched list:", newWatched);
+    console.log("[Progress] New points:", newPoints);
+    
     setWatchedVideos(newWatched);
     setPoints(newPoints);
 
     if (user) {
       try {
-        await fetch(`/api/progress/${user.id}`, {
+        console.log("[Progress] Syncing to server for user:", user.id);
+        const res = await fetch(`/api/progress/${user.id}`, {
           method: "PATCH",
           headers: getAuthHeaders(),
           body: JSON.stringify({ 
@@ -128,10 +137,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
             points: newPoints
           })
         });
+        console.log("[Progress] Server response:", res.status);
       } catch (error) {
-        console.error("Failed to sync progress:", error);
+        console.error("[Progress] Failed to sync progress:", error);
       }
     } else {
+      console.log("[Progress] Saving to localStorage (guest)");
       safeLocalStorage.setItem("watchedVideos", JSON.stringify(newWatched));
       safeLocalStorage.setItem("points", newPoints.toString());
     }
