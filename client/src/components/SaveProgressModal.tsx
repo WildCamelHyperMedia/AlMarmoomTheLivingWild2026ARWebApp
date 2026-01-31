@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Gift, User, Mail, Loader2, Phone, Camera, Book, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
 import { useUser } from "@/lib/user";
 import { useProgress } from "@/lib/progress";
@@ -14,6 +15,7 @@ interface SaveProgressModalProps {
 }
 
 export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SaveProgressModalProps) {
+  const [, setLocation] = useLocation();
   const { language, dir, t } = useLanguage();
   const { setUser } = useUser();
   const { watchedVideos, points, unlockedCount, unlockedAnimals } = useProgress();
@@ -309,16 +311,19 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
                 </span>
               </motion.button>
 
-              {/* Skip link */}
+              {/* Already registered link */}
               <motion.button
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  setLocation("/auth");
+                }}
                 className="w-full mt-3 text-[#5b3e34] hover:text-[#30221b] font-medium py-2 transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                data-testid="button-skip-save"
+                data-testid="button-already-registered"
               >
                 {t("intro.popup.skip")}
               </motion.button>

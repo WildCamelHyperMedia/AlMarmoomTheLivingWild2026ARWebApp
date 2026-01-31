@@ -73,9 +73,9 @@ export default function IntroPage() {
     setLocation("/auth");
   };
 
-  const handleSkipToGallery = () => {
+  const handleAlreadyRegistered = () => {
     setShowPrizePopup(false);
-    setLocation("/gallery");
+    setLocation("/auth");
   };
 
   // If admin, show loading while redirecting
@@ -250,7 +250,7 @@ export default function IntroPage() {
             {/* Backdrop */}
             <div 
               className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={handleSkipToGallery}
+              onClick={handleAlreadyRegistered}
             />
 
             {/* Card */}
@@ -352,11 +352,11 @@ export default function IntroPage() {
                   </motion.button>
 
                   <motion.button
-                    onClick={handleSkipToGallery}
+                    onClick={handleAlreadyRegistered}
                     className="w-full text-[#5b3e34] hover:text-[#30221b] font-medium py-2 transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    data-testid="button-skip-to-gallery"
+                    data-testid="button-already-registered"
                   >
                     {t("intro.popup.skip")}
                   </motion.button>
