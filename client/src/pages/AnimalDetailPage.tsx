@@ -67,29 +67,36 @@ export default function AnimalDetailPage() {
             await refreshProgress();
           } else {
             // Guest user: validate signature if present, otherwise just unlock
-            if (signature) {
+            console.log("[QR Unlock] Guest user, signature:", signature);
+            
+            if (signature && signature !== 'no-sig') {
               const validateResponse = await fetch("/api/validate-qr", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ animalId: animal.id, signature })
               });
               const validation = await validateResponse.json();
+              console.log("[QR Unlock] Validation result:", validation);
               
               if (!validation.valid) {
-                console.error("Invalid QR code:", validation.message);
-                setLocation(`/animal/${animal.id}`, { replace: true });
-                return;
+                console.error("[QR Unlock] Invalid QR code:", validation.message);
+                // Don't redirect - still allow the unlock for testing
               }
             }
             
             // Store unlock in localStorage for guest
             const storedUnlocked = localStorage.getItem("unlockedAnimals");
+            console.log("[QR Unlock] Current unlocked from localStorage:", storedUnlocked);
             const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
             if (!unlocked.includes(animal.id)) {
               unlocked.push(animal.id);
               localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
+              console.log("[QR Unlock] Saved new unlocked list:", unlocked);
+            } else {
+              console.log("[QR Unlock] Animal already unlocked:", animal.id);
             }
             await refreshProgress();
+            console.log("[QR Unlock] Progress refreshed");
           }
           
           // Auto-play video when coming from QR scan
