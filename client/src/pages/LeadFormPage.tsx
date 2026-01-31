@@ -12,8 +12,25 @@ export default function LeadFormPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: ""
+    phone: "",
+    phoneCode: "+971"
   });
+
+  const countryCodes = [
+    { code: "+971", country: "UAE", flag: "🇦🇪" },
+    { code: "+966", country: "KSA", flag: "🇸🇦" },
+    { code: "+974", country: "Qatar", flag: "🇶🇦" },
+    { code: "+973", country: "Bahrain", flag: "🇧🇭" },
+    { code: "+968", country: "Oman", flag: "🇴🇲" },
+    { code: "+965", country: "Kuwait", flag: "🇰🇼" },
+    { code: "+962", country: "Jordan", flag: "🇯🇴" },
+    { code: "+20", country: "Egypt", flag: "🇪🇬" },
+    { code: "+91", country: "India", flag: "🇮🇳" },
+    { code: "+92", country: "Pakistan", flag: "🇵🇰" },
+    { code: "+63", country: "Philippines", flag: "🇵🇭" },
+    { code: "+44", country: "UK", flag: "🇬🇧" },
+    { code: "+1", country: "USA", flag: "🇺🇸" },
+  ];
 
   const content = {
     en: {
@@ -60,7 +77,11 @@ export default function LeadFormPage() {
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone ? `${formData.phoneCode}${formData.phone}` : ""
+        })
       });
 
       const data = await response.json();
@@ -167,14 +188,28 @@ export default function LeadFormPage() {
                   className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#b97d42] transition-colors"
                   data-testid="input-lead-email"
                 />
-                <input
-                  type="tel"
-                  placeholder={t.phonePlaceholder}
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#b97d42] transition-colors"
-                  data-testid="input-lead-phone"
-                />
+                <div className="flex gap-2">
+                  <select
+                    value={formData.phoneCode}
+                    onChange={(e) => setFormData({ ...formData, phoneCode: e.target.value })}
+                    className="px-3 py-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-[#b97d42] transition-colors appearance-none cursor-pointer min-w-[90px]"
+                    data-testid="select-lead-phone-code"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code} value={c.code} className="bg-[#30221b]">
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    placeholder={t.phonePlaceholder}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
+                    className="flex-1 px-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#b97d42] transition-colors"
+                    data-testid="input-lead-phone"
+                  />
+                </div>
 
                 <motion.button
                   type="submit"

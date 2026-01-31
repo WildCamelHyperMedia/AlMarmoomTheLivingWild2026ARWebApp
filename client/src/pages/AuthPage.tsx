@@ -19,13 +19,30 @@ export default function AuthPage() {
     name: "",
     email: "",
     phone: "",
+    phoneCode: "+971",
     password: ""
   });
+
+  const countryCodes = [
+    { code: "+971", country: "UAE", flag: "🇦🇪" },
+    { code: "+966", country: "KSA", flag: "🇸🇦" },
+    { code: "+974", country: "Qatar", flag: "🇶🇦" },
+    { code: "+973", country: "Bahrain", flag: "🇧🇭" },
+    { code: "+968", country: "Oman", flag: "🇴🇲" },
+    { code: "+965", country: "Kuwait", flag: "🇰🇼" },
+    { code: "+962", country: "Jordan", flag: "🇯🇴" },
+    { code: "+20", country: "Egypt", flag: "🇪🇬" },
+    { code: "+91", country: "India", flag: "🇮🇳" },
+    { code: "+92", country: "Pakistan", flag: "🇵🇰" },
+    { code: "+63", country: "Philippines", flag: "🇵🇭" },
+    { code: "+44", country: "UK", flag: "🇬🇧" },
+    { code: "+1", country: "USA", flag: "🇺🇸" },
+  ];
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const resetForm = () => {
-    setFormData({ name: "", email: "", phone: "", password: "" });
+    setFormData({ name: "", email: "", phone: "", phoneCode: "+971", password: "" });
     setError("");
   };
 
@@ -56,7 +73,7 @@ export default function AuthPage() {
         body: JSON.stringify({ 
           name: formData.name.trim(), 
           email: formData.email.trim().toLowerCase(),
-          phone: formData.phone.trim(),
+          phone: formData.phone.trim() ? `${formData.phoneCode}${formData.phone.trim()}` : "",
           watchedVideos: [],
           points: 0
         })
@@ -313,17 +330,31 @@ export default function AuthPage() {
                 />
               </div>
 
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                <Input 
-                  type="tel" 
-                  placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
-                  dir="ltr"
-                  data-testid="input-phone"
-                />
+              <div className="relative flex gap-2">
+                <select
+                  value={formData.phoneCode}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phoneCode: e.target.value }))}
+                  className="bg-[#5b3e34]/80 border-none text-white h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm px-3 appearance-none cursor-pointer min-w-[90px]"
+                  data-testid="select-phone-code"
+                >
+                  {countryCodes.map((c) => (
+                    <option key={c.code} value={c.code} className="bg-[#30221b]">
+                      {c.flag} {c.code}
+                    </option>
+                  ))}
+                </select>
+                <div className="relative flex-1">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                  <Input 
+                    type="tel" 
+                    placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
+                    value={formData.phone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
+                    className="bg-[#5b3e34]/80 border-none text-white placeholder:text-white/50 h-14 rounded-2xl focus:ring-2 focus:ring-[#b97d42]/50 backdrop-blur-sm pl-12 pr-4"
+                    dir="ltr"
+                    data-testid="input-phone"
+                  />
+                </div>
               </div>
               
               {error && (

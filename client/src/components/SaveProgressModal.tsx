@@ -18,7 +18,23 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
   const { setUser } = useUser();
   const { watchedVideos, points, unlockedCount, unlockedAnimals } = useProgress();
   
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", phoneCode: "+971" });
+
+  const countryCodes = [
+    { code: "+971", country: "UAE", flag: "🇦🇪" },
+    { code: "+966", country: "KSA", flag: "🇸🇦" },
+    { code: "+974", country: "Qatar", flag: "🇶🇦" },
+    { code: "+973", country: "Bahrain", flag: "🇧🇭" },
+    { code: "+968", country: "Oman", flag: "🇴🇲" },
+    { code: "+965", country: "Kuwait", flag: "🇰🇼" },
+    { code: "+962", country: "Jordan", flag: "🇯🇴" },
+    { code: "+20", country: "Egypt", flag: "🇪🇬" },
+    { code: "+91", country: "India", flag: "🇮🇳" },
+    { code: "+92", country: "Pakistan", flag: "🇵🇰" },
+    { code: "+63", country: "Philippines", flag: "🇵🇭" },
+    { code: "+44", country: "UK", flag: "🇬🇧" },
+    { code: "+1", country: "USA", flag: "🇺🇸" },
+  ];
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,7 +60,7 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
         body: JSON.stringify({ 
           name: formData.name, 
           email: formData.email,
-          phone: formData.phone,
+          phone: formData.phone ? `${formData.phoneCode}${formData.phone}` : "",
           watchedVideos: watchedVideos,
           unlockedAnimals: unlockedAnimals,
           points: points
@@ -218,19 +234,33 @@ export default function SaveProgressModal({ isOpen, onClose, onSuccess }: SavePr
                   />
                 </div>
 
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Phone className="w-5 h-5 text-[#5b3e34]/50" />
+                <div className="flex gap-2">
+                  <select
+                    value={formData.phoneCode}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phoneCode: e.target.value }))}
+                    className="bg-white border border-[#d3c4b0] text-[#30221b] h-12 rounded-xl focus:ring-2 focus:ring-[#b97d42]/50 focus:border-[#b97d42]/50 px-2 appearance-none cursor-pointer text-sm min-w-[80px]"
+                    data-testid="select-save-phone-code"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="relative flex-1">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <Phone className="w-5 h-5 text-[#5b3e34]/50" />
+                    </div>
+                    <Input 
+                      type="tel" 
+                      placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
+                      className="bg-white border border-[#d3c4b0] text-[#30221b] placeholder:text-[#5b3e34]/50 h-12 rounded-xl focus:ring-2 focus:ring-[#b97d42]/50 focus:border-[#b97d42]/50 pl-12 pr-4 text-base transition-all"
+                      dir="ltr"
+                      data-testid="input-save-phone"
+                    />
                   </div>
-                  <Input 
-                    type="tel" 
-                    placeholder={language === 'en' ? "Phone Number" : "رقم الهاتف"}
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="bg-white border border-[#d3c4b0] text-[#30221b] placeholder:text-[#5b3e34]/50 h-12 rounded-xl focus:ring-2 focus:ring-[#b97d42]/50 focus:border-[#b97d42]/50 pl-12 pr-4 text-base transition-all"
-                    dir="ltr"
-                    data-testid="input-save-phone"
-                  />
                 </div>
                 
                 <AnimatePresence>
