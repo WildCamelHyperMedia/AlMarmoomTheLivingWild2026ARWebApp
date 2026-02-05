@@ -62,6 +62,17 @@ export default function AnimalDetailPage() {
           // Track QR scan from external camera
           trackQRScan(animal.id, `external-camera-${signature || 'no-sig'}`);
           
+          // Helper to save unlock to localStorage
+          const saveToLocalStorage = () => {
+            const storedUnlocked = localStorage.getItem("unlockedAnimals");
+            const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
+            if (!unlocked.includes(animal.id)) {
+              unlocked.push(animal.id);
+              localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
+              console.log("[QR Unlock] Saved to localStorage:", unlocked);
+            }
+          };
+          
           // Check if there's an auth token (user might be logged in even if user object not loaded)
           const authToken = localStorage.getItem("authToken");
           
@@ -104,16 +115,6 @@ export default function AnimalDetailPage() {
             console.log("[QR Unlock] Guest user detected");
             saveToLocalStorage();
             await refreshProgress();
-          }
-          
-          function saveToLocalStorage() {
-            const storedUnlocked = localStorage.getItem("unlockedAnimals");
-            const unlocked: string[] = storedUnlocked ? JSON.parse(storedUnlocked) : [];
-            if (!unlocked.includes(animal.id)) {
-              unlocked.push(animal.id);
-              localStorage.setItem("unlockedAnimals", JSON.stringify(unlocked));
-              console.log("[QR Unlock] Saved to localStorage:", unlocked);
-            }
           }
           
           // Remove the qr param from URL to prevent re-processing
@@ -222,10 +223,22 @@ export default function AnimalDetailPage() {
     }
   }, [isArOpen]);
 
+  // Preload video early for faster iOS playback
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && currentVideo) {
+      // Start loading video data immediately
+      video.load();
+      console.log("[Video] Preloading video for faster playback");
+    }
+  }, [currentVideo]);
+
   // Handle play/pause when isPlaying changes
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    
+    let hasAttemptedPlay = false;
     
     if (isPlaying) {
       console.log("[Video] Attempting to play video, readyState:", video.readyState, "src:", video.src ? "loaded" : "empty");
@@ -238,6 +251,9 @@ export default function AnimalDetailPage() {
       
       // Wait for video to be ready enough to play
       const attemptPlay = () => {
+        if (hasAttemptedPlay) return;
+        hasAttemptedPlay = true;
+        
         console.log("[Video] attemptPlay called, readyState:", video.readyState);
         video.play()
           .then(() => {
@@ -261,35 +277,49 @@ export default function AnimalDetailPage() {
           });
       };
       
-      // readyState 2+ means enough data to play
-      if (video.readyState >= 2) {
+      // readyState 2+ means enough data to play - try immediately on iOS
+      if (video.readyState >= 1) {
+        // On iOS, try playing even with readyState 1 (metadata loaded)
         attemptPlay();
       } else {
         console.log("[Video] Video not ready (readyState:", video.readyState, "), waiting...");
         
-        // Set up multiple event listeners for better compatibility
+        // Set up multiple event listeners for better iOS compatibility
         const onCanPlay = () => {
           console.log("[Video] canplay event fired");
           attemptPlay();
         };
         const onLoadedData = () => {
-          console.log("[Video] loadeddata event fired");
-          if (video.readyState >= 2) attemptPlay();
+          console.log("[Video] loadeddata event fired, readyState:", video.readyState);
+          attemptPlay();
+        };
+        const onCanPlayThrough = () => {
+          console.log("[Video] canplaythrough event fired");
+          attemptPlay();
+        };
+        const onLoadedMetadata = () => {
+          console.log("[Video] loadedmetadata event fired");
+          // On iOS, try playing as soon as metadata is loaded
+          attemptPlay();
         };
         
+        video.addEventListener('loadedmetadata', onLoadedMetadata, { once: true });
         video.addEventListener('canplay', onCanPlay, { once: true });
         video.addEventListener('loadeddata', onLoadedData, { once: true });
+        video.addEventListener('canplaythrough', onCanPlayThrough, { once: true });
         
-        // Timeout fallback - try playing anyway after 3 seconds
+        // Faster timeout fallback for iOS - try playing after 1.5 seconds
         const timeout = setTimeout(() => {
           console.log("[Video] Timeout fallback - attempting play");
           attemptPlay();
-        }, 3000);
+        }, 1500);
         
         return () => {
           clearTimeout(timeout);
+          video.removeEventListener('loadedmetadata', onLoadedMetadata);
           video.removeEventListener('canplay', onCanPlay);
           video.removeEventListener('loadeddata', onLoadedData);
+          video.removeEventListener('canplaythrough', onCanPlayThrough);
         };
       }
     } else {
