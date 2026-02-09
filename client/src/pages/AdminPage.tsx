@@ -512,7 +512,7 @@ export default function AdminPage() {
                           <div>
                             <p className="font-bold">{user.name}</p>
                             <p className="text-sm text-white/60">{user.email}</p>
-                            <p className="text-xs text-white/40">{user.phone}</p>
+                            {user.phone && <p className="text-sm text-[#b97d42]">{user.phone}</p>}
                           </div>
                           <button 
                             onClick={() => setSelectedUserAnimals({ name: user.name, animals: user.watchedVideos || [] })}
@@ -595,7 +595,7 @@ export default function AdminPage() {
                         <div>
                           <p className="font-bold">{lead.name}</p>
                           <p className="text-sm text-white/60">{lead.email}</p>
-                          <p className="text-xs text-white/40">{lead.phone}</p>
+                          {lead.phone && <p className="text-sm text-[#b97d42]">{lead.phone}</p>}
                         </div>
                         <div className="text-xs text-white/50 pt-2 border-t border-white/10">
                           Registered {formatDate(lead.createdAt)}
