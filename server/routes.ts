@@ -165,10 +165,13 @@ export async function registerRoutes(
       const randomPassword = crypto.randomBytes(16).toString("hex");
       const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
+      const { phone } = req.body;
+      const userPhone = (typeof phone === "string" && phone.trim()) ? phone.trim() : "";
+
       const user = await storage.createUser({
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        phone: "",
+        phone: userPhone,
         password: hashedPassword
       });
       
