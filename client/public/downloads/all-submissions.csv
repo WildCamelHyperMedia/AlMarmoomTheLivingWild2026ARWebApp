@@ -1,14 +1,14 @@
-Name,Email,Phone,Registration Date
-Muhammad Affan,maffan@gmail.com,+971585892186,2026-01-22
-Testing,user_0c425261-ca85-4536-909a-99982dad3705@temp.com,+97122234331,2026-01-22
-Testing,user_d61130a0-cc12-40ec-8749-8759c8399b0a@temp.com,+971123456788,2026-01-22
-Tester,user_0c51f838-ac40-41b2-9f29-5f46963cb858@temp.com,+971656758774,2026-01-22
-ehwrhewirhewiurhew,user_96a316c9-7765-4a64-9923-06d114e88a45@temp.com,+9712313243412,2026-01-22
-eiorwiehroiqurew,user_1b4bfeab-0dc4-4207-be6a-7e278543cfe0@temp.com,+97121321312312,2026-01-22
-Affan,user_b3ecfe34-974d-4945-a807-cd694f7c02e6@temp.com,123456789,2026-01-22
-yyyyyy,user_a25a032f-93c2-4a10-99c5-8f22ac0ce753@temp.com,12324234,2026-01-22
-ertyuio,user_086be5a6-9a78-4db1-90c5-0b232dcdd08c@temp.com,23456789,2026-01-22
-iuyuiuy,user_e289e189-a6ab-4bac-918b-515247dbb66f@temp.com,56457,2026-01-22
-erwrewrewre,user_c6473a74-20e6-4ae1-ae01-48721ce621c3@temp.com,324324242424,2026-01-22
-Rohail Khan,rohailg@gmail.com,,2026-01-27
-Test User,testuser@example.com,,2026-01-28
+Name,Email,Phone (Raw),Animals Unlocked,Registration Date
+Testing,user_0c425261-ca85-4536-909a-99982dad3705@temp.com,+97122234331,"white_tailed_lapwing, water_rail",2026-01-22
+Affan,user_b3ecfe34-974d-4945-a807-cd694f7c02e6@temp.com,123456789,"eurasian_stone_curlew, white_tailed_lapwing",2026-01-22
+yyyyyy,user_a25a032f-93c2-4a10-99c5-8f22ac0ce753@temp.com,12324234,eurasian_stone_curlew,2026-01-22
+ertyuio,user_086be5a6-9a78-4db1-90c5-0b232dcdd08c@temp.com,23456789,"eurasian_stone_curlew, white_tailed_lapwing",2026-01-22
+iuyuiuy,user_e289e189-a6ab-4bac-918b-515247dbb66f@temp.com,56457,"eurasian_stone_curlew, white_tailed_lapwing",2026-01-22
+erwrewrewre,user_c6473a74-20e6-4ae1-ae01-48721ce621c3@temp.com,324324242424,"eurasian_stone_curlew, white_tailed_lapwing",2026-01-22
+eiorwiehroiqurew,user_1b4bfeab-0dc4-4207-be6a-7e278543cfe0@temp.com,+97121321312312,"eurasian_stone_curlew, white_tailed_lapwing",2026-01-22
+Testing,user_d61130a0-cc12-40ec-8749-8759c8399b0a@temp.com,+971123456788,eurasian_stone_curlew,2026-01-22
+Tester,user_0c51f838-ac40-41b2-9f29-5f46963cb858@temp.com,+971656758774,eurasian_stone_curlew,2026-01-22
+ehwrhewirhewiurhew,user_96a316c9-7765-4a64-9923-06d114e88a45@temp.com,+9712313243412,eurasian_stone_curlew,2026-01-22
+Muhammad Affan,maffan@gmail.com,+971585892186,"eurasian_stone_curlew, white_tailed_lapwing, water_rail",2026-01-22
+Rohail Khan,rohailg@gmail.com,(no phone saved),none,2026-01-27
+Test User,testuser@example.com,(no phone saved),little_grebe,2026-01-28
