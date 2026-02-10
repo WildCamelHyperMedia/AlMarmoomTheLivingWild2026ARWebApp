@@ -299,7 +299,7 @@ export default function AuthPage() {
                 {language === 'en' ? 'Create Account' : 'إنشاء حساب'}
               </h1>
               <p className="text-white/50 text-sm">
-                {language === 'en' ? 'Track your progress and win prizes' : 'تتبع تقدمك واربح جوائز'}
+                {language === 'en' ? 'Track your progress' : 'تتبع تقدمك'}
               </p>
             </div>
 

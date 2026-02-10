@@ -167,15 +167,7 @@ export default function AnimalDetailPage() {
               if (recorded) {
                 setHasRecordedWatch(true);
                 trackVideoWatch(animal.id);
-                setShowRewardPopup(true);
-                setTimeout(() => {
-                  setShowRewardPopup(false);
-                  if (!user) {
-                    setTimeout(() => {
-                      setShowSaveModal(true);
-                    }, 500);
-                  }
-                }, 3000);
+                // Reward popup and save modal disabled - event is over
               }
             }).catch(err => {
               console.error("[Video] recordVideoWatch error:", err);
@@ -589,14 +581,7 @@ export default function AnimalDetailPage() {
         )}
       </AnimatePresence>
 
-      {/* Save Progress Modal - only for guests */}
-      {!user && (
-        <SaveProgressModal 
-          isOpen={showSaveModal} 
-          onClose={() => setShowSaveModal(false)} 
-          onSuccess={() => setShowSaveModal(false)}
-        />
-      )}
+      {/* Save Progress Modal - disabled, event is over */}
     </div>
   );
 }

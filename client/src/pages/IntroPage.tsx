@@ -64,7 +64,7 @@ export default function IntroPage() {
 
   const handleStartJourney = () => {
     if (canProceed) {
-      setShowPrizePopup(true);
+      setLocation("/gallery");
     }
   };
 
