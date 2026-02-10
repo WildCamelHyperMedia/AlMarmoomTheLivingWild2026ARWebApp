@@ -155,7 +155,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   };
 
   const isUnlocked = (animalId: string) => {
-    return unlockedAnimals.includes(animalId);
+    return true;
   };
 
   // Called after a successful QR unlock to update local points immediately
