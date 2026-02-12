@@ -14,33 +14,28 @@ export default function IntroPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [videoEnded, setVideoEnded] = useState(false);
+  const [autoplayFailed, setAutoplayFailed] = useState(false);
 
   const handlePlayVideo = () => {
     const video = videoRef.current;
     if (video) {
       setIsVideoLoading(true);
-      video.muted = false;
+      video.muted = true;
+      setIsMuted(true);
       video.play()
         .then(() => {
           setIsPlaying(true);
           setHasStarted(true);
           setIsVideoLoading(false);
+          setAutoplayFailed(false);
         })
         .catch((e) => {
           console.error("Play failed:", e);
-          video.muted = true;
-          setIsMuted(true);
-          video.play()
-            .then(() => {
-              setIsPlaying(true);
-              setHasStarted(true);
-              setIsVideoLoading(false);
-            })
-            .catch(() => setIsVideoLoading(false));
+          setIsVideoLoading(false);
         });
     }
   };
@@ -98,12 +93,22 @@ export default function IntroPage() {
           src="/videos/ali-intro.mp4"
           className="absolute inset-0 w-full h-full object-cover"
           playsInline
+          autoPlay
+          muted
           preload="auto"
           poster="/images/photographer_ghillie.png"
+          onPlay={() => {
+            setIsPlaying(true);
+            setHasStarted(true);
+            setAutoplayFailed(false);
+          }}
           onEnded={() => {
             setIsPlaying(false);
             setVideoEnded(true);
             setCanProceed(true);
+          }}
+          onError={() => {
+            setAutoplayFailed(true);
           }}
         />
         
@@ -140,9 +145,9 @@ export default function IntroPage() {
         )}
       </motion.div>
 
-      {/* Center Play Button - shown before video starts */}
+      {/* Fallback play button if autoplay fails */}
       <AnimatePresence>
-        {!isPlaying && !videoEnded && (
+        {!isPlaying && !videoEnded && !hasStarted && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -165,14 +170,6 @@ export default function IntroPage() {
                 <Play className="w-12 h-12 fill-white text-white ml-1" />
               )}
             </motion.button>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-white/70 text-sm font-medium tracking-wide"
-            >
-              {language === 'en' ? 'Tap to play' : 'اضغط للتشغيل'}
-            </motion.p>
           </motion.div>
         )}
       </AnimatePresence>
