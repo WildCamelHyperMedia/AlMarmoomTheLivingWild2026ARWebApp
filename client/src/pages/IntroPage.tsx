@@ -14,7 +14,7 @@ export default function IntroPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [videoEnded, setVideoEnded] = useState(false);
@@ -23,55 +23,36 @@ export default function IntroPage() {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    video.muted = false;
-    const tryPlay = video.play();
-    if (tryPlay) {
-      tryPlay
-        .then(() => {
-          setIsPlaying(true);
-          setHasStarted(true);
-          setIsMuted(false);
-        })
-        .catch(() => {
-          video.muted = true;
-          setIsMuted(true);
-          video.play()
-            .then(() => {
-              setIsPlaying(true);
-              setHasStarted(true);
-            })
-            .catch(() => {
-              setAutoplayFailed(true);
-            });
-        });
+    const tryUnmute = () => {
+      if (video.paused) return;
+      video.muted = false;
+      if (video.muted === false) {
+        setIsMuted(false);
+      }
+    };
+    if (!video.paused) {
+      tryUnmute();
+    } else {
+      video.addEventListener('playing', tryUnmute, { once: true });
     }
+    return () => video.removeEventListener('playing', tryUnmute);
   }, []);
 
   const handlePlayVideo = () => {
     const video = videoRef.current;
     if (video) {
       setIsVideoLoading(true);
-      video.muted = false;
-      setIsMuted(false);
+      video.muted = true;
       video.play()
         .then(() => {
           setIsPlaying(true);
           setHasStarted(true);
           setIsVideoLoading(false);
           setAutoplayFailed(false);
+          video.muted = false;
+          setIsMuted(video.muted);
         })
-        .catch(() => {
-          video.muted = true;
-          setIsMuted(true);
-          video.play()
-            .then(() => {
-              setIsPlaying(true);
-              setHasStarted(true);
-              setIsVideoLoading(false);
-              setAutoplayFailed(false);
-            })
-            .catch(() => setIsVideoLoading(false));
-        });
+        .catch(() => setIsVideoLoading(false));
     }
   };
 
@@ -128,6 +109,8 @@ export default function IntroPage() {
           src="/videos/ali-intro.mp4"
           className="absolute inset-0 w-full h-full object-cover"
           playsInline
+          autoPlay
+          muted
           preload="auto"
           poster="/images/photographer_ghillie.png"
           onPlay={() => {
@@ -238,19 +221,23 @@ export default function IntroPage() {
         )}
       </AnimatePresence>
 
-      {/* Mute/Unmute button - shown while playing */}
+      {/* Mute/Unmute button - always visible when video has started */}
       <AnimatePresence>
-        {isPlaying && hasStarted && (
+        {hasStarted && !videoEnded && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleMute}
-            className="absolute top-20 right-4 z-20 p-2.5 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-colors safe-top"
+            className={`absolute top-20 right-4 z-20 rounded-full backdrop-blur-sm hover:bg-black/50 transition-all safe-top ${
+              isMuted 
+                ? "p-3 bg-[#b97d42]/80 border border-[#b97d42] shadow-[0_0_15px_rgba(185,125,66,0.4)]" 
+                : "p-2.5 bg-black/30"
+            }`}
             data-testid="button-toggle-mute"
           >
             {isMuted ? (
-              <VolumeX className="h-5 w-5 text-white/80" />
+              <VolumeX className="h-6 w-6 text-white" />
             ) : (
               <Volume2 className="h-5 w-5 text-white/80" />
             )}
