@@ -14,18 +14,45 @@ export default function IntroPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [videoEnded, setVideoEnded] = useState(false);
   const [autoplayFailed, setAutoplayFailed] = useState(false);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = false;
+    const tryPlay = video.play();
+    if (tryPlay) {
+      tryPlay
+        .then(() => {
+          setIsPlaying(true);
+          setHasStarted(true);
+          setIsMuted(false);
+        })
+        .catch(() => {
+          video.muted = true;
+          setIsMuted(true);
+          video.play()
+            .then(() => {
+              setIsPlaying(true);
+              setHasStarted(true);
+            })
+            .catch(() => {
+              setAutoplayFailed(true);
+            });
+        });
+    }
+  }, []);
+
   const handlePlayVideo = () => {
     const video = videoRef.current;
     if (video) {
       setIsVideoLoading(true);
-      video.muted = true;
-      setIsMuted(true);
+      video.muted = false;
+      setIsMuted(false);
       video.play()
         .then(() => {
           setIsPlaying(true);
@@ -33,9 +60,17 @@ export default function IntroPage() {
           setIsVideoLoading(false);
           setAutoplayFailed(false);
         })
-        .catch((e) => {
-          console.error("Play failed:", e);
-          setIsVideoLoading(false);
+        .catch(() => {
+          video.muted = true;
+          setIsMuted(true);
+          video.play()
+            .then(() => {
+              setIsPlaying(true);
+              setHasStarted(true);
+              setIsVideoLoading(false);
+              setAutoplayFailed(false);
+            })
+            .catch(() => setIsVideoLoading(false));
         });
     }
   };
@@ -93,8 +128,6 @@ export default function IntroPage() {
           src="/videos/ali-intro.mp4"
           className="absolute inset-0 w-full h-full object-cover"
           playsInline
-          autoPlay
-          muted
           preload="auto"
           poster="/images/photographer_ghillie.png"
           onPlay={() => {
