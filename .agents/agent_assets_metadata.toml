@@ -6,3 +6,9 @@ id = "OdZRlVFxGlSyfeoqea6pb"
 uri = "file://the-living-wild-project.tar.gz"
 type = "unspecified"
 title = "The Living Wild - Project Backup"
+
+[[outputs]]
+id = "SvFONRcQBivLdtgn_YmV5"
+uri = "file://the-living-wild-project.zip"
+type = "unspecified"
+title = "The Living Wild - Complete Project Backup (.zip)"
