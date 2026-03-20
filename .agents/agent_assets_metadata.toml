@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "OdZRlVFxGlSyfeoqea6pb"
+uri = "file://the-living-wild-project.tar.gz"
+type = "unspecified"
+title = "The Living Wild - Project Backup"
