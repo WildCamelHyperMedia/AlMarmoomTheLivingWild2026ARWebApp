@@ -24,3 +24,15 @@ id = "vkiQb6vsMHCYksqjQVT0n"
 uri = "file://report/The-Living-Wild-Usage-Report.pdf"
 type = "pdf"
 title = "The Living Wild - Usage & Analytics Report (PDF)"
+
+[[outputs]]
+id = "ImusrLR0oh40afgztSr7f"
+uri = "file://report/The-Living-Wild-Product-Review.md"
+type = "text"
+title = "The Living Wild - Product Review (Markdown)"
+
+[[outputs]]
+id = "0XqW608YcsDZdUB1Uj5r0"
+uri = "file://report/The-Living-Wild-Product-Review.pdf"
+type = "pdf"
+title = "The Living Wild - Product Review (PDF)"
