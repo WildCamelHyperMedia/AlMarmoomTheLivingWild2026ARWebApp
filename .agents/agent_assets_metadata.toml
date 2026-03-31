@@ -18,3 +18,9 @@ id = "Gw0aOnyCWFQBc5qVGDTT0"
 uri = "file://report/The-Living-Wild-Usage-Report.md"
 type = "text"
 title = "The Living Wild - Complete Usage & Analytics Report (Updated)"
+
+[[outputs]]
+id = "vkiQb6vsMHCYksqjQVT0n"
+uri = "file://report/The-Living-Wild-Usage-Report.pdf"
+type = "pdf"
+title = "The Living Wild - Usage & Analytics Report (PDF)"
