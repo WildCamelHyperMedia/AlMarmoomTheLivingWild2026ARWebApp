@@ -241,15 +241,17 @@ The app was active for 19 days, from January 22 to February 9, 2026.
 
 ### 7.1 All Activity Types
 
-| Activity Type | Count | % of Total |
-|--------------|-------|------------|
-| QR Scan | 110,817 | 97.1% |
-| Video Play | 1,542 | 1.4% |
-| Video Watch (10s+) | 1,050 | 0.9% |
-| AR View | 507 | 0.4% |
-| Registration | 165 | 0.1% |
-| Login | 53 | <0.1% |
-| **Total** | **114,134** | **100%** |
+| Activity Type | Count | % of Total | Notes |
+|--------------|-------|------------|-------|
+| QR Scan | 110,817 | 97.1% | Includes repeat scans |
+| Video Play | 1,542 | 1.4% | Button tap events |
+| Video Watch (10s+) | 1,050 | 0.9% | Confirmed engagement |
+| AR View | 507 | 0.4% | AR link taps |
+| Registration | 165 | 0.1% | Frontend-tracked events* |
+| Login | 53 | <0.1% | Frontend-tracked events* |
+| **Total** | **114,134** | **100%** | |
+
+*Note on Registration and Login counts: The activity log tracks frontend-triggered events (165 registrations, 53 logins), which differ from server-side totals (179 users, 249 logins). The discrepancy is because the frontend activity tracker was added after initial launch, so early registrations/logins were not captured in the activity log. Server-side totals (179 users, 249 logins) are the authoritative figures used throughout this report.*
 
 ### 7.2 Peak Activity Hours (UTC)
 
@@ -394,33 +396,48 @@ These files contain per-user breakdowns of:
 
 ## 13. App Pages Visual Reference
 
-The app consists of the following pages, designed with a desert theme (colors: #b97d42 gold, #30221b dark brown, #fef3dc cream) and bilingual support (English/Arabic with RTL):
+The app is live at **https://the-living-wild.replit.app** and consists of the following pages, designed with a desert theme (colors: #b97d42 gold, #30221b dark brown, #fef3dc cream) and bilingual support (English/Arabic with RTL).
 
-### Page Descriptions
+To view each page, visit the links below on a mobile device or use your browser's mobile view (390x844 recommended):
 
-1. **Landing Page (`/`)** - Full-screen video background with language selection buttons (English/Arabic). Features the exhibition title and photographer credit.
+### Page 1: Landing Page
+- **URL:** [https://the-living-wild.replit.app/](https://the-living-wild.replit.app/)
+- **Description:** Full-screen video background with the exhibition title "The Living Wild" and photographer credit "by Ali Bin Thalith". Two prominent buttons for language selection: "English" and "العربية" (Arabic). Desert-themed gradient overlay with gold (#b97d42) accent colors.
 
-2. **Auth Page (`/auth`)** - Registration form with name, email, phone, and password fields. Also includes login mode and hidden admin login access.
+### Page 2: Auth Page
+- **URL:** [https://the-living-wild.replit.app/auth](https://the-living-wild.replit.app/auth)
+- **Description:** Registration form with fields for name, email, phone, and password. Toggle between "Sign Up" and "Login" modes. Features the exhibition logo and a hidden admin login access via triple-tap on the logo. Styled with dark brown background and gold input borders.
 
-3. **Intro Page (`/intro`)** - Full-screen autoplaying introductory video by Ali Bin Thalith with gradient overlays and a "Start Exploring" call-to-action button. Features a mute/unmute toggle.
+### Page 3: Intro Page
+- **URL:** [https://the-living-wild.replit.app/intro](https://the-living-wild.replit.app/intro)
+- **Description:** Full-screen autoplaying introductory video by photographer Ali Bin Thalith. Features gradient overlays at top and bottom, a "Start Exploring" call-to-action button at the bottom, and a mute/unmute toggle button (styled with gold glow when muted to prompt users to enable sound).
 
-4. **Gallery Page (`/gallery`)** - Grid layout showing all 24 animal photographs. Each card displays the animal image, name, and scientific name. Previously locked animals were shown with grayscale/blur effects. Includes a progress bar and points counter.
+### Page 4: Gallery Page
+- **URL:** [https://the-living-wild.replit.app/gallery](https://the-living-wild.replit.app/gallery)
+- **Description:** Grid layout displaying all 24 animal photographs in a 2-column card layout. Each card shows the animal image, common name, and scientific name. Originally featured a progress bar showing discovered vs. total animals, and locked animals appeared with grayscale/blur effects. Post-event, all animals are now unlocked and fully visible.
 
-5. **Animal Detail Page (`/animal/:id`)** - Individual animal page with a video player (manual play only), animal photograph, scientific name, "Enter AR" button linking to Zappar WebXR experience, and AI wildlife guide for asking questions about the animal. Videos available in both English and Arabic.
+### Page 5: Animal Detail Page (example: Little Grebe)
+- **URL:** [https://the-living-wild.replit.app/animal/little_grebe](https://the-living-wild.replit.app/animal/little_grebe)
+- **Description:** Individual animal page with the animal's photograph displayed prominently, common name, and scientific name. Below the photo is a video player (manual play only — no autoplay) with language toggle for English/Arabic videos. Features an "Enter AR" button that launches the Zappar WebXR augmented reality experience, and an AI-powered wildlife guide section where users can ask questions about the animal and receive bilingual responses.
 
-6. **QR Scanner Page (`/scan`)** - Instructional page explaining how to use the phone's native camera to scan QR codes at the physical exhibition displays to unlock animals in the gallery.
+### Page 6: QR Scanner Page
+- **URL:** [https://the-living-wild.replit.app/scan](https://the-living-wild.replit.app/scan)
+- **Description:** Instructional page explaining the QR code scanning process. Shows step-by-step instructions for using the phone's native camera to scan physical QR codes placed at each animal exhibit along the drive-through route. QR codes follow the format `TLW-{animalId}-{token}`.
 
-7. **Parkers Lead Form (`/parkers`)** - Promotional registration page for Parkers brand partnership, capturing name, email, and phone for prize and merchandise giveaways.
+### Page 7: Parkers Lead Form
+- **URL:** [https://the-living-wild.replit.app/parkers](https://the-living-wild.replit.app/parkers)
+- **Description:** Promotional registration page for the Parkers brand partnership campaign. Features a form capturing name, email, and phone number. Styled with Parkers branding alongside the exhibition theme. Used for prize and merchandise giveaway entries during the event.
 
-8. **Admin Dashboard (`/admin`)** - Staff-only analytics panel featuring:
-   - Dashboard with key metrics cards (total users, videos watched, avg. per user, signups)
-   - Login activity bar chart (30-day view)
-   - Top users leaderboard
-   - User management table with search and filters
-   - Leads management view
-   - Login history log
-   - Activity feed with type-based filtering
-   - CSV export and full report generation
+### Page 8: Admin Dashboard
+- **URL:** [https://the-living-wild.replit.app/admin](https://the-living-wild.replit.app/admin) (requires admin login)
+- **Description:** Staff-only analytics panel with multiple tabs:
+  - **Dashboard tab:** Key metrics cards showing total users, total videos watched, average videos per user, and recent signup counts. Includes a login activity bar chart (30-day view) and a top users leaderboard.
+  - **Users tab:** Searchable and filterable table of all registered users with their video watch counts, point totals, and registration dates.
+  - **Leads tab:** View and manage Parkers lead form submissions with name, email, and phone data.
+  - **Login History tab:** Detailed log showing when each user accessed the app, with timestamps and user agent information.
+  - **Leaderboard tab:** Ranks users by total points/animals discovered.
+  - **Activity tab:** Real-time feed of all tracked actions (QR scans, video plays, AR views) with type-based filtering and statistics cards.
+  - **Export options:** CSV user list export and comprehensive full report generation with per-animal breakdowns.
 
 ---
 
