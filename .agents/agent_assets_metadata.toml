@@ -12,3 +12,9 @@ id = "SvFONRcQBivLdtgn_YmV5"
 uri = "file://the-living-wild-project.zip"
 type = "unspecified"
 title = "The Living Wild - Complete Project Backup (.zip)"
+
+[[outputs]]
+id = "Gw0aOnyCWFQBc5qVGDTT0"
+uri = "file://report/The-Living-Wild-Usage-Report.md"
+type = "text"
+title = "The Living Wild - Complete Usage & Analytics Report"
