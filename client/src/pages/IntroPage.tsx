@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { asset } from "@/lib/assetBase";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, LogOut, ArrowLeft, Loader2, Volume2, VolumeX } from "lucide-react";
 import { useLocation } from "wouter";
@@ -106,13 +107,13 @@ export default function IntroPage() {
       <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
-          src="/videos/ali-intro.mp4"
+          src={asset("/videos/ali-intro.mp4")}
           className="absolute inset-0 w-full h-full object-cover"
           playsInline
           autoPlay
           muted
           preload="auto"
-          poster="/images/photographer_ghillie.png"
+          poster={asset("/images/photographer_ghillie.png")}
           onPlay={() => {
             setIsPlaying(true);
             setHasStarted(true);

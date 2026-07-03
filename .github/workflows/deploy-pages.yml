@@ -1,0 +1,65 @@
+name: Deploy demo to GitHub Pages
+
+# Runs only for the demo branch (keeps `main` untouched) or when triggered by hand.
+on:
+  push:
+    branches: [pages-demo]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build static demo (no backend)
+        run: npx vite build --config vite.config.static.ts
+        env:
+          # Project page served at /<repo>/. For a custom domain or an
+          # <org>.github.io page served at the domain root, set this to "/".
+          VITE_BASE: /AlMarmoomTheLivingWild2026ARWebApp/
+          # Serve heavy videos from a CDN so the Pages site stays under the
+          # ~1 GB limit. Set a repository variable named VIDEO_BASE
+          # (Settings -> Secrets and variables -> Actions -> Variables), e.g.
+          # https://media.your-domain.com  — leave it empty to serve videos
+          # locally from Pages (only works if the total site is under ~1 GB).
+          VITE_VIDEO_BASE: ${{ vars.VIDEO_BASE }}
+
+      - name: Drop bundled videos when a CDN origin is configured
+        if: ${{ vars.VIDEO_BASE != '' }}
+        run: rm -rf dist/public/videos
+
+      - name: SPA deep-link fallback + disable Jekyll
+        run: |
+          cp dist/public/index.html dist/public/404.html
+          touch dist/public/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

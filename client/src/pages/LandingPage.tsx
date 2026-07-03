@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { asset } from "@/lib/assetBase";
 import { useLocation } from "wouter";
 import { ArrowRight, Play, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -64,7 +65,7 @@ export default function LandingPage() {
       {/* Background Image to cover black areas */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/bg-texture.png')" }}
+        style={{ backgroundImage: `url('${asset("/images/bg-texture.png")}')` }}
       />
       
       {/* Background Video - optimized for all screen sizes */}
@@ -72,7 +73,7 @@ export default function LandingPage() {
         <div className="relative w-[85%] h-[85%]">
           <video
             ref={videoRef}
-            src="/videos/landing-video.mp4"
+            src={asset("/videos/landing-video.mp4")}
             className="w-full h-full object-cover rounded-2xl"
             autoPlay
             muted

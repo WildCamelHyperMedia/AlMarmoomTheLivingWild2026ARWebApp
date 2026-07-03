@@ -1,3 +1,5 @@
+import { asset, videoAsset } from "./assetBase";
+
 export interface Animal {
   id: string;
   image: string;
@@ -8,7 +10,7 @@ export interface Animal {
   arUrl?: string;
 }
 
-export const animals: Animal[] = [
+const rawAnimals: Animal[] = [
   {
     id: "little_grebe",
     image: "/animals/All Animals - Pictures/1-Little Grebe.jpg",
@@ -226,3 +228,13 @@ export const animals: Animal[] = [
     arUrl: "https://webxr.run/Lm5VY4pEmlln"
   },
 ];
+
+// Rebase local image/video paths for root OR Pages-subpath serving.
+// External arUrl (WebXR/Zappar) links are intentionally left untouched.
+export const animals: Animal[] = rawAnimals.map((a) => ({
+  ...a,
+  image: asset(a.image),
+  optimizedImage: asset(a.optimizedImage),
+  videoEn: a.videoEn ? videoAsset(a.videoEn) : a.videoEn,
+  videoAr: a.videoAr ? videoAsset(a.videoAr) : a.videoAr,
+}));
