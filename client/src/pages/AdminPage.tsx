@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { asset } from "@/lib/assetBase";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { useUser } from "@/lib/user";
@@ -298,7 +299,7 @@ export default function AdminPage() {
         >
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <img src="/logo.png" alt="Al Marmoom" className="h-8 w-auto" />
+        <img src={asset("/logo.png")} alt="Al Marmoom" className="h-8 w-auto" />
         <span className="text-sm text-white/50">Admin</span>
       </div>
 
@@ -307,7 +308,7 @@ export default function AdminPage() {
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Logo - hidden on mobile since we have header */}
           <div className="hidden md:flex p-6 border-b border-white/10 items-center gap-3">
-            <img src="/logo.png" alt="Al Marmoom" className="h-10 w-auto" />
+            <img src={asset("/logo.png")} alt="Al Marmoom" className="h-10 w-auto" />
             <div>
               <p className="text-xs text-white/50">Admin Dashboard</p>
             </div>

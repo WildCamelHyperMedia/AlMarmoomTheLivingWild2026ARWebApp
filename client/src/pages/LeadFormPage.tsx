@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { asset } from "@/lib/assetBase";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, CheckCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/language";
@@ -110,7 +111,7 @@ export default function LeadFormPage() {
       {/* Desert Dunes Background */}
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 pointer-events-none"
-        style={{ backgroundImage: "url('/images/desert-dunes.jpg')" }}
+        style={{ backgroundImage: `url('${asset("/images/desert-dunes.jpg")}')` }}
       />
       
       {/* Background Gradient Overlay */}
@@ -124,7 +125,7 @@ export default function LeadFormPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
-          <img src="/logo.png" alt="Al Marmoom" className="w-32 h-auto mx-auto" />
+          <img src={asset("/logo.png")} alt="Al Marmoom" className="w-32 h-auto mx-auto" />
         </motion.div>
 
         <AnimatePresence mode="wait">
@@ -262,7 +263,7 @@ export default function LeadFormPage() {
           transition={{ delay: 0.5 }}
           className="flex justify-center mt-8"
         >
-          <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-6 w-auto opacity-60 grayscale" />
+          <img src={asset("/dubai-culture-logo.png")} alt="Dubai Culture" className="h-6 w-auto opacity-60 grayscale" />
         </motion.div>
       </div>
     </div>

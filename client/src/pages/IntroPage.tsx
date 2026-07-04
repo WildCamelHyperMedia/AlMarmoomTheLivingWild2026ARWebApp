@@ -147,7 +147,7 @@ export default function IntroPage() {
         >
           <ArrowLeft className="h-5 w-5 text-white/80" />
         </button>
-        <img src="/logo.png" alt="Al Marmoom" className="w-28 sm:w-36 h-auto drop-shadow-lg" />
+        <img src={asset("/logo.png")} alt="Al Marmoom" className="w-28 sm:w-36 h-auto drop-shadow-lg" />
         {user ? (
           <button 
             onClick={handleLogout}
@@ -300,7 +300,7 @@ export default function IntroPage() {
           transition={{ delay: 1.2 }}
           className="flex justify-center pt-4"
         >
-          <img src="/dubai-culture-logo.png" alt="Dubai Culture" className="h-5 sm:h-6 w-auto opacity-50 grayscale" />
+          <img src={asset("/dubai-culture-logo.png")} alt="Dubai Culture" className="h-5 sm:h-6 w-auto opacity-50 grayscale" />
         </motion.div>
       </div>
     </div>

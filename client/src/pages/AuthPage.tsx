@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { asset } from "@/lib/assetBase";
 import { ArrowLeft, Globe, User, Mail, Lock, Shield, Phone } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/lib/language";
@@ -192,7 +193,7 @@ export default function AuthPage() {
       {/* Desert Dunes Background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 pointer-events-none"
-        style={{ backgroundImage: "url('/images/desert-dunes.jpg')" }}
+        style={{ backgroundImage: `url('${asset("/images/desert-dunes.jpg")}')` }}
       />
       
       {/* Background Gradient Overlay */}
